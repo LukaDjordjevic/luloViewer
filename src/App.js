@@ -1,25 +1,20 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './styles.css';
+import LuloViewer from './LuloViewer';
 
 class App extends Component {
   render() {
+    const images = [
+      'http://lorempixel.com/1920/1920/sports/Dummy-Text/',
+      'http://lorempixel.com/1920/1920/city/Dummy-Text/',
+      'http://lorempixel.com/1920/1920/people/Dummy-Text/',
+      'http://lorempixel.com/1000/600/abstract/4/',
+      'http://lorempixel.com/1000/600/technics/5/',
+      'http://lorempixel.com/1000/600/transport/6/'
+    ];
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div style={{ width: '100%', height: '100%' }}>
+        <LuloViewer imageUrls={images} />
       </div>
     );
   }
