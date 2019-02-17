@@ -4,54 +4,59 @@ import PropTypes from 'prop-types';
 class SingleImage extends Component {
   constructor(props) {
     super(props);
-
-    this.containerAspectRatio =
-      this.props.parentBoundingRect.width /
-      this.props.parentBoundingRect.height;
-    const imageTransform = this.getInitialImageTransform();
-    console.log(imageTransform);
+    this.MAX_ZOOM =
+      this.props.imageInfo.naturalWidth / this.props.parentBoundingRect.width +
+      8;
 
     this.state = {
       zoomFactor: 1,
-      left: imageTransform.left,
-      top: imageTransform.top,
-      width: imageTransform.width,
-      height: imageTransform.height,
       zoomTarget: { x: 0.5, y: 0.5 }
     };
+    const { left, top, width, height } = this.getImageTransform();
+
+    this.state.left = left;
+    this.state.top = top;
+    this.state.width = width;
+    this.state.height = height;
   }
 
-  componentDidMount() {}
+  componentWillReceiveProps(nextProps) {
+    // const { left, top, width, height } = this.getImageTransform(nextProps);
+    this.setState(this.getImageTransform(nextProps));
+  }
 
-  getInitialImageTransform() {
-    console.log(this.props.imageInfo.imageAspectRatio);
-    const imageTransform = {};
-    if (this.props.imageInfo.imageAspectRatio > this.containerAspectRatio) {
-      console.log('>');
+  getImageTransform(nextProps) {
+    const props = nextProps || this.props;
+    this.containerAspectRatio =
+      props.parentBoundingRect.width / props.parentBoundingRect.height;
+    const { width, height } = this.getImageDimensions(
+      this.state.zoomFactor,
+      nextProps
+    );
 
-      imageTransform.width = this.props.parentBoundingRect.width;
-      imageTransform.height =
-        imageTransform.width / this.props.imageInfo.imageAspectRatio;
-      imageTransform.left = 0;
-      imageTransform.top =
-        (this.props.parentBoundingRect.height -
-          this.props.parentBoundingRect.width /
-            this.props.imageInfo.imageAspectRatio) /
-        2;
+    const left =
+      -1 * width * this.state.zoomTarget.x + props.parentBoundingRect.width / 2;
+    const top =
+      -1 * height * this.state.zoomTarget.y +
+      props.parentBoundingRect.height / 2;
+
+    console.log('****', left, top, width, height);
+    return { left, top, width, height };
+  }
+
+  getImageDimensions(zoomFactor, nextProps) {
+    const props = nextProps || this.props;
+    const dimensions = {};
+    if (props.imageInfo.imageAspectRatio > this.containerAspectRatio) {
+      dimensions.width = props.parentBoundingRect.width * zoomFactor;
+      dimensions.height = dimensions.width / props.imageInfo.imageAspectRatio;
     } else {
-      console.log('<');
-
-      imageTransform.height = this.props.parentBoundingRect.height;
-      imageTransform.width =
-        imageTransform.height * this.props.imageInfo.imageAspectRatio;
-      imageTransform.left =
-        (this.props.parentBoundingRect.width -
-          this.props.parentBoundingRect.height /
-            this.props.imageInfo.imageAspectRatio) /
-        2;
-      imageTransform.top = 0;
+      dimensions.height = props.parentBoundingRect.height * zoomFactor;
+      dimensions.width = dimensions.height * props.imageInfo.imageAspectRatio;
     }
-    return imageTransform;
+    console.log('got image dimensions', dimensions);
+
+    return dimensions;
   }
 
   render() {
@@ -61,14 +66,15 @@ class SingleImage extends Component {
     return (
       <div className="image-div">
         <img
-          alt=""
           src={this.props.imageInfo.url}
+          alt=""
           style={{
             left: this.state.left,
             top: this.state.top,
             width: this.state.width,
             height: this.state.height
           }}
+          onMouseUp={this.props.onMouseUp}
         />
       </div>
     );

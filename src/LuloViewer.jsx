@@ -6,7 +6,7 @@ class LuloViewer extends Component {
     super(props);
     this.constants = {
       STARTING_SLIDE: 2,
-      MAX_PRELOADED_IMAGES: 2
+      MAX_PRELOADED_IMAGES: this.props.imageUrls.length
     };
 
     this.imagesInfo = new Array(this.props.imageUrls.length);
@@ -21,10 +21,15 @@ class LuloViewer extends Component {
     this.imageLoading = false;
     this.images = [];
     this.preloadedImagesIndeces = [];
+
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onWindowResize = this.onWindowResize.bind(this);
   }
 
   componentDidMount() {
     this.checkPreload();
+    window.addEventListener('resize', this.onWindowResize);
+    // document.documentElement.requestFullscreen();
     // setInterval(() => {
     //   const randomNum = Math.floor(
     //     Math.random() * this.props.imageUrls.length + 0
@@ -48,12 +53,20 @@ class LuloViewer extends Component {
     // }, 300);
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onWindowResize);
+  }
+
+  onWindowResize() {
+    this.forceUpdate();
+  }
+
   checkPreload() {
     const requiredImages = [];
     for (let i = 0; i < this.constants.MAX_PRELOADED_IMAGES + 1; i++) {
-      requiredImages.push(
-        (this.state.currentSlideIndex + i) % this.props.imageUrls.length
-      );
+      const nextSlide =
+        (this.state.currentSlideIndex + i) % this.props.imageUrls.length;
+      if (!requiredImages.includes(nextSlide)) requiredImages.push(nextSlide);
     }
     console.log('required slides:', requiredImages);
 
@@ -67,6 +80,7 @@ class LuloViewer extends Component {
     });
     if (allLoaded) {
       console.log('ALL REQUIRED SLIDES LOADED ============');
+      console.log(this.imagesInfo);
     }
   }
 
@@ -94,6 +108,16 @@ class LuloViewer extends Component {
     };
   }
 
+  onMouseUp() {
+    console.log('up');
+    // Element.requestFullscreen();
+    this.mainDiv.requestFullscreen();
+    this.setState({
+      currentSlideIndex:
+        (this.state.currentSlideIndex + 1) % this.props.imageUrls.length
+    });
+  }
+
   render() {
     console.log('*** render ***');
     return (
@@ -102,6 +126,8 @@ class LuloViewer extends Component {
           <SingleImage
             imageInfo={this.imagesInfo[this.state.currentSlideIndex]}
             parentBoundingRect={this.mainDiv.getBoundingClientRect()}
+            imageIndex={this.state.currentSlideIndex}
+            onMouseUp={this.onMouseUp}
           />
         ) : (
           <div>louding</div>

@@ -8,12 +8,17 @@ class App extends Component {
       'http://lorempixel.com/1920/1920/sports/Dummy-Text/',
       'http://lorempixel.com/1920/1920/city/Dummy-Text/',
       'http://lorempixel.com/1920/1920/people/Dummy-Text/',
-      'http://lorempixel.com/1000/600/abstract/4/',
-      'http://lorempixel.com/1000/600/technics/5/',
-      'http://lorempixel.com/1000/600/transport/6/'
+      'http://lorempixel.com/1000/600/abstract/Dummy-Text/',
+      'http://lorempixel.com/1000/600/technics/Dummy-Text/',
+      'http://lorempixel.com/1000/600/transport/Dummy-Text/',
+      'http://lorempixel.com/1000/600/cats/Dummy-Text/',
+      'http://lorempixel.com/1000/600/animals/Dummy-Text/',
+      'http://lorempixel.com/1000/600/nightlife/Dummy-Text/',
+      'http://lorempixel.com/1000/600/fashion/Dummy-Text/',
+      'http://lorempixel.com/1000/600/nature/Dummy-Text/'
     ];
     return (
-      <div style={{ width: '100%', height: '100%' }}>
+      <div>
         <LuloViewer imageUrls={images} />
       </div>
     );
