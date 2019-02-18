@@ -6,7 +6,8 @@ class LuloViewer extends Component {
     super(props);
     this.constants = {
       STARTING_SLIDE: 2,
-      MAX_PRELOADED_IMAGES: this.props.imageUrls.length
+      MAX_PRELOADED_IMAGES: this.props.imageUrls.length,
+      ZOOM_LEVELS: 20
     };
 
     this.imagesInfo = new Array(this.props.imageUrls.length);
@@ -24,33 +25,14 @@ class LuloViewer extends Component {
 
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onWindowResize = this.onWindowResize.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
   }
 
   componentDidMount() {
     this.checkPreload();
     window.addEventListener('resize', this.onWindowResize);
-    // document.documentElement.requestFullscreen();
-    // setInterval(() => {
-    //   const randomNum = Math.floor(
-    //     Math.random() * this.props.imageUrls.length + 0
-    //   );
-    //   console.log('rand:', randomNum);
-
-    //   if (this.preloadedImagesIndeces.includes(randomNum)) {
-    //     console.log('IMA ===================');
-
-    //     this.setState(
-    //       {
-    //         currentSlideIndex: randomNum
-    //       },
-    //       () => {
-    //         this.checkPreload();
-    //       }
-    //     );
-    //   } else {
-    //     console.log('NEEEEEMA ===================');
-    //   }
-    // }, 300);
+    document.addEventListener('keydown', this.onKeyDown, false);
+    console.log('&&&&&', this.mainDiv.getBoundingClientRect());
   }
 
   componentWillUnmount() {
@@ -59,6 +41,26 @@ class LuloViewer extends Component {
 
   onWindowResize() {
     this.forceUpdate();
+  }
+
+  onKeyDown(e) {
+    // e.preventDefault()
+    switch (e.key) {
+      case 'ArrowLeft':
+        console.log('ArrowLeft');
+        break;
+      case 'ArrowRight':
+        console.log('ArrowRight');
+        break;
+      case 'f':
+        console.log('f');
+        this.mainDiv.requestFullscreen();
+
+        break;
+
+      default:
+        console.log('something else');
+    }
   }
 
   checkPreload() {
@@ -110,8 +112,6 @@ class LuloViewer extends Component {
 
   onMouseUp() {
     console.log('up');
-    // Element.requestFullscreen();
-    this.mainDiv.requestFullscreen();
     this.setState({
       currentSlideIndex:
         (this.state.currentSlideIndex + 1) % this.props.imageUrls.length
@@ -128,6 +128,7 @@ class LuloViewer extends Component {
             parentBoundingRect={this.mainDiv.getBoundingClientRect()}
             imageIndex={this.state.currentSlideIndex}
             onMouseUp={this.onMouseUp}
+            ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
           />
         ) : (
           <div>louding</div>

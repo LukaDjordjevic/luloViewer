@@ -18,7 +18,17 @@ class App extends Component {
       'http://lorempixel.com/1000/600/nature/Dummy-Text/'
     ];
     return (
-      <div>
+      <div
+        // style={{ width: '100vw', height: '100vh', backgroundColor: 'black' }}
+        style={{
+          width: '500px',
+          height: '500px',
+          backgroundColor: 'black',
+          top: '100px',
+          left: '200px',
+          position: 'relative'
+        }}
+      >
         <LuloViewer imageUrls={images} />
       </div>
     );
