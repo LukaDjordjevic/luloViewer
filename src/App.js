@@ -19,14 +19,14 @@ class App extends Component {
     ];
     return (
       <div
-        // style={{ width: '100vw', height: '100vh', backgroundColor: 'black' }}
         style={{
-          width: '500px',
-          height: '500px',
-          backgroundColor: 'black',
+          width: '550px',
+          height: '450px',
+          backgroundColor: '#000',
           top: '100px',
           left: '200px',
           position: 'relative'
+          // display: 'flex'
         }}
       >
         <LuloViewer imageUrls={images} />

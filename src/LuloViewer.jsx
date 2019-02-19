@@ -6,54 +6,71 @@ class LuloViewer extends Component {
     super(props);
     this.constants = {
       STARTING_SLIDE: 2,
-      MAX_PRELOADED_IMAGES: this.props.imageUrls.length,
+      // MAX_PRELOADED_IMAGES: this.props.imageUrls.length,
+      MAX_PRELOADED_IMAGES: 1,
       ZOOM_LEVELS: 20
     };
-
     this.imagesInfo = new Array(this.props.imageUrls.length);
     this.imagesInfo.fill(null);
-    console.log(this.imagesInfo);
     this.state = {
       allLoaded: false,
-      currentSlideIndex: this.constants.STARTING_SLIDE,
-      currentSlideLodaed: false
+      currentSlideIndex: this.constants.STARTING_SLIDE
     };
 
     this.imageLoading = false;
     this.images = [];
-    this.preloadedImagesIndeces = [];
 
-    this.onMouseUp = this.onMouseUp.bind(this);
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
   componentDidMount() {
     this.checkPreload();
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
-    console.log('&&&&&', this.mainDiv.getBoundingClientRect());
+    this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
+      this.forceUpdate();
+    });
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.onWindowResize);
+    document.removeEventListener('keydown', this.onKeyDown, false);
   }
 
   onWindowResize() {
-    this.forceUpdate();
+    this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() });
   }
 
   onKeyDown(e) {
     // e.preventDefault()
     switch (e.key) {
       case 'ArrowLeft':
-        console.log('ArrowLeft');
+        this.setState(
+          {
+            currentSlideIndex:
+              this.state.currentSlideIndex === 0
+                ? this.props.imageUrls.length - 1
+                : this.state.currentSlideIndex - 1
+          },
+          () => {
+            this.checkPreload();
+          }
+        );
         break;
       case 'ArrowRight':
-        console.log('ArrowRight');
+        this.setState(
+          {
+            currentSlideIndex:
+              (this.state.currentSlideIndex + 1) % this.props.imageUrls.length
+          },
+          () => {
+            this.checkPreload();
+          }
+        );
         break;
       case 'f':
-        console.log('f');
         this.mainDiv.requestFullscreen();
 
         break;
@@ -70,68 +87,68 @@ class LuloViewer extends Component {
         (this.state.currentSlideIndex + i) % this.props.imageUrls.length;
       if (!requiredImages.includes(nextSlide)) requiredImages.push(nextSlide);
     }
-    console.log('required slides:', requiredImages);
+    // console.log('required slides:', requiredImages);
 
     let allLoaded = true;
     const self = this;
     requiredImages.forEach((imageIdx, idx) => {
-      if (!self.preloadedImagesIndeces.includes(imageIdx)) {
+      if (self.imagesInfo[imageIdx] === null) {
         allLoaded = false;
         if (!this.imageLoading) self.startImagePreload(imageIdx);
+        return;
       }
     });
     if (allLoaded) {
-      console.log('ALL REQUIRED SLIDES LOADED ============');
-      console.log(this.imagesInfo);
+      // console.log('ALL REQUIRED SLIDES LOADED ============');
     }
   }
 
   startImagePreload(idx) {
     this.imageLoading = true;
     const image = new Image();
-    console.log('starting preload of image', idx);
+    // console.log('starting preload of image', idx);
     image.src = this.props.imageUrls[idx];
     image.onload = () => {
-      console.log(image.naturalWidth, image.naturalHeight);
-      if (!this.preloadedImagesIndeces.includes(idx)) {
+      if (this.imagesInfo[idx] === null) {
         this.imagesInfo[idx] = {
           url: this.props.imageUrls[idx],
           imageAspectRatio: image.naturalWidth / image.naturalHeight,
           naturalWidth: image.naturalWidth,
           naturalHeight: image.naturalHeight
         };
-        console.log('downloaded image', idx);
-        this.preloadedImagesIndeces.push(idx);
-        if (idx === this.state.currentSlideIndex)
-          this.setState({ currentSlideLodaed: true });
+        // console.log('downloaded image', idx);
+        if (idx === this.state.currentSlideIndex) {
+          this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() });
+        }
+        this.imageLoading = false;
+        this.checkPreload();
       }
-      this.imageLoading = false;
-      this.checkPreload();
     };
   }
 
-  onMouseUp() {
-    console.log('up');
-    this.setState({
-      currentSlideIndex:
-        (this.state.currentSlideIndex + 1) % this.props.imageUrls.length
-    });
+  onWheel(e) {
+    e.preventDefault();
   }
 
   render() {
     console.log('*** render ***');
+
     return (
-      <div className="main-div" ref={el => (this.mainDiv = el)}>
-        {this.state.currentSlideLodaed ? (
+      <div
+        className="main-div"
+        ref={el => (this.mainDiv = el)}
+        onWheel={this.onWheel}
+      >
+        {this.imagesInfo[this.state.currentSlideIndex] !== null ? (
           <SingleImage
+            // ref={el=> this.image1 = el}
             imageInfo={this.imagesInfo[this.state.currentSlideIndex]}
-            parentBoundingRect={this.mainDiv.getBoundingClientRect()}
-            imageIndex={this.state.currentSlideIndex}
-            onMouseUp={this.onMouseUp}
+            parentBoundingRect={this.state.mainDivRect}
             ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
+            isFirefox={this.isFirefox}
           />
         ) : (
-          <div>louding</div>
+          <div style={{ color: 'white' }}>louding</div>
         )}
       </div>
     );
