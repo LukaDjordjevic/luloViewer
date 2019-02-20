@@ -218,14 +218,6 @@ class SingleImage extends Component {
     imageAspectRatio,
     containerAspectRatio
   ) {
-    console.log(
-      zoomFactor,
-      zoomTarget,
-      parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
-    );
-
     const { width, height } = this.getImageDimensions(
       zoomFactor,
       parentBoundingRect,
@@ -279,25 +271,33 @@ class SingleImage extends Component {
     let constrainedTop = top;
     let leftOffset = 0;
     let topOffset = 0;
+    let leftBoundary;
+    let topBoundary;
     if (imageAspectRatio > containerAspectRatio) {
       topOffset =
-        (parentBoundingRect.height -
+        ((parentBoundingRect.height -
           parentBoundingRect.width / imageAspectRatio) /
-        2;
+          2) *
+        zoomFactor;
+      leftBoundary =
+        -1 * parentBoundingRect.width * zoomFactor + parentBoundingRect.width;
+      topBoundary =
+        -1 * zoomFactor * (parentBoundingRect.width / imageAspectRatio) +
+        parentBoundingRect.height -
+        topOffset;
     } else {
       leftOffset =
-        (parentBoundingRect.width -
+        ((parentBoundingRect.width -
           parentBoundingRect.height * imageAspectRatio) /
-        2;
+          2) *
+        zoomFactor;
+      leftBoundary =
+        -1 * zoomFactor * (parentBoundingRect.height * imageAspectRatio) +
+        parentBoundingRect.width -
+        leftOffset;
+      topBoundary =
+        -1 * parentBoundingRect.height * zoomFactor + parentBoundingRect.height;
     }
-    const leftBoundary =
-      -1 * zoomFactor * (parentBoundingRect.height * imageAspectRatio) +
-      parentBoundingRect.height * imageAspectRatio +
-      leftOffset;
-    const topBoundary =
-      -1 * zoomFactor * (parentBoundingRect.width / imageAspectRatio) +
-      parentBoundingRect.width / imageAspectRatio +
-      topOffset;
     if (left > leftOffset) {
       console.log('too much to the left');
       constrainedLeft = leftOffset;
@@ -312,7 +312,6 @@ class SingleImage extends Component {
       constrainedTop = topBoundary;
     }
 
-    console.log('topBoundary', top, topBoundary);
     return { left: constrainedLeft, top: constrainedTop };
   }
 

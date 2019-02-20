@@ -24,7 +24,7 @@ class App extends Component {
           height: '450px',
           backgroundColor: '#000',
           top: '100px',
-          left: '200px',
+          left: '10%',
           position: 'relative'
           // display: 'flex'
         }}
