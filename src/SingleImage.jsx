@@ -8,6 +8,13 @@ class SingleImage extends Component {
       this.props.imageInfo.naturalWidth / this.props.parentBoundingRect.width +
       8;
 
+    this.startingX = this.props.parentBoundingRect.width / 2;
+    this.startingY = this.props.parentBoundingRect.height / 2;
+    this.startingLeft = this.startingX;
+    this.startingTop = this.startingY;
+
+    this.inThrottle = false;
+
     this.state = {
       zoomFactor: 1,
       zoomLevel: 0,
@@ -52,47 +59,103 @@ class SingleImage extends Component {
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.throttledOnWheel = this.throttledOnWheel.bind(this);
+
+    document.addEventListener('wheel', this.onWheel);
+
+    // document.onfullscreenchange = e => {
+    //   console.log(e, this.state, this.props);
+    //   console.log('setting state');
+
+    //   this.setState(
+    //     this.getImageTransform(
+    //       this.state.zoomFactor,
+    //       this.state.zoomTarget,
+    //       this.props.parentBoundingRect,
+    //       this.props.imageInfo.imageAspectRatio,
+    //       this.containerAspectRatio
+    //     )
+    //   );
+    // };
   }
 
   componentWillReceiveProps(nextProps) {
-    const zoomFactor = this.state.zoomFactor;
-    // const zoomTarget = { ...this.state.zoomTarget };
+    console.log('received new rect,', nextProps.parentBoundingRect);
+
     // const parentBoundingRect = { ...nextProps.parentBoundingRect };
-    const zoomTarget = JSON.parse(JSON.stringify(this.state.zoomTarget));
     const parentBoundingRect = JSON.parse(
-      JSON.stringify(this.props.parentBoundingRect)
+      JSON.stringify(nextProps.parentBoundingRect)
     );
-    console.log('zoomtarget', zoomTarget);
     const imageAspectRatio = nextProps.imageInfo.imageAspectRatio;
-    const containerAspectRatio = this.containerAspectRatio;
+    const containerAspectRatio =
+      nextProps.parentBoundingRect.width / nextProps.parentBoundingRect.height;
+
+    this.containerAspectRatio = containerAspectRatio;
+    console.log(JSON.stringify(nextProps.parentBoundingRect));
     if (
       JSON.stringify(nextProps.parentBoundingRect) !==
       JSON.stringify(this.props.parentBoundingRect)
     ) {
-      this.setState(
-        this.getImageTransform(
-          zoomFactor,
-          zoomTarget,
-          parentBoundingRect,
-          imageAspectRatio,
-          containerAspectRatio
-        )
+      console.log('1');
+
+      const zoomFactor = this.state.zoomFactor;
+      const zoomTarget = JSON.parse(JSON.stringify(this.state.zoomTarget));
+      console.log('zoomtarget', zoomTarget);
+      // const zoomTarget = { ...this.state.zoomTarget };
+      const imageTransform = this.getImageTransform(
+        zoomFactor,
+        zoomTarget,
+        parentBoundingRect,
+        imageAspectRatio,
+        containerAspectRatio
       );
+
+      console.log('constraining');
+      const { constrainedLeft, constrainedTop } = this.constrainTranslate(
+        imageTransform.left,
+        imageTransform.top,
+        zoomFactor,
+        parentBoundingRect,
+        imageAspectRatio,
+        containerAspectRatio
+      );
+
+      imageTransform.left = constrainedLeft;
+      imageTransform.top = constrainedTop;
+
+      console.log('setting state');
+      this.setState(imageTransform, () => {
+        console.log('state set');
+      });
     }
     if (
       JSON.stringify(nextProps.imageInfo) !==
       JSON.stringify(this.props.imageInfo)
     ) {
-      this.setState(
-        this.getImageTransform(
-          1,
-          { x: 0.5, y: 0.5 },
-          parentBoundingRect,
-          imageAspectRatio,
-          containerAspectRatio
-        )
+      const { left, top, width, height } = this.getImageTransform(
+        1,
+        { x: 0.5, y: 0.5 },
+        parentBoundingRect,
+        imageAspectRatio,
+        containerAspectRatio
       );
+
+      console.log('setting state');
+
+      this.setState({
+        zoomFactor: 1,
+        zoomLevel: 0,
+        left,
+        top,
+        width,
+        height
+      });
     }
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('wheel', this.onWheel);
   }
 
   onMouseDown(e) {
@@ -112,6 +175,8 @@ class SingleImage extends Component {
 
   onMouseMove(e) {
     const offset = { x: e.pageX - this.startingX, y: e.pageY - this.startingY };
+    console.log('offsset', offset);
+
     let newLeft = this.startingLeft + offset.x;
     let newTop = this.startingTop + offset.y;
 
@@ -123,7 +188,19 @@ class SingleImage extends Component {
     const parentBoundingRect = JSON.parse(
       JSON.stringify(this.props.parentBoundingRect)
     );
-    const constrainedPosition = this.constrainTranslate(
+    console.log('@@@', newLeft, newTop);
+
+    //Update zoomTarget
+    const zoomTarget = {};
+    zoomTarget.x =
+      (-1 * newLeft + this.props.parentBoundingRect.width / 2) /
+      this.state.width;
+    zoomTarget.y =
+      (-1 * newTop + this.props.parentBoundingRect.height / 2) /
+      this.state.height;
+    console.log('zoom target:', offset, zoomTarget);
+
+    const { constrainedLeft, constrainedTop } = this.constrainTranslate(
       newLeft,
       newTop,
       zoomFactor,
@@ -132,85 +209,177 @@ class SingleImage extends Component {
       containerAspectRatio
     );
     this.setState({
-      left: constrainedPosition.left,
-      top: constrainedPosition.top
-    });
-  }
-
-  onWheel(e) {
-    e.preventDefault();
-    let zoomLevel = this.state.zoomLevel - e.deltaY / 4;
-    if (zoomLevel < 0) zoomLevel = 0;
-    if (zoomLevel > this.props.ZOOM_LEVELS) zoomLevel = this.props.ZOOM_LEVELS;
-    const maxv = Math.log(this.MAX_ZOOM);
-    // Calculate adjustment factor
-    const scale = maxv / this.props.ZOOM_LEVELS;
-    const zoomFactor = Math.exp(scale * zoomLevel);
-
-    if (this.wheelTimeout) clearTimeout(this.wheelTimeout);
-    this.wheelTimeout = setTimeout(() => {
-      const cursor = this.state.zoomFactor === 1 ? 'initial' : 'grab';
-      this.setState({ cursor });
-      this.zooming = false;
-    }, 150);
-    let zoomTarget = {};
-    if (!this.zooming && e.deltaY < 0) {
-      const zoomFactor = this.state.zoomFactor;
-      const parentBoundingRect = JSON.parse(
-        JSON.stringify(this.props.parentBoundingRect)
-      );
-      const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-      const containerAspectRatio = this.containerAspectRatio;
-
-      const { width, height } = this.getImageDimensions(
-        zoomFactor,
-        parentBoundingRect,
-        imageAspectRatio,
-        containerAspectRatio
-      );
-      zoomTarget.x =
-        (-1 * this.state.left + e.pageX - this.props.parentBoundingRect.left) /
-        width;
-      zoomTarget.y =
-        (-1 * this.state.top + e.pageY - this.props.parentBoundingRect.top) /
-        height;
-      this.zooming = true;
-    } else {
-      zoomTarget = this.state.zoomTarget;
-    }
-    const parentBoundingRect = JSON.parse(
-      JSON.stringify(this.props.parentBoundingRect)
-    );
-    // const parentBoundingRect = { ...this.props.parentBoundingRect };
-    const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-    const containerAspectRatio = this.containerAspectRatio;
-    const { left, top, width, height } = this.getImageTransform(
-      zoomFactor,
-      zoomTarget,
-      parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
-    );
-
-    const constrainedPosition = this.constrainTranslate(
-      left,
-      top,
-      zoomFactor,
-      parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
-    );
-    this.setState({
-      left: constrainedPosition.left,
-      top: constrainedPosition.top,
-      width,
-      height,
-      zoomFactor,
-      zoomLevel,
+      left: constrainedLeft,
+      top: constrainedTop,
       zoomTarget
     });
   }
 
+  throttledOnWheel = (func, limit) => {
+    // let inThrottle;
+    const self = this;
+    return function() {
+      const args = arguments;
+      const context = this;
+      if (!self.inThrottle) {
+        func.apply(context, args);
+        self.inThrottle = true;
+        setTimeout(() => (self.inThrottle = false), limit);
+      }
+    };
+  };
+
+  onWheel(e) {
+    console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
+    // document.removeEventListener('wheel', this.onWheel);
+    e.preventDefault();
+    e.stopPropagation();
+
+    // if (e.deltaX > 10) {
+    //   console.log('TRIG');
+    //   this.props.changeSlide(1);
+    //   return;
+    // }
+    // if (e.deltaX < -10) {
+    //   console.log('TRIG');
+    //   this.props.changeSlide(-1);
+    //   return;
+    // }
+
+    // let zoomDamping = 8;
+    // if (this.props.isFirefox) zoomDamping = 50;
+    // let zoomLevel = this.state.zoomLevel - e.deltaY / zoomDamping;
+    // const zoomLevel =
+    //   e.deltaY > 0 ? this.state.zoomLevel + 1 : this.state.zoomLevel - 1;
+    let zoomLevel;
+    if (e.deltaY < 0) {
+      zoomLevel = this.state.zoomLevel + 1;
+    } else {
+      zoomLevel = this.state.zoomLevel - 1;
+    }
+    if (zoomLevel < 0) {
+      console.log('to little');
+
+      return;
+    }
+    if (zoomLevel > this.props.ZOOM_LEVELS) {
+      console.log('too much');
+      return;
+    }
+
+    const maxv = Math.log(this.MAX_ZOOM);
+    // Calculate adjustment factor
+    const scale = maxv / this.props.ZOOM_LEVELS;
+    const newZoomFactor = Math.exp(scale * zoomLevel);
+
+    const parentBoundingRect = JSON.parse(
+      JSON.stringify(this.props.parentBoundingRect)
+    );
+    const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
+    const containerAspectRatio = this.containerAspectRatio;
+    const eventPosition = { x: e.clientX, y: e.clientY };
+    // let zoomTarget = {};
+
+    // const parentBoundingRect = { ...this.props.parentBoundingRect };
+
+    const imgLeft = this.state.left;
+    const imgTop = this.state.top;
+    const oldZoomFactor = this.state.zoomFactor;
+    const { left, top, width, height } = this.getNewZoomTransform(
+      imgLeft,
+      imgTop,
+      newZoomFactor,
+      oldZoomFactor,
+      parentBoundingRect,
+      imageAspectRatio,
+      containerAspectRatio,
+      eventPosition
+    );
+
+    // console.log(left, top, width, height);
+
+    const { constrainedLeft, constrainedTop } = this.constrainTranslate(
+      left,
+      top,
+      newZoomFactor,
+      parentBoundingRect,
+      imageAspectRatio,
+      containerAspectRatio
+    );
+    this.setState(
+      {
+        // cursor: 'none',
+        left: constrainedLeft,
+        top: constrainedTop,
+        width,
+        height,
+        zoomFactor: newZoomFactor,
+        zoomLevel
+        // zoomTarget
+      },
+      () => {
+        // document.addEventListener('wheel', this.onWheel);
+      }
+    );
+  }
+
+  getNewZoomTransform(
+    imgLeft,
+    imgTop,
+    newZoomFactor,
+    oldZoomFactor,
+    parentBoundingRect,
+    imageAspectRatio,
+    containerAspectRatio,
+    eventPosition
+  ) {
+    console.log(
+      'IN:',
+      imgLeft,
+      imgTop,
+      newZoomFactor,
+      oldZoomFactor,
+      parentBoundingRect,
+      imageAspectRatio,
+      containerAspectRatio,
+      eventPosition
+    );
+    let width;
+    let height;
+    let oldWidth;
+    let oldHeight;
+    let left = imgLeft;
+    let top = imgTop;
+    if (imageAspectRatio > containerAspectRatio) {
+      width = parentBoundingRect.width * newZoomFactor;
+      height = width / imageAspectRatio;
+      oldWidth = parentBoundingRect.width * oldZoomFactor;
+      oldHeight = oldWidth / imageAspectRatio;
+    } else {
+      height = parentBoundingRect.height * newZoomFactor;
+      width = height * imageAspectRatio;
+      oldHeight = parentBoundingRect.height * oldZoomFactor;
+      oldWidth = oldHeight * imageAspectRatio;
+    }
+    const divCoords = {
+      x: eventPosition.x - parentBoundingRect.left,
+      y: eventPosition.y - parentBoundingRect.top
+    };
+    console.log('div coords', divCoords);
+
+    const oldPointX = -1 * imgLeft + divCoords.x;
+    const newPointX = (oldPointX / oldWidth) * width;
+    const oldPointY = -1 * imgTop + divCoords.y;
+    const newPointY = (oldPointY / oldHeight) * height;
+    console.log('POINTS', oldPointX, newPointX);
+
+    left = -1 * newPointX + divCoords.x;
+    top = -1 * newPointY + divCoords.y;
+    console.log('OUT:', imgLeft, left);
+    return { left, top, width, height };
+  }
+
+  // Get image position and dimensions based on zoomTarget, zoomFactor and div rectangle
   getImageTransform( // Pure
     zoomFactor,
     zoomTarget,
@@ -218,6 +387,8 @@ class SingleImage extends Component {
     imageAspectRatio,
     containerAspectRatio
   ) {
+    console.log('RECEIVING', parentBoundingRect);
+
     const { width, height } = this.getImageDimensions(
       zoomFactor,
       parentBoundingRect,
@@ -227,11 +398,12 @@ class SingleImage extends Component {
 
     const left = -1 * width * zoomTarget.x + parentBoundingRect.width / 2;
     const top = -1 * height * zoomTarget.y + parentBoundingRect.height / 2;
+    console.log('RETURNING', { left, top, width, height });
 
     return { left, top, width, height };
   }
 
-  getImageDimensions( // Pure
+  getImageDimensions(
     zoomFactor,
     parentBoundingRect,
     imageAspectRatio,
@@ -256,17 +428,6 @@ class SingleImage extends Component {
     imageAspectRatio,
     containerAspectRatio
   ) {
-    console.log(
-      '===',
-      left,
-      top,
-      zoomFactor,
-      parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
-    );
-    // let leftBoundary;
-    // let topBoundary;
     let constrainedLeft = left;
     let constrainedTop = top;
     let leftOffset = 0;
@@ -298,21 +459,15 @@ class SingleImage extends Component {
       topBoundary =
         -1 * parentBoundingRect.height * zoomFactor + parentBoundingRect.height;
     }
-    if (left > leftOffset) {
-      console.log('too much to the left');
-      constrainedLeft = leftOffset;
-    }
-    if (left < leftBoundary) constrainedLeft = leftBoundary;
-    if (top > topOffset) {
-      console.log('too much up');
-      constrainedTop = topOffset;
-    }
-    if (top < topBoundary) {
-      console.log('too much down');
-      constrainedTop = topBoundary;
-    }
 
-    return { left: constrainedLeft, top: constrainedTop };
+    if (left > leftOffset) constrainedLeft = leftOffset;
+    if (left < leftBoundary) constrainedLeft = leftBoundary;
+    if (top > topOffset) constrainedTop = topOffset;
+    if (top < topBoundary) constrainedTop = topBoundary;
+
+    console.log('CONSTRAIN RETURNED:', constrainedLeft, constrainedTop);
+
+    return { constrainedLeft, constrainedTop };
   }
 
   refresh() {
@@ -320,10 +475,15 @@ class SingleImage extends Component {
   }
 
   render() {
-    // console.log('*** single image render ***');
+    console.log('*** single image render ***');
+    // document.addEventListener('wheel', this.onWheel);
 
     return (
-      <div className="image-div" onWheel={this.onWheel}>
+      <div
+        className="image-div"
+        // onWheel={this.onWheel}
+        style={{ cursor: this.state.cursor }}
+      >
         <img
           src={this.props.imageInfo.url}
           alt=""
