@@ -5,7 +5,8 @@ class LuloViewer extends Component {
   constructor(props) {
     super(props);
     this.constants = {
-      STARTING_SLIDE: 2,
+      STARTING_SLIDE: 0,
+      // isFullScreen: false,
       // MAX_PRELOADED_IMAGES: this.props.imageUrls.length,
       MAX_PRELOADED_IMAGES: 1,
       ZOOM_LEVELS: 20
@@ -19,9 +20,11 @@ class LuloViewer extends Component {
 
     this.imageLoading = false;
     this.images = [];
+    this.isFullScreen = false;
 
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.changeSlide = this.changeSlide.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
@@ -47,37 +50,43 @@ class LuloViewer extends Component {
     // e.preventDefault()
     switch (e.key) {
       case 'ArrowLeft':
-        this.setState(
-          {
-            currentSlideIndex:
-              this.state.currentSlideIndex === 0
-                ? this.props.imageUrls.length - 1
-                : this.state.currentSlideIndex - 1
-          },
-          () => {
-            this.checkPreload();
-          }
-        );
+        e.preventDefault();
+
+        this.changeSlide(-1);
+
         break;
       case 'ArrowRight':
-        this.setState(
-          {
-            currentSlideIndex:
-              (this.state.currentSlideIndex + 1) % this.props.imageUrls.length
-          },
-          () => {
-            this.checkPreload();
-          }
-        );
+        e.preventDefault();
+
+        this.changeSlide(1);
         break;
       case 'f':
-        this.mainDiv.requestFullscreen();
+        if (!this.isFullScreen) {
+          this.isFullScreen = true;
+          console.log('isfullscreen', this.isFullScreen);
+          this.mainDiv.requestFullscreen();
+        } else {
+          console.log('isfullscreen', this.isFullScreen);
+
+          this.isFullScreen = false;
+          document.exitFullscreen();
+        }
 
         break;
 
       default:
         console.log('something else');
     }
+  }
+
+  changeSlide(direction) {
+    let currentSlideIndex =
+      (this.state.currentSlideIndex + direction) % this.props.imageUrls.length;
+    if (currentSlideIndex === -1)
+      currentSlideIndex = this.props.imageUrls.length - 1;
+    this.setState({ currentSlideIndex }, () => {
+      this.checkPreload();
+    });
   }
 
   checkPreload() {
@@ -126,9 +135,9 @@ class LuloViewer extends Component {
     };
   }
 
-  onWheel(e) {
-    e.preventDefault();
-  }
+  // onWheel(e) {
+  //   e.preventDefault();
+  // }
 
   render() {
     console.log('*** render ***');
@@ -137,7 +146,7 @@ class LuloViewer extends Component {
       <div
         className="main-div"
         ref={el => (this.mainDiv = el)}
-        onWheel={this.onWheel}
+        // onWheel={this.onWheel}
       >
         {this.imagesInfo[this.state.currentSlideIndex] !== null ? (
           <SingleImage
@@ -146,6 +155,7 @@ class LuloViewer extends Component {
             parentBoundingRect={this.state.mainDivRect}
             ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
             isFirefox={this.isFirefox}
+            changeSlide={this.changeSlide}
           />
         ) : (
           <div style={{ color: 'white' }}>louding</div>
