@@ -6,7 +6,6 @@ class LuloViewer extends Component {
     super(props);
     this.constants = {
       STARTING_SLIDE: 0,
-      // isFullScreen: false,
       // MAX_PRELOADED_IMAGES: this.props.imageUrls.length,
       MAX_PRELOADED_IMAGES: 1,
       ZOOM_LEVELS: 20
@@ -51,29 +50,21 @@ class LuloViewer extends Component {
     switch (e.key) {
       case 'ArrowLeft':
         e.preventDefault();
-
         this.changeSlide(-1);
-
         break;
       case 'ArrowRight':
         e.preventDefault();
-
         this.changeSlide(1);
         break;
       case 'f':
         if (!this.isFullScreen) {
           this.isFullScreen = true;
-          console.log('isfullscreen', this.isFullScreen);
           this.mainDiv.requestFullscreen();
         } else {
-          console.log('isfullscreen', this.isFullScreen);
-
           this.isFullScreen = false;
           document.exitFullscreen();
         }
-
         break;
-
       default:
         console.log('something else');
     }
