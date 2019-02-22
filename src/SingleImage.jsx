@@ -56,14 +56,25 @@ class SingleImage extends Component {
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
+    // this.onTouchStart = this.onTouchStart.bind(this);
+    // this.onTouchMove = this.onTouchMove.bind(this);
+    // this.onTouchEnd = this.onTouchEnd.bind(this);
 
     // document.onfullscreenchange = e => {
     // };
   }
 
-  componentWillMount() {
-    document.addEventListener('wheel', this.onWheel);
+  componentDidMount() {
+    console.log('adding listeners');
+    this.image.addEventListener('wheel', this.onWheel);
+    // const el = this.image;
+    // console.log('el', el);
+
+    // this.image.addEventListener('touchstart', this.onTouchStart, false);
+    // el.addEventListener('touchend', this.onTouchEnd, false);
+    // el.addEventListener('touchcancel', handleCancel, false);
+    // el.addEventListener('touchmove', this.onTouchMove, false);
+    console.log('initialized');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -183,30 +194,34 @@ class SingleImage extends Component {
     });
   }
 
-  throttledOnWheel = (func, limit) => {
-    // let inThrottle;
-    const self = this;
-    return function() {
-      const args = arguments;
-      const context = this;
-      if (!self.inThrottle) {
-        func.apply(context, args);
-        self.inThrottle = true;
-        setTimeout(() => (self.inThrottle = false), limit);
-      }
-    };
-  };
+  // throttledOnWheel = (func, limit) => {
+  //   // let inThrottle;
+  //   const self = this;
+  //   return function() {
+  //     const args = arguments;
+  //     const context = this;
+  //     if (!self.inThrottle) {
+  //       func.apply(context, args);
+  //       self.inThrottle = true;
+  //       setTimeout(() => (self.inThrottle = false), limit);
+  //     }
+  //   };
+  // };
 
   onWheel(e) {
-    console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
-    setTimeout(() => {
-      if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
-      this.zooming = false;
-    }, 1050);
     e.preventDefault();
     e.stopPropagation();
+    console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
+    if (Math.abs(e.deltaX) > 120) {
+      if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
+      console.log('IZ');
+      this.zoomTimeout = setTimeout(() => {
+        console.log('Swipe allowed');
+        this.zooming = false;
+      }, 150);
+    }
 
-    if (e.deltaX > 30) {
+    if (e.deltaX > 120) {
       console.log('TRIG');
       if (!this.zooming) {
         console.log('*********** i am zomming:', this.zooming);
@@ -215,15 +230,17 @@ class SingleImage extends Component {
       }
       return;
     }
-    if (e.deltaX < -30) {
+    if (e.deltaX < -120) {
       console.log('TRIG');
       if (!this.zooming) {
+        console.log('*********** i am zomming:', this.zooming);
         this.zooming = true;
         this.props.changeSlide(-1);
       }
       return;
     }
 
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     // let zoomDamping = 8;
     // if (this.props.isFirefox) zoomDamping = 50;
     // let zoomLevel = this.state.zoomLevel - e.deltaY / zoomDamping;
@@ -236,12 +253,11 @@ class SingleImage extends Component {
       zoomLevel = this.state.zoomLevel - 1;
     }
     if (zoomLevel < 0) {
-      console.log('to little');
-
+      // console.log('to little');
       return;
     }
     if (zoomLevel > this.props.ZOOM_LEVELS) {
-      console.log('too much');
+      // console.log('too much');
       return;
     }
 
@@ -256,7 +272,6 @@ class SingleImage extends Component {
     const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
     const containerAspectRatio = this.containerAspectRatio;
     const eventPosition = { x: e.clientX, y: e.clientY };
-    // let zoomTarget = {};
 
     const imgLeft = this.state.left;
     const imgTop = this.state.top;
@@ -272,6 +287,27 @@ class SingleImage extends Component {
       eventPosition
     );
 
+    // Calculate new zoomTarget
+    let zoomTarget = {};
+    if (!this.zooming && e.deltaY < 0) {
+      const { width, height } = this.getImageDimensions(
+        oldZoomFactor,
+        parentBoundingRect,
+        imageAspectRatio,
+        containerAspectRatio
+      );
+      zoomTarget.x =
+        (-1 * this.state.left + e.pageX - this.props.parentBoundingRect.left) /
+        width;
+      zoomTarget.y =
+        (-1 * this.state.top + e.pageY - this.props.parentBoundingRect.top) /
+        height;
+      this.zooming = true;
+    } else {
+      zoomTarget = this.state.zoomTarget;
+    }
+
+    // Constrain image position
     const { constrainedLeft, constrainedTop } = this.constrainTranslate(
       left,
       top,
@@ -280,6 +316,7 @@ class SingleImage extends Component {
       imageAspectRatio,
       containerAspectRatio
     );
+
     this.setState(
       {
         // cursor: 'none',
@@ -288,7 +325,8 @@ class SingleImage extends Component {
         width,
         height,
         zoomFactor: newZoomFactor,
-        zoomLevel
+        zoomLevel,
+        zoomTarget
       },
       () => {}
     );
@@ -430,6 +468,18 @@ class SingleImage extends Component {
     this.forceUpdate();
   }
 
+  // onTouchStart(e) {
+  //   console.log('touch start', e);
+  // }
+
+  // onTouchMove(e) {
+  //   console.log('touch move', e);
+  // }
+
+  // onTouchEnd(e) {
+  //   console.log('touch end', e);
+  // }
+
   render() {
     console.log('*** single image render ***');
     // document.addEventListener('wheel', this.onWheel);
@@ -439,9 +489,14 @@ class SingleImage extends Component {
         className="image-div"
         // onWheel={this.onWheel}
         style={{ cursor: this.state.cursor }}
+        ref={el => (this.imageDiv = el)}
+        // onTouchStart={this.onTouchStart}
+        // onTouchMove={this.onTouchMove}
+        // onTouchEnd={this.onTouchEnd}
       >
         <img
           src={this.props.imageInfo.url}
+          ref={el => (this.image = el)}
           alt=""
           style={{
             left: this.state.left,

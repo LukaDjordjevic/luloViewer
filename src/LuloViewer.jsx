@@ -32,7 +32,7 @@ class LuloViewer extends Component {
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
     this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
-      this.forceUpdate();
+      // this.forceUpdate();
     });
   }
 
