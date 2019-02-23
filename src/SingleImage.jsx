@@ -4,9 +4,6 @@ import PropTypes from 'prop-types';
 class SingleImage extends PureComponent {
   constructor(props) {
     super(props);
-    this.MAX_ZOOM =
-      this.props.imageInfo.naturalWidth / this.props.parentBoundingRect.width +
-      8;
 
     this.startingX = this.props.parentBoundingRect.width / 2;
     this.startingY = this.props.parentBoundingRect.height / 2;
@@ -19,7 +16,6 @@ class SingleImage extends PureComponent {
     this.state = {
       zoomFactor: 1,
       zoomLevel: 0,
-      // zooming: false,
       cursor: 'initial',
       zoomTarget: { x: 0.5, y: 0.5 }
     };
@@ -64,15 +60,6 @@ class SingleImage extends PureComponent {
   }
 
   componentDidMount() {
-    // console.log('adding listeners');
-    // this.image.addEventListener('wheel', this.onWheel);
-    // const el = this.image;
-    // console.log('el', el);
-
-    // this.image.addEventListener('touchstart', this.onTouchStart, false);
-    // el.addEventListener('touchend', this.onTouchEnd, false);
-    // el.addEventListener('touchcancel', handleCancel, false);
-    // el.addEventListener('touchmove', this.onTouchMove, false);
     console.log('initialized');
   }
 
@@ -121,17 +108,26 @@ class SingleImage extends PureComponent {
       JSON.stringify(nextProps.imageInfo) !==
       JSON.stringify(this.props.imageInfo)
     ) {
+      console.log(
+        'CHANGING SLIDE, got new zoomFactor',
+        this.props.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel],
+        nextProps.imageInfo.zoomLevel
+      );
       const { left, top, width, height } = this.getImageTransform(
-        1,
-        { x: 0.5, y: 0.5 },
+        this.props.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] ||
+          1,
+        nextProps.imageInfo.zoomTarget || { x: 0.5, y: 0.5 },
         parentBoundingRect,
         imageAspectRatio,
         containerAspectRatio
       );
 
       this.setState({
-        zoomFactor: 1,
-        zoomLevel: 0,
+        zoomFactor: this.props.imageInfo.zoomMultipliers[
+          nextProps.imageInfo.zoomLevel
+        ],
+        zoomLevel: nextProps.imageInfo.zoomLevel,
+        zoomTarget: nextProps.imageInfo.zoomTarget,
         left,
         top,
         width,
@@ -205,20 +201,6 @@ class SingleImage extends PureComponent {
     });
   }
 
-  // throttledOnWheel = (func, limit) => {
-  //   // let inThrottle;
-  //   const self = this;
-  //   return function() {
-  //     const args = arguments;
-  //     const context = this;
-  //     if (!self.inThrottle) {
-  //       func.apply(context, args);
-  //       self.inThrottle = true;
-  //       setTimeout(() => (self.inThrottle = false), limit);
-  //     }
-  //   };
-  // };
-
   onWheel(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -250,31 +232,20 @@ class SingleImage extends PureComponent {
     }
 
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-    // let zoomDamping = 8;
-    // if (this.props.isFirefox) zoomDamping = 50;
-    // let zoomLevel = this.state.zoomLevel - e.deltaY / zoomDamping;
-    // const zoomLevel =
-    //   e.deltaY > 0 ? this.state.zoomLevel + 1 : this.state.zoomLevel - 1;
 
-    let zoomLevel = this.state.zoomLevel - e.deltaY / 5;
-    // if (e.deltaY < 0) {
-    //   zoomLevel = this.state.zoomLevel + 1;
-    // } else {
-    //   zoomLevel = this.state.zoomLevel - 1;
-    // }
+    let zoomLevel = Math.round(this.state.zoomLevel - e.deltaY / 5);
     if (zoomLevel < 0) {
       // console.log('to little');
       return;
     }
-    if (zoomLevel > this.props.ZOOM_LEVELS) {
+    if (zoomLevel > this.props.ZOOM_LEVELS - 1) {
       // console.log('too much');
       return;
     }
 
-    const maxv = Math.log(this.MAX_ZOOM);
-    // Calculate adjustment factor
-    const scale = maxv / this.props.ZOOM_LEVELS;
-    const newZoomFactor = Math.exp(scale * zoomLevel).toFixed(2);
+    const newZoomFactor = this.props.imageInfo.zoomMultipliers[
+      zoomLevel.toString()
+    ];
 
     const parentBoundingRect = JSON.parse(
       JSON.stringify(this.props.parentBoundingRect)
@@ -479,18 +450,6 @@ class SingleImage extends PureComponent {
     this.forceUpdate();
   }
 
-  // onTouchStart(e) {
-  //   console.log('touch start', e);
-  // }
-
-  // onTouchMove(e) {
-  //   console.log('touch move', e);
-  // }
-
-  // onTouchEnd(e) {
-  //   console.log('touch end', e);
-  // }
-
   render() {
     console.log('*** single image render ***');
     // document.addEventListener('wheel', this.onWheel);
@@ -498,12 +457,8 @@ class SingleImage extends PureComponent {
     return (
       <div
         className="image-div"
-        // onWheel={this.onWheel}
         style={{ cursor: this.state.cursor }}
         ref={el => (this.imageDiv = el)}
-        // onTouchStart={this.onTouchStart}
-        // onTouchMove={this.onTouchMove}
-        // onTouchEnd={this.onTouchEnd}
       >
         <img
           src={this.props.imageInfo.url}

@@ -12,13 +12,13 @@ class LuloViewer extends Component {
       SWIPE_THRESHOLD: 40,
       SLIDE_TRANSITION_DURATION: 0.5
     };
+
     const imagesInfo = new Array(this.props.imageUrls.length);
     imagesInfo.fill(null);
     this.state = {
       allLoaded: false,
       activeSlide: 'A',
       currentSlideIndex: this.constants.STARTING_SLIDE,
-      // nextSlideIndex: this.getNextSlideIndex(this.constants.STARTING_SLIDE, 1),
       imagesInfo,
       slideAImage: null,
       slideBImage: null,
@@ -52,22 +52,6 @@ class LuloViewer extends Component {
     this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
       // this.forceUpdate();
     });
-    // setTimeout(() => {
-    //   this.setState({ slideALeft: '-700px' });
-    //   // this.forceUpdate();
-    // }, 1000);
-    // setTimeout(() => {
-    //   this.setState({ slideALeft: '0px' });
-    //   // this.forceUpdate();
-    // }, 2000);
-    // setTimeout(() => {
-    //   this.setState({ slideALeft: '700px' });
-    //   // this.forceUpdate();
-    // }, 3000);
-    // setTimeout(() => {
-    //   this.setState({ slideALeft: '0px' });
-    //   // this.forceUpdate();
-    // }, 4000);
   }
 
   componentWillUnmount() {
@@ -116,11 +100,28 @@ class LuloViewer extends Component {
     this.changingSlide = true;
     setTimeout(() => {
       this.changingSlide = false;
-    }, this.constants.SLIDE_TRANSITION_DURATION * 1100);
+    }, this.constants.SLIDE_TRANSITION_DURATION * 1200);
     const nextSlideIndex = this.getNextSlideIndex(
       this.state.currentSlideIndex,
       amount
     );
+
+    const imageInfo = this.state.imagesInfo[this.state.currentSlideIndex];
+    const { imagesInfo } = this.state;
+    console.log('IMAGE InFO BEFORE', this.state.activeSlide, imageInfo);
+    if (this.state.activeSlide === 'A') {
+      imageInfo.zoomLevel = this.slideA.state.zoomLevel;
+      imageInfo.zoomTarget = this.slideA.state.zoomTarget;
+      imagesInfo[this.state.currentSlideIndex] = imageInfo;
+    } else {
+      imageInfo.zoomLevel = this.slideB.state.zoomLevel;
+      imageInfo.zoomTarget = this.slideB.state.zoomTarget;
+      imagesInfo[this.state.currentSlideIndex] = imageInfo;
+    }
+    if (imageInfo.zoomLevel === 0)
+      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+    console.log('IMAGE InFO AFTER', this.state.activeSlide, imageInfo);
+
     if (amount > 0) {
       // Forwards
       if (this.state.activeSlide === 'A') {
@@ -133,11 +134,11 @@ class LuloViewer extends Component {
 
         this.setState({
           currentSlideIndex: nextSlideIndex,
+          imagesInfo,
           activeSlide: 'B',
           slideALeft: -1 * this.state.mainDivRect.width,
           slideBTransition: `left 0s`,
           slideBLeft: this.state.mainDivRect.width,
-          slideAImage: this.state.imagesInfo[this.state.currentSlideIndex],
           slideBImage: this.state.imagesInfo[nextSlideIndex]
         });
         setTimeout(() => {
@@ -151,11 +152,11 @@ class LuloViewer extends Component {
       } else {
         this.setState({
           currentSlideIndex: nextSlideIndex,
+          imagesInfo,
           activeSlide: 'A',
           slideBLeft: -1 * this.state.mainDivRect.width,
           slideATransition: 'left 0s',
           slideALeft: this.state.mainDivRect.width,
-          slideBImage: this.state.imagesInfo[this.state.currentSlideIndex],
           slideAImage: this.state.imagesInfo[nextSlideIndex]
         });
         setTimeout(() => {
@@ -176,14 +177,13 @@ class LuloViewer extends Component {
           nextSlideIndex,
           this.state.mainDivRect.width
         );
-
         this.setState({
           currentSlideIndex: nextSlideIndex,
+          imagesInfo,
           activeSlide: 'B',
           slideALeft: this.state.mainDivRect.width,
           slideBTransition: `left 0s`,
           slideBLeft: -1 * this.state.mainDivRect.width,
-          slideAImage: this.state.imagesInfo[this.state.currentSlideIndex],
           slideBImage: this.state.imagesInfo[nextSlideIndex]
         });
         setTimeout(() => {
@@ -197,11 +197,11 @@ class LuloViewer extends Component {
       } else {
         this.setState({
           currentSlideIndex: nextSlideIndex,
+          imagesInfo,
           activeSlide: 'A',
           slideBLeft: this.state.mainDivRect.width,
           slideATransition: 'left 0s',
           slideALeft: -1 * this.state.mainDivRect.width,
-          slideBImage: this.state.imagesInfo[this.state.currentSlideIndex],
           slideAImage: this.state.imagesInfo[nextSlideIndex]
         });
         setTimeout(() => {
@@ -262,30 +262,28 @@ class LuloViewer extends Component {
         // const imagesInfo = [...this.state.imagesInfo];
         const imagesInfo = this.state.imagesInfo;
         console.log('spread images info:', imagesInfo, this.state.imagesInfo);
+
+        const MAX_ZOOM = image.naturalWidth / this.state.mainDivRect.width + 8;
+
+        const maxv = Math.log(MAX_ZOOM);
+        const scale = maxv / this.constants.ZOOM_LEVELS;
+        const zoomMultipliers = {};
+        for (let i = 0; i < this.constants.ZOOM_LEVELS; i++) {
+          zoomMultipliers[i] = Math.exp(scale * i);
+        }
         imagesInfo[idx] = {
           url: this.props.imageUrls[idx],
           imageAspectRatio: image.naturalWidth / image.naturalHeight,
           naturalWidth: image.naturalWidth,
-          naturalHeight: image.naturalHeight
+          naturalHeight: image.naturalHeight,
+          zoomLevel: 0,
+          zoomTarget: { x: 0.5, y: 0.5 },
+          zoomMultipliers
         };
         console.log('*************imageinfo', imagesInfo);
 
         this.setState({ imagesInfo });
         console.log('downloaded image', idx);
-
-        // if (idx === this.state.currentSlideIndex) {
-        //   this.setState({
-        //     mainDivRect: this.mainDiv.getBoundingClientRect(),
-        //     slideAImage: this.state.imagesInfo[this.state.currentSlideIndex]
-        //   });
-        // }
-        // if (idx === this.state.nextSlideIndex) {
-        //   this.setState({
-        //     slideBImage: this.state.imagesInfo[
-        //       this.getNextSlideIndex(this.state.currentSlideIndex, 1)
-        //     ]
-        //   });
-        // }
 
         this.checkPreload();
       }
@@ -302,7 +300,7 @@ class LuloViewer extends Component {
   }
 
   render() {
-    console.log('*** render ***');
+    console.log('*** viewer render ***');
 
     return (
       <div className="viewer" ref={el => (this.mainDiv = el)}>
@@ -312,7 +310,6 @@ class LuloViewer extends Component {
             left: this.state.slideALeft,
             transition: this.state.slideATransition
           }}
-          // onWheel={this.onWheel}
         >
           {this.state.slideAImage !== null ? (
             <SingleImage
@@ -336,8 +333,6 @@ class LuloViewer extends Component {
             left: this.state.slideBLeft,
             transition: this.state.slideBTransition
           }}
-          // ref={el => (this.mainDiv = el)}
-          // onWheel={this.onWheel}
         >
           {this.state.slideBImage !== null ? (
             <SingleImage
