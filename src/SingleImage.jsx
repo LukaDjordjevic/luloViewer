@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-class SingleImage extends Component {
+class SingleImage extends PureComponent {
   constructor(props) {
     super(props);
     this.MAX_ZOOM =
@@ -15,6 +15,7 @@ class SingleImage extends Component {
 
     this.inThrottle = false;
     this.zooming = false;
+    this.zoomTargetSelected = false;
     this.state = {
       zoomFactor: 1,
       zoomLevel: 0,
@@ -26,8 +27,6 @@ class SingleImage extends Component {
     this.containerAspectRatio =
       this.props.parentBoundingRect.width /
       this.props.parentBoundingRect.height;
-    const bla = { x: 0, y: 0, left: 1, top: 21 };
-    const bla1 = { ...bla };
 
     // const parentBoundingRect = { ...this.props.parentBoundingRect };
     const parentBoundingRect = {
@@ -65,8 +64,8 @@ class SingleImage extends Component {
   }
 
   componentDidMount() {
-    console.log('adding listeners');
-    this.image.addEventListener('wheel', this.onWheel);
+    // console.log('adding listeners');
+    // this.image.addEventListener('wheel', this.onWheel);
     // const el = this.image;
     // console.log('el', el);
 
@@ -86,13 +85,15 @@ class SingleImage extends Component {
       nextProps.parentBoundingRect.width / nextProps.parentBoundingRect.height;
 
     this.containerAspectRatio = containerAspectRatio;
+
+    // Window resize or toggling fullscreen
     if (
       JSON.stringify(nextProps.parentBoundingRect) !==
       JSON.stringify(this.props.parentBoundingRect)
     ) {
       const zoomFactor = this.state.zoomFactor;
-      const zoomTarget = JSON.parse(JSON.stringify(this.state.zoomTarget));
-      // const zoomTarget = { ...this.state.zoomTarget };
+      // cont zoomTarget = JSON.parse(JSON.stringify(this.state.zoomTarget));
+      const zoomTarget = { ...this.state.zoomTarget };
       const imageTransform = this.getImageTransform(
         zoomFactor,
         zoomTarget,
@@ -115,6 +116,7 @@ class SingleImage extends Component {
 
       this.setState(imageTransform, () => {});
     }
+    // Slide change
     if (
       JSON.stringify(nextProps.imageInfo) !==
       JSON.stringify(this.props.imageInfo)
@@ -139,7 +141,7 @@ class SingleImage extends Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('wheel', this.onWheel);
+    // document.removeEventListener('wheel', this.onWheel);
   }
 
   onMouseDown(e) {
@@ -169,6 +171,15 @@ class SingleImage extends Component {
     const parentBoundingRect = JSON.parse(
       JSON.stringify(this.props.parentBoundingRect)
     );
+    console.log('stringifaj:', parentBoundingRect);
+
+    const parentBoundingRect1 = { ...this.props.parentBoundingRect };
+    const parentBoundingRect2 = Object.assign(
+      {},
+      this.props.parentBoundingRect
+    );
+    console.log('spread:', parentBoundingRect1);
+    console.log('assign:', parentBoundingRect2);
 
     //Update zoomTarget
     const zoomTarget = {};
@@ -211,33 +222,31 @@ class SingleImage extends Component {
   onWheel(e) {
     e.preventDefault();
     e.stopPropagation();
-    console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
-    if (Math.abs(e.deltaX) > 120) {
+    // console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
+    let threshold = this.props.SWIPE_THRESHOLD;
+    let timeout = 100;
+    if (this.props.isFirefox) {
+      threshold = this.props.SWIPE_THRESHOLD * 1.5;
+      timeout = 180;
+    }
+    if (Math.abs(e.deltaX) > threshold) {
       if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
       console.log('IZ');
       this.zoomTimeout = setTimeout(() => {
-        console.log('Swipe allowed');
+        console.log('*****************Swipe allowed');
         this.zooming = false;
-      }, 150);
-    }
-
-    if (e.deltaX > 120) {
-      console.log('TRIG');
+      }, timeout);
       if (!this.zooming) {
-        console.log('*********** i am zomming:', this.zooming);
         this.zooming = true;
-        this.props.changeSlide(1);
+        console.log('TRIG');
+        console.log('*********** i am zomming:', this.zooming, e.deltaX);
+        if (e.deltaX > 0) {
+          this.props.changeSlide(1);
+        } else {
+          this.props.changeSlide(-1);
+        }
+        return;
       }
-      return;
-    }
-    if (e.deltaX < -120) {
-      console.log('TRIG');
-      if (!this.zooming) {
-        console.log('*********** i am zomming:', this.zooming);
-        this.zooming = true;
-        this.props.changeSlide(-1);
-      }
-      return;
     }
 
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
@@ -246,12 +255,13 @@ class SingleImage extends Component {
     // let zoomLevel = this.state.zoomLevel - e.deltaY / zoomDamping;
     // const zoomLevel =
     //   e.deltaY > 0 ? this.state.zoomLevel + 1 : this.state.zoomLevel - 1;
-    let zoomLevel;
-    if (e.deltaY < 0) {
-      zoomLevel = this.state.zoomLevel + 1;
-    } else {
-      zoomLevel = this.state.zoomLevel - 1;
-    }
+
+    let zoomLevel = this.state.zoomLevel - e.deltaY / 5;
+    // if (e.deltaY < 0) {
+    //   zoomLevel = this.state.zoomLevel + 1;
+    // } else {
+    //   zoomLevel = this.state.zoomLevel - 1;
+    // }
     if (zoomLevel < 0) {
       // console.log('to little');
       return;
@@ -264,7 +274,7 @@ class SingleImage extends Component {
     const maxv = Math.log(this.MAX_ZOOM);
     // Calculate adjustment factor
     const scale = maxv / this.props.ZOOM_LEVELS;
-    const newZoomFactor = Math.exp(scale * zoomLevel);
+    const newZoomFactor = Math.exp(scale * zoomLevel).toFixed(2);
 
     const parentBoundingRect = JSON.parse(
       JSON.stringify(this.props.parentBoundingRect)
@@ -289,20 +299,21 @@ class SingleImage extends Component {
 
     // Calculate new zoomTarget
     let zoomTarget = {};
-    if (!this.zooming && e.deltaY < 0) {
-      const { width, height } = this.getImageDimensions(
-        oldZoomFactor,
-        parentBoundingRect,
-        imageAspectRatio,
-        containerAspectRatio
-      );
+    console.log(!this.zooming, e.deltaY);
+
+    if (!this.zoomTargetSelected && e.deltaY < 0) {
+      if (this.zoomTargetTimeout) clearTimeout(this.zoomTargetTimeout);
+      this.zoomTargetTimeout = setTimeout(() => {
+        this.zoomTargetSelected = false;
+      }, 200);
+
+      //Update zoomTarget
       zoomTarget.x =
-        (-1 * this.state.left + e.pageX - this.props.parentBoundingRect.left) /
-        width;
+        (-1 * this.state.left + parentBoundingRect.width / 2) /
+        this.state.width;
       zoomTarget.y =
-        (-1 * this.state.top + e.pageY - this.props.parentBoundingRect.top) /
-        height;
-      this.zooming = true;
+        (-1 * this.state.top + parentBoundingRect.height / 2) /
+        this.state.height;
     } else {
       zoomTarget = this.state.zoomTarget;
     }

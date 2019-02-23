@@ -1,8 +1,22 @@
-.main-div {
+.viewer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+}
+
+.main-image-div {
   /* display: flex; */
   width: 100%;
   height: 100%;
+  left: initial;
   overflow: hidden;
+  /* transition: 0.5s; */
+  /* -webkit-transition: 0.5s;
+  -moz-transition: 0.5s;
+  -o-transition: 0.5s;
+  transition: 0.5s; */
+  position: absolute;
 }
 
 .image-div {
