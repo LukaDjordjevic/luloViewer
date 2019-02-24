@@ -41,17 +41,17 @@ class LuloViewer extends Component {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() });
-    }, 0);
+    // setTimeout(() => {
+    //   this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() });
+    // }, 0);
     this.checkPreload();
     document.addEventListener('wheel', this.onWheel);
 
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
-    this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
-      // this.forceUpdate();
-    });
+    // this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
+    //   // this.forceUpdate();
+    // });
   }
 
   componentWillUnmount() {
@@ -61,6 +61,18 @@ class LuloViewer extends Component {
 
   onWindowResize() {
     this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() });
+    if (this.state.activeSlide === 'A') {
+      console.log('TRIGGERED, moving...', this.props.slide);
+      this.setState({
+        slideBLeft: this.state.mainDivRect.width,
+        slideBTransition: 'left 0s'
+      });
+    } else {
+      this.setState({
+        slideALeft: this.state.mainDivRect.width,
+        slideATransition: 'left 0s'
+      });
+    }
   }
 
   onKeyDown(e) {
@@ -108,7 +120,6 @@ class LuloViewer extends Component {
 
     const imageInfo = this.state.imagesInfo[this.state.currentSlideIndex];
     const { imagesInfo } = this.state;
-    console.log('IMAGE InFO BEFORE', this.state.activeSlide, imageInfo);
     if (this.state.activeSlide === 'A') {
       imageInfo.zoomLevel = this.slideA.state.zoomLevel;
       imageInfo.zoomTarget = this.slideA.state.zoomTarget;
@@ -118,10 +129,6 @@ class LuloViewer extends Component {
       imageInfo.zoomTarget = this.slideB.state.zoomTarget;
       imagesInfo[this.state.currentSlideIndex] = imageInfo;
     }
-    if (imageInfo.zoomLevel === 0)
-      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-    console.log('IMAGE InFO AFTER', this.state.activeSlide, imageInfo);
-
     if (amount > 0) {
       // Forwards
       if (this.state.activeSlide === 'A') {
@@ -171,8 +178,9 @@ class LuloViewer extends Component {
     } else {
       // Backwards
       if (this.state.activeSlide === 'A') {
+        console.log('doing dat');
+
         console.log(
-          'CHANGING SLIDE',
           this.state.currentSlideIndex,
           nextSlideIndex,
           this.state.mainDivRect.width
@@ -187,6 +195,7 @@ class LuloViewer extends Component {
           slideBImage: this.state.imagesInfo[nextSlideIndex]
         });
         setTimeout(() => {
+          console.log('starting animation');
           this.setState({
             slideBTransition: `left ${
               this.constants.SLIDE_TRANSITION_DURATION
@@ -220,8 +229,12 @@ class LuloViewer extends Component {
   checkPreload() {
     const requiredImages = [];
     if (!this.state.slideAImage && this.state.activeSlide === 'A') {
+      const mainDivRect = this.mainDiv.getBoundingClientRect();
       this.setState({
-        slideAImage: this.state.imagesInfo[this.state.currentSlideIndex]
+        slideAImage: this.state.imagesInfo[this.state.currentSlideIndex],
+        mainDivRect: mainDivRect,
+        slideBLeft: mainDivRect.width,
+        slideBTransition: 'left 0s'
       });
     }
     if (!this.state.slideBImage && this.state.activeSlide === 'B') {
@@ -261,7 +274,6 @@ class LuloViewer extends Component {
       if (this.state.imagesInfo[idx] === null) {
         // const imagesInfo = [...this.state.imagesInfo];
         const imagesInfo = this.state.imagesInfo;
-        console.log('spread images info:', imagesInfo, this.state.imagesInfo);
 
         const MAX_ZOOM = image.naturalWidth / this.state.mainDivRect.width + 8;
 
@@ -280,7 +292,6 @@ class LuloViewer extends Component {
           zoomTarget: { x: 0.5, y: 0.5 },
           zoomMultipliers
         };
-        console.log('*************imageinfo', imagesInfo);
 
         this.setState({ imagesInfo });
         console.log('downloaded image', idx);
@@ -316,6 +327,8 @@ class LuloViewer extends Component {
               ref={el => {
                 this.slideA = el;
               }}
+              slide="A"
+              activeSlide={this.state.activeSlide}
               imageInfo={this.state.slideAImage}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
@@ -339,6 +352,8 @@ class LuloViewer extends Component {
               ref={el => {
                 this.slideB = el;
               }}
+              slide="B"
+              activeSlide={this.state.activeSlide}
               imageInfo={this.state.slideBImage}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}

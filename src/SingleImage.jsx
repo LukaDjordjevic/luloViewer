@@ -78,10 +78,11 @@ class SingleImage extends PureComponent {
       JSON.stringify(nextProps.parentBoundingRect) !==
       JSON.stringify(this.props.parentBoundingRect)
     ) {
+      console.log(nextProps.activeSlide, this.props.slide);
       const zoomFactor = this.state.zoomFactor;
       // cont zoomTarget = JSON.parse(JSON.stringify(this.state.zoomTarget));
       const zoomTarget = { ...this.state.zoomTarget };
-      const imageTransform = this.getImageTransform(
+      let { left, top, width, height } = this.getImageTransform(
         zoomFactor,
         zoomTarget,
         parentBoundingRect,
@@ -90,33 +91,47 @@ class SingleImage extends PureComponent {
       );
 
       const { constrainedLeft, constrainedTop } = this.constrainTranslate(
-        imageTransform.left,
-        imageTransform.top,
+        left,
+        top,
         zoomFactor,
         parentBoundingRect,
         imageAspectRatio,
         containerAspectRatio
       );
 
-      imageTransform.left = constrainedLeft;
-      imageTransform.top = constrainedTop;
-
-      this.setState(imageTransform, () => {});
+      left = constrainedLeft;
+      top = constrainedTop;
+      // if (nextProps.activeSlide !== this.props.slide) {
+      //   console.log('TRIGGERED, moving...', this.props.slide);
+      //   left = nextProps.parentBoundingRect.width;
+      // }
+      console.log('SLIDE', this.props.slide, 'CHANGING TRANSFORM TO', {
+        left,
+        top,
+        width,
+        height
+      });
+      this.setState({ left, top, width, height }, () => {});
     }
-    // Slide change
+    // Slide image has changed
     if (
       JSON.stringify(nextProps.imageInfo) !==
       JSON.stringify(this.props.imageInfo)
     ) {
-      console.log(
-        'CHANGING SLIDE, got new zoomFactor',
-        this.props.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel],
-        nextProps.imageInfo.zoomLevel
-      );
       const { left, top, width, height } = this.getImageTransform(
         this.props.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] ||
           1,
         nextProps.imageInfo.zoomTarget || { x: 0.5, y: 0.5 },
+        parentBoundingRect,
+        imageAspectRatio,
+        containerAspectRatio
+      );
+
+      const { constrainedLeft, constrainedTop } = this.constrainTranslate(
+        left,
+        top,
+        this.props.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] ||
+          1,
         parentBoundingRect,
         imageAspectRatio,
         containerAspectRatio
@@ -128,8 +143,8 @@ class SingleImage extends PureComponent {
         ],
         zoomLevel: nextProps.imageInfo.zoomLevel,
         zoomTarget: nextProps.imageInfo.zoomTarget,
-        left,
-        top,
+        left: constrainedLeft,
+        top: constrainedTop,
         width,
         height
       });
