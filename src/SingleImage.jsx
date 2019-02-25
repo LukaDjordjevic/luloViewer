@@ -60,6 +60,7 @@ class SingleImage extends PureComponent {
   }
 
   componentDidMount() {
+    this.props.slideDidMount(this.props.slide);
     console.log('initialized');
   }
 

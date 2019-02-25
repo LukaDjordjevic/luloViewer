@@ -17,6 +17,7 @@ class LuloViewer extends Component {
     imagesInfo.fill(null);
     this.state = {
       allLoaded: false,
+      imageLoadFailedArr: [],
       activeSlide: 'A',
       currentSlideIndex: this.constants.STARTING_SLIDE,
       imagesInfo,
@@ -35,8 +36,9 @@ class LuloViewer extends Component {
 
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
-    this.changeSlide = this.changeSlide.bind(this);
+    // this.changeSlide = this.changeSlide.bind(this);
     this.onWheel = this.onWheel.bind(this);
+    this.slideDidMount = this.slideDidMount.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
@@ -77,6 +79,7 @@ class LuloViewer extends Component {
 
   onKeyDown(e) {
     // e.preventDefault()
+    console.log('changing:', this.changingSlide);
     switch (e.key) {
       case 'ArrowLeft':
         e.preventDefault();
@@ -107,6 +110,30 @@ class LuloViewer extends Component {
     return nextSlideIndex;
   }
 
+  slideDidMount(slide) {
+    setTimeout(() => {
+      if (slide === 'A') {
+        this.slideADiv.addEventListener(
+          'transitionend',
+          this.onTransitionEnd,
+          true
+        );
+      }
+      if (slide === 'B') {
+        this.slideBDiv.addEventListener(
+          'transitionend',
+          this.onTransitionEnd,
+          true
+        );
+      }
+    }, 0);
+  }
+
+  onTransitionEnd() {
+    this.changingSlide = false;
+    console.log('**********************transition end', this.changingSlide);
+  }
+
   changeSlide(amount) {
     console.log('change slide', amount);
     this.changingSlide = true;
@@ -121,13 +148,17 @@ class LuloViewer extends Component {
     const imageInfo = this.state.imagesInfo[this.state.currentSlideIndex];
     const { imagesInfo } = this.state;
     if (this.state.activeSlide === 'A') {
-      imageInfo.zoomLevel = this.slideA.state.zoomLevel;
-      imageInfo.zoomTarget = this.slideA.state.zoomTarget;
-      imagesInfo[this.state.currentSlideIndex] = imageInfo;
+      if (this.slideA) {
+        imageInfo.zoomLevel = this.slideA.state.zoomLevel;
+        imageInfo.zoomTarget = this.slideA.state.zoomTarget;
+        imagesInfo[this.state.currentSlideIndex] = imageInfo;
+      }
     } else {
-      imageInfo.zoomLevel = this.slideB.state.zoomLevel;
-      imageInfo.zoomTarget = this.slideB.state.zoomTarget;
-      imagesInfo[this.state.currentSlideIndex] = imageInfo;
+      if (this.slideB) {
+        imageInfo.zoomLevel = this.slideB.state.zoomLevel;
+        imageInfo.zoomTarget = this.slideB.state.zoomTarget;
+        imagesInfo[this.state.currentSlideIndex] = imageInfo;
+      }
     }
     if (amount > 0) {
       // Forwards
@@ -253,9 +284,12 @@ class LuloViewer extends Component {
     const self = this;
     requiredImages.forEach((imageIdx, idx) => {
       if (self.state.imagesInfo[imageIdx] === null) {
-        console.log('isNull');
         allLoaded = false;
-        if (!this.imageLoading) self.startImagePreload(imageIdx);
+        if (
+          !this.imageLoading &&
+          !this.state.imageLoadFailedArr.includes(imageIdx)
+        )
+          self.startImagePreload(imageIdx);
         return;
       }
     });
@@ -299,6 +333,12 @@ class LuloViewer extends Component {
         this.checkPreload();
       }
     };
+    image.onerror = () => {
+      this.imageLoading = false;
+      const { imageLoadFailedArr } = this.state;
+      imageLoadFailedArr.push(idx);
+      console.log('loud fejld');
+    };
   }
 
   onWheel(e) {
@@ -317,6 +357,9 @@ class LuloViewer extends Component {
       <div className="viewer" ref={el => (this.mainDiv = el)}>
         <div
           className="main-image-div"
+          ref={el => {
+            this.slideADiv = el;
+          }}
           style={{
             left: this.state.slideALeft,
             transition: this.state.slideATransition
@@ -328,20 +371,28 @@ class LuloViewer extends Component {
                 this.slideA = el;
               }}
               slide="A"
+              slideDidMount={this.slideDidMount}
               activeSlide={this.state.activeSlide}
               imageInfo={this.state.slideAImage}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
               SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
               isFirefox={this.isFirefox}
-              changeSlide={this.changeSlide}
+              // changeSlide={this.changeSlide}
             />
+          ) : this.state.imageLoadFailedArr.includes(
+              this.state.currentSlideIndex
+            ) && this.state.activeSlide === 'A' ? (
+            <div style={{ color: 'white' }}>loud fejld</div>
           ) : (
             <div style={{ color: 'white' }}>louding</div>
           )}
         </div>
         <div
           className="main-image-div"
+          ref={el => {
+            this.slideBDiv = el;
+          }}
           style={{
             left: this.state.slideBLeft,
             transition: this.state.slideBTransition
@@ -353,14 +404,19 @@ class LuloViewer extends Component {
                 this.slideB = el;
               }}
               slide="B"
+              slideDidMount={this.slideDidMount}
               activeSlide={this.state.activeSlide}
               imageInfo={this.state.slideBImage}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
               SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
               isFirefox={this.isFirefox}
-              changeSlide={this.changeSlide}
+              // changeSlide={this.changeSlide}
             />
+          ) : this.state.imageLoadFailedArr.includes(
+              this.state.currentSlideIndex
+            ) && this.state.activeSlide === 'B' ? (
+            <div style={{ color: 'white' }}>loud fejld</div>
           ) : (
             <div style={{ color: 'white' }}>louding</div>
           )}
