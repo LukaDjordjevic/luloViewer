@@ -23,10 +23,16 @@ class LuloViewer extends Component {
       imagesInfo,
       slideAImage: null,
       slideBImage: null,
-      slideATransition: `left ${this.constants.SLIDE_TRANSITION_DURATION}s`,
-      slideBTransition: `left ${this.constants.SLIDE_TRANSITION_DURATION}s`,
-      slideALeft: '0px',
-      slideBLeft: '0px',
+      slideATransition: `transform ${
+        this.constants.SLIDE_TRANSITION_DURATION
+      }s`,
+      slideBTransition: `transform ${
+        this.constants.SLIDE_TRANSITION_DURATION
+      }s`,
+      slideATransform: 0,
+      slideBTransform: 0,
+      slideALeft: 0,
+      slideBLeft: 0,
       changingSlide: false
     };
 
@@ -44,8 +50,9 @@ class LuloViewer extends Component {
 
   componentDidMount() {
     // setTimeout(() => {
-    //   this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() });
-    // }, 0);
+    //   console.log('CIC!!')
+    //   this.setState({ slideATransform: 'translateX(300px)' });
+    // }, 500);
     this.checkPreload();
     document.addEventListener('wheel', this.onWheel);
 
@@ -66,13 +73,11 @@ class LuloViewer extends Component {
     if (this.state.activeSlide === 'A') {
       console.log('TRIGGERED, moving...', this.props.slide);
       this.setState({
-        slideBLeft: this.state.mainDivRect.width,
-        slideBTransition: 'left 0s'
+        slideBLeft: -1 * this.state.mainDivRect.width
       });
     } else {
       this.setState({
-        slideALeft: this.state.mainDivRect.width,
-        slideATransition: 'left 0s'
+        slideALeft: -1 * this.state.mainDivRect.width
       });
     }
   }
@@ -160,51 +165,34 @@ class LuloViewer extends Component {
         imagesInfo[this.state.currentSlideIndex] = imageInfo;
       }
     }
+    const width = this.state.mainDivRect.width;
     if (amount > 0) {
       // Forwards
       if (this.state.activeSlide === 'A') {
         console.log(
-          'CHANGING SLIDE',
-          this.state.currentSlideIndex,
-          nextSlideIndex,
-          this.state.mainDivRect.width
+          `translateX(${this.state.slideATransform - width}px)`,
+          `translateX(${this.state.slideBTransform - width}px)`
         );
-
         this.setState({
           currentSlideIndex: nextSlideIndex,
           imagesInfo,
           activeSlide: 'B',
-          slideALeft: -1 * this.state.mainDivRect.width,
-          slideBTransition: `left 0s`,
-          slideBLeft: this.state.mainDivRect.width,
-          slideBImage: this.state.imagesInfo[nextSlideIndex]
+          slideBImage: this.state.imagesInfo[nextSlideIndex],
+          // slideALeft: this.state.slideALeft + width + width,
+          slideBLeft: this.state.slideBLeft + width + width,
+          slideATransform: this.state.slideATransform - width,
+          slideBTransform: this.state.slideBTransform - width
         });
-        setTimeout(() => {
-          this.setState({
-            slideBTransition: `left ${
-              this.constants.SLIDE_TRANSITION_DURATION
-            }s`,
-            slideBLeft: 0
-          });
-        }, 0);
       } else {
         this.setState({
           currentSlideIndex: nextSlideIndex,
           imagesInfo,
           activeSlide: 'A',
-          slideBLeft: -1 * this.state.mainDivRect.width,
-          slideATransition: 'left 0s',
-          slideALeft: this.state.mainDivRect.width,
-          slideAImage: this.state.imagesInfo[nextSlideIndex]
+          slideAImage: this.state.imagesInfo[nextSlideIndex],
+          slideALeft: this.state.slideALeft + width + width,
+          slideATransform: this.state.slideATransform - width,
+          slideBTransform: this.state.slideBTransform - width
         });
-        setTimeout(() => {
-          this.setState({
-            slideATransition: `left ${
-              this.constants.SLIDE_TRANSITION_DURATION
-            }s`,
-            slideALeft: 0
-          });
-        }, 0);
       }
     } else {
       // Backwards
@@ -220,38 +208,21 @@ class LuloViewer extends Component {
           currentSlideIndex: nextSlideIndex,
           imagesInfo,
           activeSlide: 'B',
-          slideALeft: this.state.mainDivRect.width,
-          slideBTransition: `left 0s`,
-          slideBLeft: -1 * this.state.mainDivRect.width,
-          slideBImage: this.state.imagesInfo[nextSlideIndex]
+          slideBImage: this.state.imagesInfo[nextSlideIndex],
+          slideBLeft: this.state.slideBLeft - width - width,
+          slideATransform: this.state.slideATransform + width,
+          slideBTransform: this.state.slideBTransform + width
         });
-        setTimeout(() => {
-          console.log('starting animation');
-          this.setState({
-            slideBTransition: `left ${
-              this.constants.SLIDE_TRANSITION_DURATION
-            }s`,
-            slideBLeft: 0
-          });
-        }, 0);
       } else {
         this.setState({
           currentSlideIndex: nextSlideIndex,
           imagesInfo,
           activeSlide: 'A',
-          slideBLeft: this.state.mainDivRect.width,
-          slideATransition: 'left 0s',
-          slideALeft: -1 * this.state.mainDivRect.width,
-          slideAImage: this.state.imagesInfo[nextSlideIndex]
+          slideAImage: this.state.imagesInfo[nextSlideIndex],
+          slideALeft: this.state.slideALeft - width - width,
+          slideATransform: this.state.slideATransform + width,
+          slideBTransform: this.state.slideBTransform + width
         });
-        setTimeout(() => {
-          this.setState({
-            slideATransition: `left ${
-              this.constants.SLIDE_TRANSITION_DURATION
-            }s`,
-            slideALeft: 0
-          });
-        }, 0);
       }
     }
     this.checkPreload();
@@ -264,8 +235,8 @@ class LuloViewer extends Component {
       this.setState({
         slideAImage: this.state.imagesInfo[this.state.currentSlideIndex],
         mainDivRect: mainDivRect,
-        slideBLeft: mainDivRect.width,
-        slideBTransition: 'left 0s'
+        slideBLeft: -1 * mainDivRect.width
+        // slideBImage: this.state.imagesInfo[this.getNextSlideIndex(1)] ? this.state.imagesInfo[this.getNextSlideIndex(1)] : null
       });
     }
     if (!this.state.slideBImage && this.state.activeSlide === 'B') {
@@ -361,8 +332,9 @@ class LuloViewer extends Component {
             this.slideADiv = el;
           }}
           style={{
-            left: this.state.slideALeft,
-            transition: this.state.slideATransition
+            left: `${this.state.slideALeft}px`,
+            transition: this.state.slideATransition,
+            transform: `translateX(${this.state.slideATransform}px)`
           }}
         >
           {this.state.slideAImage !== null ? (
@@ -394,8 +366,9 @@ class LuloViewer extends Component {
             this.slideBDiv = el;
           }}
           style={{
-            left: this.state.slideBLeft,
-            transition: this.state.slideBTransition
+            left: `${this.state.slideBLeft}px`,
+            transition: this.state.slideBTransition,
+            transform: `translateX(${this.state.slideBTransform}px)`
           }}
         >
           {this.state.slideBImage !== null ? (

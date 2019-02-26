@@ -480,6 +480,7 @@ class SingleImage extends PureComponent {
           src={this.props.imageInfo.url}
           ref={el => (this.image = el)}
           alt=""
+          validate="never"
           style={{
             left: this.state.left,
             top: this.state.top,

@@ -9,10 +9,10 @@ class App extends Component {
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-3.jpg',
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-4.jpg',
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-1.jpg',
-      'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/02-young-beautiful-model.jpg',
-      'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/02-young-beautiful-model.jpg',
+      // 'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/02-young-beautiful-model.jpg',
+      // 'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/02-young-beautiful-model.jpg',
       'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-1.jpg',
-      'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-2.jpg'
+      'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-2.jpg',
       // 'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-3.jpg',
       // 'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-4.jpg',
       // 'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-5.jpg'
@@ -25,7 +25,7 @@ class App extends Component {
       // 'http://lorempixel.com/1000/600/cats/Dummy-Text/',
       // 'http://lorempixel.com/1000/600/animals/Dummy-Text/',
       // 'http://lorempixel.com/1000/600/nightlife/Dummy-Text/',
-      // 'http://lorempixel.com/1000/600/fashion/Dummy-Text/',
+      // 'http://lorempixel.com/1000/600/fashion/Dummy-Text/'
       // 'http://lorempixel.com/1000/600/nature/Dummy-Text/'
     ];
     return (
