@@ -23,11 +23,14 @@ class LuloViewer extends Component {
       imagesInfo,
       slideAImage: null,
       slideBImage: null,
-      slideATransition: `left ${this.constants.SLIDE_TRANSITION_DURATION}s`,
-      slideBTransition: `left ${this.constants.SLIDE_TRANSITION_DURATION}s`,
-      slideALeft: '0px',
-      slideBLeft: '0px',
-      changingSlide: false
+      // slideATransition: `left ${this.constants.SLIDE_TRANSITION_DURATION}s`,
+      // slideBTransition: `left ${this.constants.SLIDE_TRANSITION_DURATION}s`,
+      // slideALeft: '0px',
+      // slideBLeft: '0px',
+      changingSlide: false,
+      slideAAnimationName: null,
+      slideBAnimationName: null,
+      slideTransitionDuration: this.constants.SLIDE_TRANSITION_DURATION
     };
 
     this.imageLoading = false;
@@ -40,41 +43,110 @@ class LuloViewer extends Component {
     this.onWheel = this.onWheel.bind(this);
     this.slideDidMount = this.slideDidMount.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
+
+  }
+  
+  createSlideKeyframes() {
+    console.log(this.slideAnimationsStylesheet)
   }
 
+  createSlideAnimationKeyframes(styleSheet) {
+    const width = this.state.mainDivRect.width
+    if (styleSheet.sheet.cssRules[0]) styleSheet.sheet.deleteRule(0)
+    console.log('***********', styleSheet.sheet.cssRules)
+    styleSheet.sheet.insertRule(`
+    @keyframes center-left {
+      from { left: 0px; } 
+      to { left: ${ -1 * width}px; }
+    }`, 0)
+    if (styleSheet.sheet.cssRules[1]) styleSheet.sheet.deleteRule(1)
+    styleSheet.sheet.insertRule(`
+    @keyframes center-right {
+      from { left: 0px; } 
+      to { left: ${width}px; }
+    }`, 1)
+    if (styleSheet.sheet.cssRules[2]) styleSheet.sheet.deleteRule(2)
+    styleSheet.sheet.insertRule(`
+    @keyframes left-center {
+      from { left: ${ -1 * width}px; } 
+      to { left: 0px; }
+    }`, 2)
+    if (styleSheet.sheet.cssRules[3]) styleSheet.sheet.deleteRule(3)
+    styleSheet.sheet.insertRule(`
+    @keyframes right-center {
+      from { left: ${ width}px; } 
+      to { left: 0px; }
+    }`, 3)
+    if (styleSheet.sheet.cssRules[4]) styleSheet.sheet.deleteRule(4)
+    styleSheet.sheet.insertRule(`
+    @keyframes center-left-alt {
+      from { left: 0px; } 
+      to { left: ${ -1 * width}px; }
+    }`, 4)
+    if (styleSheet.sheet.cssRules[5]) styleSheet.sheet.deleteRule(5)
+    styleSheet.sheet.insertRule(`
+    @keyframes center-right-alt {
+      from { left: 0px; } 
+      to { left: ${width}px; }
+    }`, 5)
+    if (styleSheet.sheet.cssRules[6]) styleSheet.sheet.deleteRule(6)
+    styleSheet.sheet.insertRule(`
+    @keyframes left-center-alt {
+      from { left: ${ -1 * width}px; } 
+      to { left: 0px; }
+    }`, 6)
+    if (styleSheet.sheet.cssRules[7]) styleSheet.sheet.deleteRule(7)
+    styleSheet.sheet.insertRule(`
+    @keyframes right-center-alt {
+      from { left: ${ width}px; } 
+      to { left: 0px; }
+    }`, 7)
+    console.log('new animations:', styleSheet.sheet)
+  }
+  
   componentDidMount() {
+    this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
+      // Create style object for slide animations
+      this.slideAnimationsStylesheet = document.createElement('style')
+      this.slideAnimationsStylesheet.type = 'text/css';
+      document.head.appendChild(this.slideAnimationsStylesheet)
+      this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet)
+      console.log(this.slideAnimationsStylesheet)
+    });
     // setTimeout(() => {
-    //   this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() });
-    // }, 0);
+    //   this.setState({animationName: 'center-right', animationDuration: '0.5s'})
+    // }, 2000);
     this.checkPreload();
+    
     document.addEventListener('wheel', this.onWheel);
-
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
-    // this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
-    //   // this.forceUpdate();
-    // });
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.onWindowResize);
     document.removeEventListener('keydown', this.onKeyDown, false);
+    // Delete animation styleSheet
+    this.slideAnimationsStylesheet.parentNode.removeChild(this.slideAnimationsStylesheet)
+
   }
 
   onWindowResize() {
-    this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() });
-    if (this.state.activeSlide === 'A') {
-      console.log('TRIGGERED, moving...', this.props.slide);
-      this.setState({
-        slideBLeft: this.state.mainDivRect.width,
-        slideBTransition: 'left 0s'
-      });
-    } else {
-      this.setState({
-        slideALeft: this.state.mainDivRect.width,
-        slideATransition: 'left 0s'
-      });
-    }
+    this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
+      this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet)
+    });
+    // if (this.state.activeSlide === 'A') {
+    //   console.log('TRIGGERED, moving...', this.props.slide);
+    //   this.setState({
+    //     slideBLeft: this.state.mainDivRect.width,
+    //     slideBTransition: 'left 0s'
+    //   });
+    // } else {
+    //   this.setState({
+    //     slideALeft: this.state.mainDivRect.width,
+    //     slideATransition: 'left 0s'
+    //   });
+    // }
   }
 
   onKeyDown(e) {
@@ -83,11 +155,13 @@ class LuloViewer extends Component {
     switch (e.key) {
       case 'ArrowLeft':
         e.preventDefault();
-        if (!this.changingSlide) this.changeSlide(-1);
+        // if (!this.changingSlide) 
+        this.changeSlide(-1);
         break;
       case 'ArrowRight':
         e.preventDefault();
-        if (!this.changingSlide) this.changeSlide(1);
+        // if (!this.changingSlide) 
+        this.changeSlide(1);
         break;
       case 'f':
         if (!this.isFullScreen) {
@@ -111,35 +185,35 @@ class LuloViewer extends Component {
   }
 
   slideDidMount(slide) {
-    setTimeout(() => {
-      if (slide === 'A') {
-        this.slideADiv.addEventListener(
-          'transitionend',
-          this.onTransitionEnd,
-          true
-        );
-      }
-      if (slide === 'B') {
-        this.slideBDiv.addEventListener(
-          'transitionend',
-          this.onTransitionEnd,
-          true
-        );
-      }
-    }, 0);
+    // setTimeout(() => {
+    //   if (slide === 'A') {
+    //     this.slideADiv.addEventListener(
+    //       'transitionend',
+    //       this.onTransitionEnd,
+    //       true
+    //     );
+    //   }
+    //   if (slide === 'B') {
+    //     this.slideBDiv.addEventListener(
+    //       'transitionend',
+    //       this.onTransitionEnd,
+    //       true
+    //     );
+    //   }
+    // }, 0);
   }
 
-  onTransitionEnd() {
-    this.changingSlide = false;
-    console.log('**********************transition end', this.changingSlide);
-  }
+  // onTransitionEnd() {
+  //   this.changingSlide = false;
+  //   console.log('**********************transition end', this.changingSlide);
+  // }
 
   changeSlide(amount) {
     console.log('change slide', amount);
     this.changingSlide = true;
-    setTimeout(() => {
-      this.changingSlide = false;
-    }, this.constants.SLIDE_TRANSITION_DURATION * 1200);
+    // setTimeout(() => {
+    //   this.changingSlide = false;
+    // }, this.constants.SLIDE_TRANSITION_DURATION * 1200);
     const nextSlideIndex = this.getNextSlideIndex(
       this.state.currentSlideIndex,
       amount
@@ -160,7 +234,10 @@ class LuloViewer extends Component {
         imagesInfo[this.state.currentSlideIndex] = imageInfo;
       }
     }
+
+    // const width = this.state.mainDivRect.width
     if (amount > 0) {
+      console.log('helllo????')
       // Forwards
       if (this.state.activeSlide === 'A') {
         console.log(
@@ -169,42 +246,43 @@ class LuloViewer extends Component {
           nextSlideIndex,
           this.state.mainDivRect.width
         );
-
+        // this.slideA.classList.remove(this.state.slideAAnimationName)
+        console.log(this.state.slideAAnimationName, this.state.slideAAnimationName === 'center-left' ? 'center-left-alt' : 'center-left')
         this.setState({
           currentSlideIndex: nextSlideIndex,
           imagesInfo,
           activeSlide: 'B',
-          slideALeft: -1 * this.state.mainDivRect.width,
-          slideBTransition: `left 0s`,
-          slideBLeft: this.state.mainDivRect.width,
+          slideAAnimationName: this.state.slideAAnimationName === 'center-left' ? 'center-left-alt' : 'center-left',
+          slideBAnimationName: this.state.slideBAnimationName === 'right-center' ? 'right-center-alt' : 'right-center',
           slideBImage: this.state.imagesInfo[nextSlideIndex]
         });
-        setTimeout(() => {
-          this.setState({
-            slideBTransition: `left ${
-              this.constants.SLIDE_TRANSITION_DURATION
-            }s`,
-            slideBLeft: 0
-          });
-        }, 0);
+        // setTimeout(() => {
+        //   this.setState({
+        //     slideBTransition: `left ${
+        //       this.constants.SLIDE_TRANSITION_DURATION
+        //     }s`,
+        //     slideBLeft: 0
+        //   });
+        // }, 0);
       } else {
+        console.log(this.state.slideBAnimationName, this.state.slideBAnimationName === 'center-left' ? 'center-left-alt' : 'center-left')
+
         this.setState({
           currentSlideIndex: nextSlideIndex,
           imagesInfo,
           activeSlide: 'A',
-          slideBLeft: -1 * this.state.mainDivRect.width,
-          slideATransition: 'left 0s',
-          slideALeft: this.state.mainDivRect.width,
+          slideBAnimationName: this.state.slideBAnimationName === 'center-left' ? 'center-left-alt' : 'center-left',
+          slideAAnimationName: this.state.slideAAnimationName === 'right-center' ? 'right-center-alt' : 'right-center',
           slideAImage: this.state.imagesInfo[nextSlideIndex]
         });
-        setTimeout(() => {
-          this.setState({
-            slideATransition: `left ${
-              this.constants.SLIDE_TRANSITION_DURATION
-            }s`,
-            slideALeft: 0
-          });
-        }, 0);
+        // setTimeout(() => {
+        //   this.setState({
+        //     slideATransition: `left ${
+        //       this.constants.SLIDE_TRANSITION_DURATION
+        //     }s`,
+        //     slideALeft: 0
+        //   });
+        // }, 0);
       }
     } else {
       // Backwards
@@ -220,38 +298,20 @@ class LuloViewer extends Component {
           currentSlideIndex: nextSlideIndex,
           imagesInfo,
           activeSlide: 'B',
-          slideALeft: this.state.mainDivRect.width,
-          slideBTransition: `left 0s`,
-          slideBLeft: -1 * this.state.mainDivRect.width,
+          slideAAnimationName: this.state.slideAAnimationName === 'center-right' ? 'center-right-alt' : 'center-right',
+          slideBAnimationName: this.state.slideBAnimationName === 'left-center' ? 'left-center-alt' : 'left-center',
           slideBImage: this.state.imagesInfo[nextSlideIndex]
         });
-        setTimeout(() => {
-          console.log('starting animation');
-          this.setState({
-            slideBTransition: `left ${
-              this.constants.SLIDE_TRANSITION_DURATION
-            }s`,
-            slideBLeft: 0
-          });
-        }, 0);
       } else {
         this.setState({
           currentSlideIndex: nextSlideIndex,
           imagesInfo,
           activeSlide: 'A',
-          slideBLeft: this.state.mainDivRect.width,
-          slideATransition: 'left 0s',
-          slideALeft: -1 * this.state.mainDivRect.width,
+          slideBAnimationName: this.state.slideBAnimationName === 'center-right' ? 'center-right-alt' : 'center-right',
+          slideAAnimationName: this.state.slideAAnimationName === 'left-center' ? 'left-center-alt' : 'left-center',
           slideAImage: this.state.imagesInfo[nextSlideIndex]
         });
-        setTimeout(() => {
-          this.setState({
-            slideATransition: `left ${
-              this.constants.SLIDE_TRANSITION_DURATION
-            }s`,
-            slideALeft: 0
-          });
-        }, 0);
+
       }
     }
     this.checkPreload();
@@ -264,8 +324,8 @@ class LuloViewer extends Component {
       this.setState({
         slideAImage: this.state.imagesInfo[this.state.currentSlideIndex],
         mainDivRect: mainDivRect,
-        slideBLeft: mainDivRect.width,
-        slideBTransition: 'left 0s'
+        // slideBLeft: mainDivRect.width,
+        // slideBTransition: 'left 0s'
       });
     }
     if (!this.state.slideBImage && this.state.activeSlide === 'B') {
@@ -361,8 +421,11 @@ class LuloViewer extends Component {
             this.slideADiv = el;
           }}
           style={{
-            left: this.state.slideALeft,
-            transition: this.state.slideATransition
+            // left: this.state.slideALeft,
+            // transition: this.state.slideATransition,
+            animationName: this.state.slideAAnimationName,
+            animationDuration: `${this.state.slideTransitionDuration}s`,
+            animationFillMode: 'forwards'
           }}
         >
           {this.state.slideAImage !== null ? (
@@ -394,8 +457,10 @@ class LuloViewer extends Component {
             this.slideBDiv = el;
           }}
           style={{
-            left: this.state.slideBLeft,
-            transition: this.state.slideBTransition
+            // left: this.state.slideBLeft,
+            animationName: this.state.slideBAnimationName,
+            animationDuration: `${this.state.slideTransitionDuration}s`,
+            animationFillMode: 'forwards'
           }}
         >
           {this.state.slideBImage !== null ? (
