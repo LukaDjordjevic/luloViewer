@@ -3,6 +3,15 @@ import './styles.css';
 import LuloViewer from './LuloViewer';
 
 class App extends Component {
+  constructor() {
+    super();
+    this.state = { bb: true };
+  }
+  componentDidMount() {
+    // setTimeout(() => {
+    //   this.setState({ bb: false });
+    // }, 2000);
+  }
   render() {
     const images = [
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-2.jpg',
@@ -40,7 +49,7 @@ class App extends Component {
           // display: 'flex'
         }}
       >
-        <LuloViewer imageUrls={images} />
+        {this.state.bb ? <LuloViewer imageUrls={images} /> : null}
       </div>
     );
   }

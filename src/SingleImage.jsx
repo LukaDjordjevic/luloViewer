@@ -14,10 +14,10 @@ class SingleImage extends PureComponent {
     this.zooming = false;
     this.zoomTargetSelected = false;
     this.state = {
-      zoomFactor: 1,
-      zoomLevel: 0,
+      zoomFactor: this.props.imageInfo.zoomMultipliers[this.props.imageInfo.zoomLevel] || 1,
+      zoomLevel: this.props.imageInfo.zoomLevel || 0,
       cursor: 'initial',
-      zoomTarget: { x: 0.5, y: 0.5 }
+      zoomTarget: this.props.imageInfo.zoomTarget || { x: 0.5, y: 0.5 }
     };
 
     this.containerAspectRatio =
@@ -35,8 +35,8 @@ class SingleImage extends PureComponent {
     const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
     const containerAspectRatio = this.containerAspectRatio;
     const { left, top, width, height } = this.getImageTransform(
-      1,
-      { x: 0.5, y: 0.5 },
+      this.state.zoomFactor,
+      this.state.zoomTarget,
       parentBoundingRect,
       imageAspectRatio,
       containerAspectRatio
@@ -60,7 +60,6 @@ class SingleImage extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.slideDidMount(this.props.slide);
     console.log('initialized');
   }
 
@@ -81,7 +80,6 @@ class SingleImage extends PureComponent {
     ) {
       console.log(nextProps.activeSlide, this.props.slide);
       const zoomFactor = this.state.zoomFactor;
-      // cont zoomTarget = JSON.parse(JSON.stringify(this.state.zoomTarget));
       const zoomTarget = { ...this.state.zoomTarget };
       let { left, top, width, height } = this.getImageTransform(
         zoomFactor,
@@ -102,16 +100,7 @@ class SingleImage extends PureComponent {
 
       left = constrainedLeft;
       top = constrainedTop;
-      // if (nextProps.activeSlide !== this.props.slide) {
-      //   console.log('TRIGGERED, moving...', this.props.slide);
-      //   left = nextProps.parentBoundingRect.width;
-      // }
-      console.log('SLIDE', this.props.slide, 'CHANGING TRANSFORM TO', {
-        left,
-        top,
-        width,
-        height
-      });
+
       this.setState({ left, top, width, height }, () => {});
     }
     // Slide image has changed
@@ -149,6 +138,7 @@ class SingleImage extends PureComponent {
         width,
         height
       });
+    } else {
     }
   }
 
@@ -218,8 +208,6 @@ class SingleImage extends PureComponent {
   }
 
   onWheel(e) {
-    e.preventDefault();
-    e.stopPropagation();
     // console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
     let threshold = this.props.SWIPE_THRESHOLD;
     let timeout = 100;
@@ -231,13 +219,10 @@ class SingleImage extends PureComponent {
       if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
       console.log('IZ');
       this.zoomTimeout = setTimeout(() => {
-        console.log('*****************Swipe allowed');
         this.zooming = false;
       }, timeout);
       if (!this.zooming) {
         this.zooming = true;
-        console.log('TRIG');
-        console.log('*********** i am zomming:', this.zooming, e.deltaX);
         if (e.deltaX > 0) {
           this.props.changeSlide(1);
         } else {
@@ -317,7 +302,6 @@ class SingleImage extends PureComponent {
 
     this.setState(
       {
-        // cursor: 'none',
         left: constrainedLeft,
         top: constrainedTop,
         width,
@@ -468,7 +452,6 @@ class SingleImage extends PureComponent {
 
   render() {
     console.log('*** single image render ***');
-    // document.addEventListener('wheel', this.onWheel);
 
     return (
       <div
