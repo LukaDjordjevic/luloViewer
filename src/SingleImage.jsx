@@ -42,8 +42,17 @@ class SingleImage extends PureComponent {
       containerAspectRatio
     );
 
-    this.state.left = left;
-    this.state.top = top;
+    const { constrainedLeft, constrainedTop } = this.constrainTranslate(
+      left,
+      top,
+      this.state.zoomFactor,
+      parentBoundingRect,
+      imageAspectRatio,
+      containerAspectRatio
+    );
+
+    this.state.left = constrainedLeft;
+    this.state.top = constrainedTop;
     this.state.width = width;
     this.state.height = height;
 
