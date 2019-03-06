@@ -3,7 +3,7 @@
   height: 100%;
   position: absolute;
   /* display: inline-block; */
-  /* overflow: hidden; */
+  overflow: hidden;
 }
 
 .main-image-div {

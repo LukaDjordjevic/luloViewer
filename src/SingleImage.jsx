@@ -14,7 +14,9 @@ class SingleImage extends PureComponent {
     this.zooming = false;
     this.zoomTargetSelected = false;
     this.state = {
-      zoomFactor: this.props.imageInfo.zoomMultipliers[this.props.imageInfo.zoomLevel] || 1,
+      zoomFactor:
+        this.props.imageInfo.zoomMultipliers[this.props.imageInfo.zoomLevel] ||
+        1,
       zoomLevel: this.props.imageInfo.zoomLevel || 0,
       cursor: 'initial',
       zoomTarget: this.props.imageInfo.zoomTarget || { x: 0.5, y: 0.5 }
@@ -218,28 +220,27 @@ class SingleImage extends PureComponent {
 
   onWheel(e) {
     // console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
-    let threshold = this.props.SWIPE_THRESHOLD;
-    let timeout = 100;
-    if (this.props.isFirefox) {
-      threshold = this.props.SWIPE_THRESHOLD * 1.5;
-      timeout = 180;
-    }
-    if (Math.abs(e.deltaX) > threshold) {
-      if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
-      console.log('IZ');
-      this.zoomTimeout = setTimeout(() => {
-        this.zooming = false;
-      }, timeout);
-      if (!this.zooming) {
-        this.zooming = true;
-        if (e.deltaX > 0) {
-          this.props.changeSlide(1);
-        } else {
-          this.props.changeSlide(-1);
-        }
-        return;
-      }
-    }
+    // let threshold = this.props.SWIPE_THRESHOLD;
+    // let timeout = 250;
+    // if (this.props.isFirefox) {
+    //   threshold = this.props.SWIPE_THRESHOLD * 1.5;
+    //   timeout = 180;
+    // }
+    // if (Math.abs(e.deltaX) > threshold) {
+    //   if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
+    //   this.zoomTimeout = setTimeout(() => {
+    //     this.zooming = false;
+    //   }, timeout);
+    //   if (!this.zooming) {
+    //     this.zooming = true;
+    //     if (e.deltaX > 0) {
+    //       this.props.changeSlide(1);
+    //     } else {
+    //       this.props.changeSlide(-1);
+    //     }
+    //     return;
+    //   }
+    // }
 
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
 
@@ -396,15 +397,18 @@ class SingleImage extends PureComponent {
     imageAspectRatio,
     containerAspectRatio
   ) {
-    const dimensions = {};
+    let width;
+    let height;
+
     if (imageAspectRatio > containerAspectRatio) {
-      dimensions.width = parentBoundingRect.width * zoomFactor;
-      dimensions.height = dimensions.width / imageAspectRatio;
+      width = parentBoundingRect.width * zoomFactor;
+      height = width / imageAspectRatio;
     } else {
-      dimensions.height = parentBoundingRect.height * zoomFactor;
-      dimensions.width = dimensions.height * imageAspectRatio;
+      height = parentBoundingRect.height * zoomFactor;
+      width = height * imageAspectRatio;
     }
-    return dimensions;
+
+    return { width, height };
   }
 
   constrainTranslate(
