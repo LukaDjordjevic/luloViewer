@@ -10,7 +10,7 @@ class LuloViewer extends Component {
       MAX_PRELOADED_IMAGES: 5,
       ZOOM_LEVELS: 100,
       SWIPE_THRESHOLD: 20,
-      SLIDE_TRANSITION_DURATION: 0.3,
+      SLIDE_TRANSITION_DURATION: 0.5,
       SLIDE_TRANSITION_TIMEOUT: 600
     };
 
@@ -131,10 +131,9 @@ class LuloViewer extends Component {
       // timeout = 180;
     }
 
-    if (Math.abs(e.deltaX) > threshold) {
-      console.log('THRESHOLD');
-
-      if (!this.changingSlide) {
+    if (!this.changingSlide) {
+      if (Math.abs(e.deltaX) > threshold) {
+        console.log('THRESHOLD');
         if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
         this.zoomTimeout = setTimeout(() => {
           this.changingSlide = false;
@@ -145,15 +144,14 @@ class LuloViewer extends Component {
         } else {
           this.changeSlide(-1);
         }
+        return;
       }
-      return;
-    }
-
-    if (this.state.activeSlide === 'A' && this.slideA) {
-      this.slideA.onWheel(e);
-    } else if (this.slideB) {
-      this.slideB.onWheel(e);
-    } else {
+      if (this.state.activeSlide === 'A' && this.slideA) {
+        this.slideA.onWheel(e);
+      } else if (this.slideB) {
+        this.slideB.onWheel(e);
+      } else {
+      }
     }
   }
 
@@ -337,7 +335,6 @@ class LuloViewer extends Component {
   }
 
   checkPreload() {
-    const requiredImages = [];
     // if (
     //   !this.state.imagesInfo[this.state.slideAImageIndex] &&
     //   this.state.activeSlide === 'A'
@@ -362,6 +359,8 @@ class LuloViewer extends Component {
     //   });
     // }
 
+    //First figure out which images should be preloaded based on current image index & MAX_PRELOADED_IMAGES
+    const requiredImages = [];
     for (let i = 0; i < this.constants.MAX_PRELOADED_IMAGES + 1; i++) {
       const nextSlide = this.getNextSlideIndex(this.state.currentSlideIndex, i);
       if (!requiredImages.includes(nextSlide)) requiredImages.push(nextSlide);
@@ -402,9 +401,9 @@ class LuloViewer extends Component {
 
         const maxv = Math.log(MAX_ZOOM);
         const scale = maxv / this.constants.ZOOM_LEVELS;
-        const zoomMultipliers = {};
+        const zoomMultipliers = [];
         for (let i = 0; i < this.constants.ZOOM_LEVELS; i++) {
-          zoomMultipliers[i] = Math.exp(scale * i);
+          zoomMultipliers.push(Math.exp(scale * i));
         }
         imagesInfo[idx] = {
           url: this.props.imageUrls[idx],
