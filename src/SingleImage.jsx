@@ -89,7 +89,7 @@ class SingleImage extends PureComponent {
       JSON.stringify(nextProps.parentBoundingRect) !==
       JSON.stringify(this.props.parentBoundingRect)
     ) {
-      console.log(nextProps.activeSlide, this.props.slide);
+      // console.log(nextProps.activeSlide, this.props.slide);
       const zoomFactor = this.state.zoomFactor;
       const zoomTarget = { ...this.state.zoomTarget };
       let { left, top, width, height } = this.getImageTransform(

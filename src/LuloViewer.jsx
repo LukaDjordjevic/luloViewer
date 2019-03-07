@@ -281,6 +281,7 @@ class LuloViewer extends Component {
     // );
 
     const width = this.state.mainDivRect.width;
+    let activeSlide;
 
     const { imagesInfo } = this.state;
     const imageInfo = JSON.parse(
@@ -340,6 +341,7 @@ class LuloViewer extends Component {
         slideALeft = width;
         slideCLeft = 0;
         slideBLeft = -1 * width;
+        activeSlide = 'C';
 
         slideAImageIndex = this.getNextSlideIndex(
           this.state.currentSlideIndex,
@@ -363,6 +365,8 @@ class LuloViewer extends Component {
         slideCLeft = -1 * width;
         slideALeft = 0;
         slideBLeft = width;
+        activeSlide = 'A';
+
         slideBImageIndex = this.getNextSlideIndex(
           this.state.currentSlideIndex,
           2
@@ -386,6 +390,8 @@ class LuloViewer extends Component {
         slideALeft = -1 * width;
         slideBLeft = 0;
         slideCLeft = width;
+        activeSlide = 'B';
+
         slideCImageIndex = this.getNextSlideIndex(
           this.state.currentSlideIndex,
           2
@@ -417,6 +423,7 @@ class LuloViewer extends Component {
         slideALeft = 0;
         slideBLeft = width;
         slideCLeft = -1 * width;
+        activeSlide = 'A';
 
         // slideBImageIndex = this.getNextSlideIndex(slideCImageIndex, -1);
         // const helperIndex = this.getNextSlideIndex(
@@ -444,6 +451,8 @@ class LuloViewer extends Component {
         slideALeft = -1 * width;
         slideBLeft = 0;
         slideCLeft = width;
+        activeSlide = 'B';
+
         // const helperIndex = this.getNextSlideIndex(
         //   this.state.currentSlideIndex,
         //   -1
@@ -469,6 +478,8 @@ class LuloViewer extends Component {
         slideBLeft = -1 * width;
         slideCLeft = 0;
         slideALeft = width;
+        activeSlide = 'C';
+
         // const helperIndex = this.getNextSlideIndex(
         //   this.state.currentSlideIndex,
         //   -1
@@ -484,6 +495,7 @@ class LuloViewer extends Component {
 
     this.setState(
       {
+        activeSlide,
         slideALeft,
         slideBLeft,
         slideCLeft,
@@ -666,7 +678,7 @@ class LuloViewer extends Component {
               }}
               slide="A"
               parentLeft={this.state.slideALeft}
-              activeSlide={this.state.activeSlide}
+              // activeSlide={this.state.activeSlide}
               imageInfo={this.state.imagesInfo[this.state.slideAImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
@@ -700,7 +712,7 @@ class LuloViewer extends Component {
               }}
               slide="B"
               parentLeft={this.state.slideBLeft}
-              activeSlide={this.state.activeSlide}
+              // activeSlide={this.state.activeSlide}
               imageInfo={this.state.imagesInfo[this.state.slideBImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
@@ -734,7 +746,7 @@ class LuloViewer extends Component {
               }}
               slide="C"
               parentLeft={this.state.slideCLeft}
-              activeSlide={this.state.activeSlide}
+              // activeSlide={this.state.activeSlide}
               imageInfo={this.state.imagesInfo[this.state.slideCImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
