@@ -195,13 +195,26 @@ class SingleImage extends PureComponent {
     console.log('assign:', parentBoundingRect2);
 
     //Update zoomTarget
-    const zoomTarget = {};
-    zoomTarget.x =
-      (-1 * newLeft + this.props.parentBoundingRect.width / 2) /
-      this.state.width;
-    zoomTarget.y =
-      (-1 * newTop + this.props.parentBoundingRect.height / 2) /
-      this.state.height;
+    // const zoomTarget = {};
+    // zoomTarget.x =
+    //   (-1 * newLeft + this.props.parentBoundingRect.width / 2) /
+    //   this.state.width;
+    // zoomTarget.y =
+    //   (-1 * newTop + this.props.parentBoundingRect.height / 2) /
+    //   this.state.height;
+
+    const imageWidth = this.state.width;
+    const imageHeight = this.state.height;
+    const divWidth = this.props.parentBoundingRect.width;
+    const divHeight = this.props.parentBoundingRect.height;
+    const zoomTarget = this.updateZoomTarget(
+      newLeft,
+      newTop,
+      imageWidth,
+      imageHeight,
+      divWidth,
+      divHeight
+    );
 
     const { constrainedLeft, constrainedTop } = this.constrainTranslate(
       newLeft,
@@ -219,28 +232,6 @@ class SingleImage extends PureComponent {
   }
 
   onWheel(e) {
-    // console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
-    // let threshold = this.props.SWIPE_THRESHOLD;
-    // let timeout = 250;
-    // if (this.props.isFirefox) {
-    //   threshold = this.props.SWIPE_THRESHOLD * 1.5;
-    //   timeout = 180;
-    // }
-    // if (Math.abs(e.deltaX) > threshold) {
-    //   if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
-    //   this.zoomTimeout = setTimeout(() => {
-    //     this.zooming = false;
-    //   }, timeout);
-    //   if (!this.zooming) {
-    //     this.zooming = true;
-    //     if (e.deltaX > 0) {
-    //       this.props.changeSlide(1);
-    //     } else {
-    //       this.props.changeSlide(-1);
-    //     }
-    //     return;
-    //   }
-    // }
 
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
 
@@ -255,7 +246,7 @@ class SingleImage extends PureComponent {
     }
 
     const newZoomFactor = this.props.imageInfo.zoomMultipliers[
-      zoomLevel.toString()
+      zoomLevel //.toString()
     ];
 
     const parentBoundingRect = JSON.parse(
@@ -279,23 +270,30 @@ class SingleImage extends PureComponent {
       eventPosition
     );
 
-    // Calculate new zoomTarget
-    let zoomTarget = {};
     console.log(!this.zooming, e.deltaY);
 
+    let zoomTarget;
     if (!this.zoomTargetSelected && e.deltaY < 0) {
       if (this.zoomTargetTimeout) clearTimeout(this.zoomTargetTimeout);
       this.zoomTargetTimeout = setTimeout(() => {
         this.zoomTargetSelected = false;
       }, 200);
 
-      //Update zoomTarget
-      zoomTarget.x =
-        (-1 * this.state.left + parentBoundingRect.width / 2) /
-        this.state.width;
-      zoomTarget.y =
-        (-1 * this.state.top + parentBoundingRect.height / 2) /
-        this.state.height;
+      // Calculate new zoomTarget
+      const imageLeft = this.state.left;
+      const imageTop = this.state.top;
+      const imageWidth = this.state.width;
+      const imageHeight = this.state.height;
+      const divWidth = this.props.parentBoundingRect.width;
+      const divHeight = this.props.parentBoundingRect.height;
+      zoomTarget = this.updateZoomTarget(
+        imageLeft,
+        imageTop,
+        imageWidth,
+        imageHeight,
+        divWidth,
+        divHeight
+      );
     } else {
       zoomTarget = this.state.zoomTarget;
     }
@@ -322,6 +320,21 @@ class SingleImage extends PureComponent {
       },
       () => {}
     );
+  }
+
+  // Calculate point in center of screen based on image transform and div bounding rectangle.
+  // Returns dimensionless coords (represented as multipliers of image width and height)
+  updateZoomTarget(
+    imageLeft,
+    imageTop,
+    imageWidth,
+    imageHeight,
+    boundingRectWidth,
+    boundingRectHeight
+  ) {
+    const zoomTargetX = (-1 * imageLeft + boundingRectWidth / 2) / imageWidth;
+    const zoomTargetY = (-1 * imageTop + boundingRectHeight / 2) / imageHeight;
+    return { x: zoomTargetX, y: zoomTargetY };
   }
 
   // Returns new image pos & dimensions while zooming such that the point on image below mouse pointer doesn't move
