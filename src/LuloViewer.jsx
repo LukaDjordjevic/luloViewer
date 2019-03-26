@@ -10,7 +10,7 @@ class LuloViewer extends Component {
       MAX_PRELOADED_IMAGES: 5,
       ZOOM_LEVELS: 100,
       SWIPE_THRESHOLD: 20,
-      SLIDE_TRANSITION_DURATION: 0.5,
+      SLIDE_TRANSITION_DURATION: 0.3,
       SLIDE_TRANSITION_TIMEOUT: 600
     };
 
@@ -21,6 +21,9 @@ class LuloViewer extends Component {
       activeSlide: 'A',
       currentSlideIndex: this.constants.STARTING_SLIDE,
       imagesInfo,
+      slideALeft: 0,
+      slideBLeft: 0,
+      slideCLeft: 0,
       slideAImageIndex: this.constants.STARTING_SLIDE,
       slideBImageIndex: this.getNextSlideIndex(
         this.constants.STARTING_SLIDE,
@@ -52,8 +55,14 @@ class LuloViewer extends Component {
   }
 
   componentDidMount() {
+    const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
     this.setState(
-      { mainDivRect: this.mainDiv.parentNode.getBoundingClientRect() },
+      {
+        mainDivRect,
+        slideALeft: 0,
+        slideBLeft: mainDivRect.width,
+        slideCLeft: -1 * mainDivRect.width
+      },
       () => {
         // Create style object for slide animations
         this.slideAnimationsStylesheet = document.createElement('style');
@@ -63,13 +72,13 @@ class LuloViewer extends Component {
         console.log(this.slideAnimationsStylesheet);
       }
     );
-    this.checkPreload();
-
-    // this.slideDivA.addEventListener('animationend', this.onAnimationEnd, false);
-    // this.slideDivB.addEventListener('animationend', this.onAnimationEnd, false);
     document.addEventListener('wheel', this.onWheel);
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
+    // this.slideDivA.addEventListener('animationend', this.onAnimationEnd, false);
+    // this.slideDivB.addEventListener('animationend', this.onAnimationEnd, false);
+
+    this.checkPreload();
   }
 
   componentWillUnmount() {
@@ -83,9 +92,27 @@ class LuloViewer extends Component {
   }
 
   onWindowResize() {
-    this.setState({ mainDivRect: this.mainDiv.getBoundingClientRect() }, () => {
-      this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet);
-    });
+    const mainDivRect = this.mainDiv.getBoundingClientRect();
+    let slideALeft = 0;
+    let slideBLeft = 0;
+    let slideCLeft = 0;
+    if (this.state.slideALeft > 0) slideALeft = mainDivRect.width;
+    if (this.state.slideALeft < 0) slideALeft = -1 * mainDivRect.width;
+    if (this.state.slideBLeft > 0) slideBLeft = mainDivRect.width;
+    if (this.state.slideBLeft < 0) slideBLeft = -1 * mainDivRect.width;
+    if (this.state.slideCLeft > 0) slideCLeft = mainDivRect.width;
+    if (this.state.slideCLeft < 0) slideCLeft = -1 * mainDivRect.width;
+    this.setState(
+      {
+        mainDivRect,
+        slideALeft,
+        slideBLeft,
+        slideCLeft
+      },
+      () => {
+        this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet);
+      }
+    );
   }
 
   onKeyDown(e) {
@@ -146,11 +173,13 @@ class LuloViewer extends Component {
         }
         return;
       }
-      if (this.state.activeSlide === 'A' && this.slideA) {
+      console.log('MEEET', this.state.activeSlide === 'A', this.slideA);
+      if (this.state.slideALeft === 0 && this.slideA) {
         this.slideA.onWheel(e);
-      } else if (this.slideB) {
+      } else if (this.state.slideBLeft === 0 && this.slideB) {
         this.slideB.onWheel(e);
-      } else {
+      } else if (this.slideC) {
+        this.slideC.onWheel(e);
       }
     }
   }
@@ -241,134 +270,329 @@ class LuloViewer extends Component {
   }
 
   changeSlide(amount) {
-    const nextSlideIndex = this.getNextSlideIndex(
-      this.state.currentSlideIndex,
-      amount
-    );
+    // const nextSlideIndex = this.getNextSlideIndex(
+    //   this.state.currentSlideIndex,
+    //   amount
+    // );
+
+    // const previousSlideIndex = this.getNextSlideIndex(
+    //   this.state.currentSlideIndex,
+    //   -1 * amount
+    // );
+
+    const width = this.state.mainDivRect.width;
+    let activeSlide;
 
     const { imagesInfo } = this.state;
     const imageInfo = JSON.parse(
       JSON.stringify(imagesInfo[this.state.currentSlideIndex])
     );
-    if (this.state.activeSlide === 'A') {
-      if (this.state.imagesInfo[this.state.slideAImageIndex] && this.slideA) {
+    if (this.state.slideALeft === 0) {
+      if (imageInfo && this.slideA) {
         imageInfo.zoomLevel = this.slideA.state.zoomLevel;
         imageInfo.zoomTarget = this.slideA.state.zoomTarget;
         imagesInfo[this.state.currentSlideIndex] = imageInfo;
       }
-    } else {
-      if (this.state.imagesInfo[this.state.slideBImageIndex] && this.slideB) {
+    } else if (this.state.slideBLeft === 0) {
+      if (imageInfo && this.slideB) {
         imageInfo.zoomLevel = this.slideB.state.zoomLevel;
         imageInfo.zoomTarget = this.slideB.state.zoomTarget;
         imagesInfo[this.state.currentSlideIndex] = imageInfo;
       }
+    } else {
+      if (imageInfo && this.slideC) {
+        imageInfo.zoomLevel = this.slideC.state.zoomLevel;
+        imageInfo.zoomTarget = this.slideC.state.zoomTarget;
+        imagesInfo[this.state.currentSlideIndex] = imageInfo;
+      }
     }
 
+    let slideAAnimationName = this.state.slideAAnimationName;
+    let slideBAnimationName = this.state.slideBAnimationName;
+    let slideCAnimationName = this.state.slideCAnimationName;
+    let slideALeft = this.state.slideALeft;
+    let slideBLeft = this.state.slideBLeft;
+    let slideCLeft = this.state.slideCLeft;
+    let slideAImageIndex = this.state.slideAImageIndex;
+    let slideBImageIndex = this.state.slideBImageIndex;
+    let slideCImageIndex = this.state.slideCImageIndex;
+    let currentSlideIndex;
     if (amount > 0) {
       // Forwards
-      if (this.state.activeSlide === 'A') {
-        this.setState({
-          currentSlideIndex: nextSlideIndex,
-          imagesInfo,
-          activeSlide: 'B',
-          slideAAnimationName:
-            this.state.slideAAnimationName === 'center-left'
-              ? 'center-left-alt'
-              : 'center-left',
-          slideBAnimationName:
-            this.state.slideBAnimationName === 'right-center'
-              ? 'right-center-alt'
-              : 'right-center',
-          slideBImageIndex: nextSlideIndex
-        });
+      currentSlideIndex = this.getNextSlideIndex(
+        this.state.currentSlideIndex,
+        1
+      );
+      if (this.state.slideALeft === -1 * this.state.mainDivRect.width) {
+        console.log(
+          'AAAA IS LEFT',
+          this.state.slideALeft,
+          -1 * this.state.mainDivRect.width
+        );
+        slideBAnimationName =
+          this.state.slideBAnimationName === 'center-left'
+            ? 'center-left-alt'
+            : 'center-left';
+        slideCAnimationName =
+          this.state.slideCAnimationName === 'right-center'
+            ? 'right-center-alt'
+            : 'right-center';
+        slideAAnimationName = null;
+        slideALeft = width;
+        slideCLeft = 0;
+        slideBLeft = -1 * width;
+        activeSlide = 'C';
+
+        slideAImageIndex = this.getNextSlideIndex(
+          this.state.currentSlideIndex,
+          2
+        );
+        // slideAImageIndex = this.getNextSlideIndex(slideCImageIndex, 1);
+        // slideBImageIndex = this.state.currentSlideIndex;
+      } else if (this.state.slideBLeft === -1 * this.state.mainDivRect.width) {
+        console.log('B is left');
+
+        slideCAnimationName =
+          this.state.slideCAnimationName === 'center-left'
+            ? 'center-left-alt'
+            : 'center-left';
+        slideAAnimationName =
+          this.state.slideAAnimationName === 'right-center'
+            ? 'right-center-alt'
+            : 'right-center';
+        slideBAnimationName = null;
+
+        slideCLeft = -1 * width;
+        slideALeft = 0;
+        slideBLeft = width;
+        activeSlide = 'A';
+
+        slideBImageIndex = this.getNextSlideIndex(
+          this.state.currentSlideIndex,
+          2
+        );
+        console.log('###', this.state.currentSlideIndex, slideBImageIndex);
+
+        // slideBImageIndex = this.getNextSlideIndex(slideAImageIndex, 1);
+        // slideCImageIndex = this.state.currentSlideIndex;
       } else {
-        this.setState({
-          currentSlideIndex: nextSlideIndex,
-          imagesInfo,
-          activeSlide: 'A',
-          slideBAnimationName:
-            this.state.slideBAnimationName === 'center-left'
-              ? 'center-left-alt'
-              : 'center-left',
-          slideAAnimationName:
-            this.state.slideAAnimationName === 'right-center'
-              ? 'right-center-alt'
-              : 'right-center',
-          slideAImageIndex: nextSlideIndex
-        });
+        console.log('C is left');
+
+        slideAAnimationName =
+          this.state.slideAAnimationName === 'center-left'
+            ? 'center-left-alt'
+            : 'center-left';
+        slideBAnimationName =
+          this.state.slideBAnimationName === 'right-center'
+            ? 'right-center-alt'
+            : 'right-center';
+        slideCAnimationName = null;
+        slideALeft = -1 * width;
+        slideBLeft = 0;
+        slideCLeft = width;
+        activeSlide = 'B';
+
+        slideCImageIndex = this.getNextSlideIndex(
+          this.state.currentSlideIndex,
+          2
+        );
+        // slideCImageIndex = this.getNextSlideIndex(slideBImageIndex, 1);
+        // slideAImageIndex = this.state.currentSlideIndex;
       }
     } else {
       // Backwards
-      if (this.state.activeSlide === 'A') {
-        this.setState({
-          currentSlideIndex: nextSlideIndex,
-          imagesInfo,
-          activeSlide: 'B',
-          slideAAnimationName:
-            this.state.slideAAnimationName === 'center-right'
-              ? 'center-right-alt'
-              : 'center-right',
-          slideBAnimationName:
-            this.state.slideBAnimationName === 'left-center'
-              ? 'left-center-alt'
-              : 'left-center',
-          slideBImageIndex: nextSlideIndex
-        });
+      currentSlideIndex = this.getNextSlideIndex(
+        this.state.currentSlideIndex,
+        -1
+      );
+      if (this.state.slideALeft === -1 * this.state.mainDivRect.width) {
+        console.log(
+          'AAAA IS LEFT',
+          this.state.slideALeft,
+          -1 * this.state.mainDivRect.width
+        );
+        slideAAnimationName =
+          this.state.slideAAnimationName === 'left-center'
+            ? 'left-center-alt'
+            : 'left-center';
+        slideBAnimationName =
+          this.state.slideCAnimationName === 'center-right'
+            ? 'center-right-alt'
+            : 'center-right';
+        slideCAnimationName = null;
+        slideALeft = 0;
+        slideBLeft = width;
+        slideCLeft = -1 * width;
+        activeSlide = 'A';
+
+        // slideBImageIndex = this.getNextSlideIndex(slideCImageIndex, -1);
+        // const helperIndex = this.getNextSlideIndex(
+        //   this.state.currentSlideIndex,
+        //   -1
+        // );
+        slideCImageIndex = this.getNextSlideIndex(
+          this.state.currentSlideIndex,
+          -2
+        );
+        // slideAImageIndex = this.state.currentSlideIndex;
+      } else if (this.state.slideBLeft === -1 * this.state.mainDivRect.width) {
+        console.log('B is left');
+
+        slideBAnimationName =
+          this.state.slideCAnimationName === 'left-center'
+            ? 'left-center-alt'
+            : 'left-center';
+        slideCAnimationName =
+          this.state.slideAAnimationName === 'center-right'
+            ? 'center-right-alt'
+            : 'center-right';
+        slideAAnimationName = null;
+
+        slideALeft = -1 * width;
+        slideBLeft = 0;
+        slideCLeft = width;
+        activeSlide = 'B';
+
+        // const helperIndex = this.getNextSlideIndex(
+        //   this.state.currentSlideIndex,
+        //   -1
+        // );
+        slideAImageIndex = this.getNextSlideIndex(
+          this.state.currentSlideIndex,
+          -2
+        );
+        // slideBImageIndex = this.getNextSlideIndex(slideAImageIndex, 1);
+        // slideCImageIndex = this.state.currentSlideIndex;
       } else {
-        this.setState({
-          currentSlideIndex: nextSlideIndex,
-          imagesInfo,
-          activeSlide: 'A',
-          slideBAnimationName:
-            this.state.slideBAnimationName === 'center-right'
-              ? 'center-right-alt'
-              : 'center-right',
-          slideAAnimationName:
-            this.state.slideAAnimationName === 'left-center'
-              ? 'left-center-alt'
-              : 'left-center',
-          slideAImageIndex: nextSlideIndex
-        });
+        console.log('C is left');
+
+        slideCAnimationName =
+          this.state.slideAAnimationName === 'left-center'
+            ? 'left-center-alt'
+            : 'left-center';
+        slideAAnimationName =
+          this.state.slideBAnimationName === 'center-right'
+            ? 'center-right-alt'
+            : 'center-right';
+        slideBAnimationName = null;
+        slideBLeft = -1 * width;
+        slideCLeft = 0;
+        slideALeft = width;
+        activeSlide = 'C';
+
+        // const helperIndex = this.getNextSlideIndex(
+        //   this.state.currentSlideIndex,
+        //   -1
+        // );
+        slideBImageIndex = this.getNextSlideIndex(
+          this.state.currentSlideIndex,
+          -2
+        );
+        // slideCImageIndex = this.getNextSlideIndex(slideBImageIndex, 1);
+        // slideAImageIndex = this.state.currentSlideIndex;
       }
     }
+
+    this.setState(
+      {
+        activeSlide,
+        slideALeft,
+        slideBLeft,
+        slideCLeft,
+        slideAImageIndex,
+        slideBImageIndex,
+        slideCImageIndex,
+        currentSlideIndex,
+        slideAAnimationName,
+        slideBAnimationName,
+        slideCAnimationName
+      },
+      () => {
+        this.setState({});
+      }
+    );
+    // if (amount > 0) {
+    //   // Forwards
+    //   if (this.state.activeSlide === 'A') {
+    //     this.setState({
+    //       currentSlideIndex: nextSlideIndex,
+    //       imagesInfo,
+    //       activeSlide: 'B',
+    //       slideAAnimationName:
+    //         this.state.slideAAnimationName === 'center-left'
+    //           ? 'center-left-alt'
+    //           : 'center-left',
+    //       slideBAnimationName:
+    //         this.state.slideBAnimationName === 'right-center'
+    //           ? 'right-center-alt'
+    //           : 'right-center',
+    //       slideBImageIndex: nextSlideIndex
+    //     });
+    //   } else {
+    //     this.setState({
+    //       currentSlideIndex: nextSlideIndex,
+    //       imagesInfo,
+    //       activeSlide: 'A',
+    //       slideBAnimationName:
+    //         this.state.slideBAnimationName === 'center-left'
+    //           ? 'center-left-alt'
+    //           : 'center-left',
+    //       slideAAnimationName:
+    //         this.state.slideAAnimationName === 'right-center'
+    //           ? 'right-center-alt'
+    //           : 'right-center',
+    //       slideAImageIndex: nextSlideIndex
+    //     });
+    //   }
+    // } else {
+    //   // Backwards
+    //   if (this.state.activeSlide === 'A') {
+    //     this.setState({
+    //       currentSlideIndex: nextSlideIndex,
+    //       imagesInfo,
+    //       activeSlide: 'B',
+    //       slideAAnimationName:
+    //         this.state.slideAAnimationName === 'center-right'
+    //           ? 'center-right-alt'
+    //           : 'center-right',
+    //       slideBAnimationName:
+    //         this.state.slideBAnimationName === 'left-center'
+    //           ? 'left-center-alt'
+    //           : 'left-center',
+    //       slideBImageIndex: nextSlideIndex
+    //     });
+    //   } else {
+    //     this.setState({
+    //       currentSlideIndex: nextSlideIndex,
+    //       imagesInfo,
+    //       activeSlide: 'A',
+    //       slideBAnimationName:
+    //         this.state.slideBAnimationName === 'center-right'
+    //           ? 'center-right-alt'
+    //           : 'center-right',
+    //       slideAAnimationName:
+    //         this.state.slideAAnimationName === 'left-center'
+    //           ? 'left-center-alt'
+    //           : 'left-center',
+    //       slideAImageIndex: nextSlideIndex
+    //     });
+    //   }
+    // }
     this.checkPreload();
   }
 
   checkPreload() {
-    // if (
-    //   !this.state.imagesInfo[this.state.slideAImageIndex] &&
-    //   this.state.activeSlide === 'A'
-    // ) {
-    //   const mainDivRect = this.mainDiv.getBoundingClientRect();
-    //   this.setState({
-    //     slideAImageIndex: this.state.currentSlideIndex,
-    //     mainDivRect: mainDivRect
-    //   });
-    // }
-    // if (
-    //   !this.state.imagesInfo[this.state.slideBImageIndex] &&
-    //   this.state.activeSlide === 'B'
-    // ) {
-    //   this.setState({
-    //     slideBImageIndex: this.state.currentSlideIndex
-    //   });
-    // }
-    // if (!this.state.slideBImage && this.state.activeSlide === 'C') {
-    //   this.setState({
-    //     slideCImage: this.state.imagesInfo[this.state.currentSlideIndex]
-    //   });
-    // }
-
     //First figure out which images should be preloaded based on current image index & MAX_PRELOADED_IMAGES
     const requiredImages = [];
+    requiredImages.push(
+      // First add the slide on the left (previous slide)
+      this.getNextSlideIndex(this.state.currentSlideIndex, -1)
+    );
+    // Then add all the rest
     for (let i = 0; i < this.constants.MAX_PRELOADED_IMAGES + 1; i++) {
       const nextSlide = this.getNextSlideIndex(this.state.currentSlideIndex, i);
       if (!requiredImages.includes(nextSlide)) requiredImages.push(nextSlide);
     }
-    // Add previous slide also
-    requiredImages.push(
-      this.getNextSlideIndex(this.state.currentSlideIndex, -1)
-    );
     console.log('required slides:', requiredImages);
 
     let allLoaded = true;
@@ -426,6 +650,7 @@ class LuloViewer extends Component {
       // const { imageLoadFailedArr } = this.state;
       this.imageLoadFailedArr.push(idx);
       console.log('loud fejld');
+      this.checkPreload();
     };
   }
 
@@ -436,14 +661,14 @@ class LuloViewer extends Component {
       <div className="viewer" ref={el => (this.mainDiv = el)}>
         <div
           className="main-image-div"
-          ref={el => {
-            this.slideDivA = el;
-          }}
+          // ref={el => {
+          //   this.slideDivA = el;
+          // }}
           style={{
             animationName: this.state.slideAAnimationName,
             animationDuration: `${this.state.slideTransitionDuration}s`,
             animationFillMode: 'forwards',
-            left: '0px'
+            left: `${this.state.slideALeft}px`
           }}
         >
           {this.state.imagesInfo[this.state.slideAImageIndex] !== null ? (
@@ -452,7 +677,8 @@ class LuloViewer extends Component {
                 this.slideA = el;
               }}
               slide="A"
-              activeSlide={this.state.activeSlide}
+              parentLeft={this.state.slideALeft}
+              // activeSlide={this.state.activeSlide}
               imageInfo={this.state.imagesInfo[this.state.slideAImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
@@ -469,14 +695,14 @@ class LuloViewer extends Component {
         </div>
         <div
           className="main-image-div"
-          ref={el => {
-            this.slideDivB = el;
-          }}
+          // ref={el => {
+          //   this.slideDivB = el;
+          // }}
           style={{
             animationName: this.state.slideBAnimationName,
             animationDuration: `${this.state.slideTransitionDuration}s`,
             animationFillMode: 'forwards',
-            left: this.state.mainDivRect ? this.state.mainDivRect.width : 0
+            left: `${this.state.slideBLeft}px`
           }}
         >
           {this.state.imagesInfo[this.state.slideBImageIndex] !== null ? (
@@ -485,7 +711,8 @@ class LuloViewer extends Component {
                 this.slideB = el;
               }}
               slide="B"
-              activeSlide={this.state.activeSlide}
+              parentLeft={this.state.slideBLeft}
+              // activeSlide={this.state.activeSlide}
               imageInfo={this.state.imagesInfo[this.state.slideBImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
@@ -500,33 +727,39 @@ class LuloViewer extends Component {
             <div style={{ color: 'white' }}>louding</div>
           )}
         </div>
-        {/* <div
+        <div
           className="main-image-div"
+          // ref={el => {
+          //   this.slideDivC = el;
+          // }}
           style={{
             animationName: this.state.slideCAnimationName,
             animationDuration: `${this.state.slideTransitionDuration}s`,
             animationFillMode: 'forwards',
-            left: this.state.mainDivRect ? -1 * this.state.mainDivRect.width : 0
+            left: `${this.state.slideCLeft}px`
           }}
         >
           {this.state.imagesInfo[this.state.slideCImageIndex] !== null ? (
             <SingleImage
+              ref={el => {
+                this.slideC = el;
+              }}
               slide="C"
-              activeSlide={this.state.activeSlide}
+              parentLeft={this.state.slideCLeft}
+              // activeSlide={this.state.activeSlide}
               imageInfo={this.state.imagesInfo[this.state.slideCImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
               SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
               isFirefox={this.isFirefox}
             />
-          ) : this.state.imageLoadFailedArr.includes(
-              this.state.currentSlideIndex
-            ) && this.state.activeSlide === 'C' ? (
+          ) : this.imageLoadFailedArr.includes(this.state.currentSlideIndex) &&
+            this.state.activeSlide === 'C' ? (
             <div style={{ color: 'white' }}>loud fejld</div>
           ) : (
             <div style={{ color: 'white' }}>louding</div>
           )}
-        </div> */}
+        </div>
       </div>
     );
   }
