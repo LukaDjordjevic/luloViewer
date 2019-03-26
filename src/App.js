@@ -18,13 +18,11 @@ class App extends Component {
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-3.jpg',
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-4.jpg',
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-1.jpg',
-      'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/02-young-beautiful-model.jpg',
-      'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/02-young-beautiful-model.jpg',
-      'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-1.jpg',
-      'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-2.jpg'
-      // 'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-3.jpg',
-      // 'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-4.jpg',
-      // 'http://galleries.gossipkings.com/hollywoodscanner/pictures/041-eva-herzigova-eva-mendes/images/eva-herzigova-eva-mendes-5.jpg'
+      'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/bad_url.jpg',
+      'https://solarsystem.nasa.gov/internal_resources/3326',
+      'https://qph.fs.quoracdn.net/main-qimg-53b60475fe8386e610447a63d6d97baa',
+      'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/bad_url.jpg',      
+      'https://blog.nationalgeographic.org/wp-content/uploads/2014/05/gpw-201306-NASA-ISS035-E-34688-Earth-from-space-clouds-shadows-20130505-large-1024x681.jpg',
       // // 'http://lorempixel.com/1920/1920/sports/Dummy-Text/'
       // // 'http://lorempixel.com/1920/1920/city/Dummy-Text/',
       // 'http://lorempixel.com/1920/1920/people/Dummy-Text/',

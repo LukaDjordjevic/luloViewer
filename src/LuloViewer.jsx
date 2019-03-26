@@ -621,7 +621,7 @@ class LuloViewer extends Component {
         // const imagesInfo = [...this.state.imagesInfo];
         const imagesInfo = this.state.imagesInfo;
 
-        const MAX_ZOOM = image.naturalWidth / this.state.mainDivRect.width + 8;
+        const MAX_ZOOM = image.naturalWidth / this.state.mainDivRect.width + 4;
 
         const maxv = Math.log(MAX_ZOOM);
         const scale = maxv / this.constants.ZOOM_LEVELS;
