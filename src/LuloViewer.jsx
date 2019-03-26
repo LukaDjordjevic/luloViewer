@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SingleImage from './SingleImage';
+import Icon from './Icon';
 
 class LuloViewer extends Component {
   constructor(props) {
@@ -11,7 +12,10 @@ class LuloViewer extends Component {
       ZOOM_LEVELS: 100,
       SWIPE_THRESHOLD: 20,
       SLIDE_TRANSITION_DURATION: 0.3,
-      SLIDE_TRANSITION_TIMEOUT: 600
+      SLIDE_TRANSITION_TIMEOUT: 600,
+      SHOW_ARROWS: true,
+      ARROWS_SIZE: 0.05,
+      ARROWS_PADDING: 0.5
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
@@ -36,7 +40,9 @@ class LuloViewer extends Component {
       slideAAnimationName: null,
       slideBAnimationName: null,
       slideCAnimationName: null,
-      slideTransitionDuration: this.constants.SLIDE_TRANSITION_DURATION
+      slideTransitionDuration: this.constants.SLIDE_TRANSITION_DURATION,
+      leftArrowColor: '#CCCCCC',
+      rightArrowColor: '#CCCCCC'
     };
 
     this.imageLoadFailedArr = [];
@@ -49,6 +55,12 @@ class LuloViewer extends Component {
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onWheel = this.onWheel.bind(this);
+    this.onLeftArrowEnter = this.onLeftArrowEnter.bind(this);
+    this.onLeftArrowLeave = this.onLeftArrowLeave.bind(this);
+    this.onRightArrowEnter = this.onRightArrowEnter.bind(this);
+    this.onRightArrowLeave = this.onRightArrowLeave.bind(this);
+    this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
+    this.onRightArrowClick = this.onRightArrowClick.bind(this);
     // this.changeSlide = this.changeSlide.bind(this);
     // this.onAnimationEnd = this.onAnimationEnd.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
@@ -184,6 +196,30 @@ class LuloViewer extends Component {
     }
   }
 
+  onLeftArrowEnter() {
+    this.setState({ leftArrowColor: '#FFFFFF' });
+  }
+
+  onLeftArrowLeave() {
+    this.setState({ leftArrowColor: '#CCCCCC' });
+  }
+
+  onRightArrowEnter() {
+    this.setState({ rightArrowColor: '#FFFFFF' });
+  }
+
+  onRightArrowLeave() {
+    this.setState({ rightArrowColor: '#CCCCCC' });
+  }
+
+  onLeftArrowClick() {
+    this.changeSlide(-1);
+  }
+
+  onRightArrowClick() {
+    this.changeSlide(1);
+  }
+
   createSlideAnimationKeyframes(styleSheet) {
     const width = this.state.mainDivRect.width;
     if (styleSheet.sheet.cssRules[0]) styleSheet.sheet.deleteRule(0);
@@ -270,16 +306,6 @@ class LuloViewer extends Component {
   }
 
   changeSlide(amount) {
-    // const nextSlideIndex = this.getNextSlideIndex(
-    //   this.state.currentSlideIndex,
-    //   amount
-    // );
-
-    // const previousSlideIndex = this.getNextSlideIndex(
-    //   this.state.currentSlideIndex,
-    //   -1 * amount
-    // );
-
     const width = this.state.mainDivRect.width;
     let activeSlide;
 
@@ -347,8 +373,6 @@ class LuloViewer extends Component {
           this.state.currentSlideIndex,
           2
         );
-        // slideAImageIndex = this.getNextSlideIndex(slideCImageIndex, 1);
-        // slideBImageIndex = this.state.currentSlideIndex;
       } else if (this.state.slideBLeft === -1 * this.state.mainDivRect.width) {
         console.log('B is left');
 
@@ -372,9 +396,6 @@ class LuloViewer extends Component {
           2
         );
         console.log('###', this.state.currentSlideIndex, slideBImageIndex);
-
-        // slideBImageIndex = this.getNextSlideIndex(slideAImageIndex, 1);
-        // slideCImageIndex = this.state.currentSlideIndex;
       } else {
         console.log('C is left');
 
@@ -396,8 +417,6 @@ class LuloViewer extends Component {
           this.state.currentSlideIndex,
           2
         );
-        // slideCImageIndex = this.getNextSlideIndex(slideBImageIndex, 1);
-        // slideAImageIndex = this.state.currentSlideIndex;
       }
     } else {
       // Backwards
@@ -425,16 +444,10 @@ class LuloViewer extends Component {
         slideCLeft = -1 * width;
         activeSlide = 'A';
 
-        // slideBImageIndex = this.getNextSlideIndex(slideCImageIndex, -1);
-        // const helperIndex = this.getNextSlideIndex(
-        //   this.state.currentSlideIndex,
-        //   -1
-        // );
         slideCImageIndex = this.getNextSlideIndex(
           this.state.currentSlideIndex,
           -2
         );
-        // slideAImageIndex = this.state.currentSlideIndex;
       } else if (this.state.slideBLeft === -1 * this.state.mainDivRect.width) {
         console.log('B is left');
 
@@ -453,16 +466,10 @@ class LuloViewer extends Component {
         slideCLeft = width;
         activeSlide = 'B';
 
-        // const helperIndex = this.getNextSlideIndex(
-        //   this.state.currentSlideIndex,
-        //   -1
-        // );
         slideAImageIndex = this.getNextSlideIndex(
           this.state.currentSlideIndex,
           -2
         );
-        // slideBImageIndex = this.getNextSlideIndex(slideAImageIndex, 1);
-        // slideCImageIndex = this.state.currentSlideIndex;
       } else {
         console.log('C is left');
 
@@ -480,16 +487,10 @@ class LuloViewer extends Component {
         slideALeft = width;
         activeSlide = 'C';
 
-        // const helperIndex = this.getNextSlideIndex(
-        //   this.state.currentSlideIndex,
-        //   -1
-        // );
         slideBImageIndex = this.getNextSlideIndex(
           this.state.currentSlideIndex,
           -2
         );
-        // slideCImageIndex = this.getNextSlideIndex(slideBImageIndex, 1);
-        // slideAImageIndex = this.state.currentSlideIndex;
       }
     }
 
@@ -511,81 +512,14 @@ class LuloViewer extends Component {
         this.setState({});
       }
     );
-    // if (amount > 0) {
-    //   // Forwards
-    //   if (this.state.activeSlide === 'A') {
-    //     this.setState({
-    //       currentSlideIndex: nextSlideIndex,
-    //       imagesInfo,
-    //       activeSlide: 'B',
-    //       slideAAnimationName:
-    //         this.state.slideAAnimationName === 'center-left'
-    //           ? 'center-left-alt'
-    //           : 'center-left',
-    //       slideBAnimationName:
-    //         this.state.slideBAnimationName === 'right-center'
-    //           ? 'right-center-alt'
-    //           : 'right-center',
-    //       slideBImageIndex: nextSlideIndex
-    //     });
-    //   } else {
-    //     this.setState({
-    //       currentSlideIndex: nextSlideIndex,
-    //       imagesInfo,
-    //       activeSlide: 'A',
-    //       slideBAnimationName:
-    //         this.state.slideBAnimationName === 'center-left'
-    //           ? 'center-left-alt'
-    //           : 'center-left',
-    //       slideAAnimationName:
-    //         this.state.slideAAnimationName === 'right-center'
-    //           ? 'right-center-alt'
-    //           : 'right-center',
-    //       slideAImageIndex: nextSlideIndex
-    //     });
-    //   }
-    // } else {
-    //   // Backwards
-    //   if (this.state.activeSlide === 'A') {
-    //     this.setState({
-    //       currentSlideIndex: nextSlideIndex,
-    //       imagesInfo,
-    //       activeSlide: 'B',
-    //       slideAAnimationName:
-    //         this.state.slideAAnimationName === 'center-right'
-    //           ? 'center-right-alt'
-    //           : 'center-right',
-    //       slideBAnimationName:
-    //         this.state.slideBAnimationName === 'left-center'
-    //           ? 'left-center-alt'
-    //           : 'left-center',
-    //       slideBImageIndex: nextSlideIndex
-    //     });
-    //   } else {
-    //     this.setState({
-    //       currentSlideIndex: nextSlideIndex,
-    //       imagesInfo,
-    //       activeSlide: 'A',
-    //       slideBAnimationName:
-    //         this.state.slideBAnimationName === 'center-right'
-    //           ? 'center-right-alt'
-    //           : 'center-right',
-    //       slideAAnimationName:
-    //         this.state.slideAAnimationName === 'left-center'
-    //           ? 'left-center-alt'
-    //           : 'left-center',
-    //       slideAImageIndex: nextSlideIndex
-    //     });
-    //   }
-    // }
     this.checkPreload();
   }
 
   checkPreload() {
     //First figure out which images should be preloaded based on current image index & MAX_PRELOADED_IMAGES
     const requiredImages = [];
+    // Add the slide on the left (previous slide)
     requiredImages.push(
-      // First add the slide on the left (previous slide)
       this.getNextSlideIndex(this.state.currentSlideIndex, -1)
     );
     // Then add all the rest
@@ -655,10 +589,77 @@ class LuloViewer extends Component {
   }
 
   render() {
-    console.log('*** viewer render ***');
-
+    console.log(
+      '*** viewer render ***',
+      this.state.mainDivRect ? this.state.mainDivRect.height / 2 : 0
+    );
+    const arrowSize = this.state.mainDivRect
+      ? this.state.mainDivRect.height * this.constants.ARROWS_SIZE
+      : 0;
+    const arrows = (
+      <div
+        className="arrows"
+        style={{
+          top: this.state.mainDivRect
+            ? this.state.mainDivRect.height / 2 -
+              (this.state.mainDivRect.height * this.constants.ARROWS_SIZE) / 2
+            : 0
+        }}
+      >
+        <div
+          className="arrow"
+          onMouseEnter={this.onLeftArrowEnter}
+          onMouseLeave={this.onLeftArrowLeave}
+          onMouseUp={this.onLeftArrowClick}
+          style={{
+            // top: this.state.mainDivRect
+            //   ? this.state.mainDivRect.height / 2 -
+            //     (this.state.mainDivRect.height * this.constants.ARROWS_SIZE) / 2
+            //   : 0,
+            width: arrowSize,
+            height: arrowSize
+          }}
+        >
+          <div className="arrows-padding">
+            <Icon
+              name="arrow-left"
+              color={this.state.leftArrowColor}
+              size={'100%'}
+            />
+          </div>
+          {/* <div className="arrows-background" /> */}
+        </div>
+        <div
+          className="arrow"
+          onMouseEnter={this.onRightArrowEnter}
+          onMouseLeave={this.onRightArrowLeave}
+          onMouseUp={this.onRightArrowClick}
+          style={{
+            // top: this.state.mainDivRect
+            //   ? this.state.mainDivRect.height / 2 -
+            //     (this.state.mainDivRect.height * this.constants.ARROWS_SIZE) / 2
+            //   : 0,
+            width: arrowSize,
+            height: arrowSize
+            // left: this.state.mainDivRect
+            //   ? this.state.mainDivRect.width * (1 - this.constants.ARROWS_SIZE)
+            //   : 0
+          }}
+        >
+          <div className="arrows-padding">
+            <Icon
+              name="arrow-right"
+              color={this.state.rightArrowColor}
+              size={'100%'}
+            />
+          </div>
+          {/* <div className="arrows-background" /> */}
+        </div>
+      </div>
+    );
     return (
       <div className="viewer" ref={el => (this.mainDiv = el)}>
+        {this.constants.SHOW_ARROWS ? arrows : null}
         <div
           className="main-image-div"
           // ref={el => {
