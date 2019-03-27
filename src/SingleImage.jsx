@@ -195,19 +195,11 @@ class SingleImage extends PureComponent {
     console.log('spread:', parentBoundingRect1);
     console.log('assign:', parentBoundingRect2);
 
-    //Update zoomTarget
-    // const zoomTarget = {};
-    // zoomTarget.x =
-    //   (-1 * newLeft + this.props.parentBoundingRect.width / 2) /
-    //   this.state.width;
-    // zoomTarget.y =
-    //   (-1 * newTop + this.props.parentBoundingRect.height / 2) /
-    //   this.state.height;
-
     const imageWidth = this.state.width;
     const imageHeight = this.state.height;
     const divWidth = this.props.parentBoundingRect.width;
     const divHeight = this.props.parentBoundingRect.height;
+    //Update zoomTarget
     const zoomTarget = this.updateZoomTarget(
       newLeft,
       newTop,

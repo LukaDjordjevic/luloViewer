@@ -7,7 +7,6 @@ class LuloViewer extends Component {
     super(props);
     this.constants = {
       STARTING_SLIDE: 0,
-      // MAX_PRELOADED_IMAGES: this.props.imageUrls.length,
       MAX_PRELOADED_IMAGES: 5,
       ZOOM_LEVELS: 100,
       SWIPE_THRESHOLD: 20,
@@ -16,7 +15,7 @@ class LuloViewer extends Component {
       SHOW_ARROWS: true,
       ARROWS_SIZE: 0.05,
       ARROWS_PADDING: 5,
-      ALLOW_CYCLIC: false
+      ALLOW_CYCLIC: true
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
@@ -63,7 +62,6 @@ class LuloViewer extends Component {
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
     this.onDoubleClick = this.onDoubleClick.bind(this);
-    // this.changeSlide = this.changeSlide.bind(this);
     // this.onAnimationEnd = this.onAnimationEnd.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
@@ -89,6 +87,7 @@ class LuloViewer extends Component {
     document.addEventListener('wheel', this.onWheel);
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
+    // document.addEventListener('keydown', this.onMouseDown, false);
     // this.slideDivA.addEventListener('animationend', this.onAnimationEnd, false);
     // this.slideDivB.addEventListener('animationend', this.onAnimationEnd, false);
 
@@ -232,13 +231,12 @@ class LuloViewer extends Component {
   }
 
   onLeftArrowClick(e) {
-    // e.preventDefault();
+    e.preventDefault();
     this.changeSlide(-1);
   }
 
   onRightArrowClick(e) {
-    // e.preventDefault();
-
+    e.preventDefault();
     this.changeSlide(1);
   }
 
@@ -639,6 +637,8 @@ class LuloViewer extends Component {
           onMouseEnter={this.onLeftArrowEnter}
           onMouseLeave={this.onLeftArrowLeave}
           onMouseUp={this.onLeftArrowClick}
+          onMouseDown={this.onDoubleClick}
+          onDoubleClick={this.onDoubleClick}
           style={{
             width: arrowSize,
             height:
@@ -661,6 +661,7 @@ class LuloViewer extends Component {
           onMouseEnter={this.onRightArrowEnter}
           onMouseLeave={this.onRightArrowLeave}
           onMouseUp={this.onRightArrowClick}
+          onMouseDown={this.onDoubleClick}
           onDoubleClick={this.onDoubleClick}
           style={{
             width: arrowSize,
@@ -748,9 +749,12 @@ class LuloViewer extends Component {
             />
           ) : this.imageLoadFailedArr.includes(this.state.currentSlideIndex) &&
             this.state.activeSlide === 'B' ? (
-            <div style={{ color: 'white' }}>loud fejld</div>
+            <div style={{ color: 'white' }}>
+              Image ${this.props.imageUrls[this.state.currentSlideIndex]} failed
+              to load.
+            </div>
           ) : (
-            <div style={{ color: 'white' }}>louding</div>
+            <div style={{ color: 'white' }}>loading</div>
           )}
         </div>
         <div
@@ -781,9 +785,12 @@ class LuloViewer extends Component {
             />
           ) : this.imageLoadFailedArr.includes(this.state.currentSlideIndex) &&
             this.state.activeSlide === 'C' ? (
-            <div style={{ color: 'white' }}>loud fejld</div>
+            <div style={{ color: 'white' }}>
+              Image ${this.props.imageUrls[this.state.currentSlideIndex]} failed
+              to load.
+            </div>
           ) : (
-            <div style={{ color: 'white' }}>louding</div>
+            <div style={{ color: 'white' }}>loading</div>
           )}
         </div>
       </div>
