@@ -2,7 +2,7 @@
   width: 100%;
   height: 100%;
   position: absolute;
-  /* overflow: hidden; */
+  overflow: hidden;
 }
 
 .main-image-div {
@@ -29,11 +29,11 @@
   width: 100%;
 }
 
-.arrows-padding {
+.arrows-icon {
   /* padding: 20%; */
   width: 100%;
-  height: 140%;
-  background-color: rgba(0, 0, 0, 0.5);
+  height: 200%;
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 10%;
 }
 

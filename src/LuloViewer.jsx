@@ -15,7 +15,8 @@ class LuloViewer extends Component {
       SLIDE_TRANSITION_TIMEOUT: 600,
       SHOW_ARROWS: true,
       ARROWS_SIZE: 0.05,
-      ARROWS_PADDING: 0.5
+      ARROWS_PADDING: 5,
+      ALLOW_CYCLIC: false
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
@@ -61,6 +62,7 @@ class LuloViewer extends Component {
     this.onRightArrowLeave = this.onRightArrowLeave.bind(this);
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
+    this.onDoubleClick = this.onDoubleClick.bind(this);
     // this.changeSlide = this.changeSlide.bind(this);
     // this.onAnimationEnd = this.onAnimationEnd.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
@@ -132,11 +134,18 @@ class LuloViewer extends Component {
     switch (e.key) {
       case 'ArrowLeft':
         e.preventDefault();
-        this.changeSlide(-1);
+        if (this.constants.ALLOW_CYCLIC || this.state.currentSlideIndex !== 0) {
+          this.changeSlide(-1);
+        }
         break;
       case 'ArrowRight':
         e.preventDefault();
-        this.changeSlide(1);
+        if (
+          this.constants.ALLOW_CYCLIC ||
+          this.state.currentSlideIndex !== this.props.imageUrls.length - 1
+        ) {
+          this.changeSlide(1);
+        }
         break;
       case 'f':
         if (!this.isFullScreen) {
@@ -179,9 +188,19 @@ class LuloViewer extends Component {
         }, timeout);
         this.changingSlide = true;
         if (e.deltaX > 0) {
-          this.changeSlide(1);
+          if (
+            this.constants.ALLOW_CYCLIC ||
+            this.state.currentSlideIndex !== this.props.imageUrls.length - 1
+          ) {
+            this.changeSlide(1);
+          }
         } else {
-          this.changeSlide(-1);
+          if (
+            this.constants.ALLOW_CYCLIC ||
+            this.state.currentSlideIndex !== 0
+          ) {
+            this.changeSlide(-1);
+          }
         }
         return;
       }
@@ -212,12 +231,21 @@ class LuloViewer extends Component {
     this.setState({ rightArrowColor: '#CCCCCC' });
   }
 
-  onLeftArrowClick() {
+  onLeftArrowClick(e) {
+    // e.preventDefault();
     this.changeSlide(-1);
   }
 
-  onRightArrowClick() {
+  onRightArrowClick(e) {
+    // e.preventDefault();
+
     this.changeSlide(1);
+  }
+
+  onDoubleClick(e) {
+    console.log('click');
+
+    e.preventDefault();
   }
 
   createSlideAnimationKeyframes(styleSheet) {
@@ -612,48 +640,45 @@ class LuloViewer extends Component {
           onMouseLeave={this.onLeftArrowLeave}
           onMouseUp={this.onLeftArrowClick}
           style={{
-            // top: this.state.mainDivRect
-            //   ? this.state.mainDivRect.height / 2 -
-            //     (this.state.mainDivRect.height * this.constants.ARROWS_SIZE) / 2
-            //   : 0,
             width: arrowSize,
-            height: arrowSize
+            height:
+              this.constants.ALLOW_CYCLIC || this.state.currentSlideIndex !== 0
+                ? arrowSize
+                : '0',
+            paddingLeft: `${this.constants.ARROWS_PADDING}%`
           }}
         >
-          <div className="arrows-padding">
+          <div className="arrows-icon">
             <Icon
               name="arrow-left"
               color={this.state.leftArrowColor}
               size={'100%'}
             />
           </div>
-          {/* <div className="arrows-background" /> */}
         </div>
         <div
           className="arrow"
           onMouseEnter={this.onRightArrowEnter}
           onMouseLeave={this.onRightArrowLeave}
           onMouseUp={this.onRightArrowClick}
+          onDoubleClick={this.onDoubleClick}
           style={{
-            // top: this.state.mainDivRect
-            //   ? this.state.mainDivRect.height / 2 -
-            //     (this.state.mainDivRect.height * this.constants.ARROWS_SIZE) / 2
-            //   : 0,
             width: arrowSize,
-            height: arrowSize
-            // left: this.state.mainDivRect
-            //   ? this.state.mainDivRect.width * (1 - this.constants.ARROWS_SIZE)
-            //   : 0
+            height:
+              this.constants.ALLOW_CYCLIC ||
+              this.state.currentSlideIndex !== this.props.imageUrls.length - 1
+                ? arrowSize
+                : '0',
+            paddingRight: `${this.constants.ARROWS_PADDING}%`
           }}
         >
-          <div className="arrows-padding">
+          <div className="arrows-icon">
             <Icon
               name="arrow-right"
               color={this.state.rightArrowColor}
               size={'100%'}
             />
           </div>
-          {/* <div className="arrows-background" /> */}
         </div>
       </div>
     );
@@ -752,7 +777,7 @@ class LuloViewer extends Component {
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
               SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
-              isFirefox={this.isFirefox}
+              // isFirefox={this.isFirefox}
             />
           ) : this.imageLoadFailedArr.includes(this.state.currentSlideIndex) &&
             this.state.activeSlide === 'C' ? (

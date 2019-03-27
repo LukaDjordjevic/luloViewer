@@ -167,7 +167,8 @@ class SingleImage extends PureComponent {
     document.addEventListener('mouseup', this.onMouseUp);
   }
 
-  onMouseUp() {
+  onMouseUp(e) {
+    e.preventDefault();
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
   }
@@ -232,7 +233,6 @@ class SingleImage extends PureComponent {
   }
 
   onWheel(e) {
-
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
 
     let zoomLevel = Math.round(this.state.zoomLevel - e.deltaY / 5);
