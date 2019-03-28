@@ -13,9 +13,11 @@ class LuloViewer extends Component {
       SLIDE_TRANSITION_DURATION: 0.3,
       SLIDE_TRANSITION_TIMEOUT: 600,
       SHOW_ARROWS: true,
-      ARROWS_SIZE: 0.05,
+      ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
       ARROWS_PADDING: 5,
-      ALLOW_CYCLIC: true
+      ALLOW_CYCLIC: true,
+      ARROW_DEFAULT_COLOR: '#CCCCCC',
+      ARROW_HIGHLIGHT_COLOR: '#FFFFFF'
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
@@ -54,6 +56,9 @@ class LuloViewer extends Component {
 
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
     this.onWheel = this.onWheel.bind(this);
     this.onLeftArrowEnter = this.onLeftArrowEnter.bind(this);
     this.onLeftArrowLeave = this.onLeftArrowLeave.bind(this);
@@ -67,6 +72,7 @@ class LuloViewer extends Component {
   }
 
   componentDidMount() {
+    console.log('WTF?');
     const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
     this.setState(
       {
@@ -165,6 +171,40 @@ class LuloViewer extends Component {
   //   // this.changingSlide = false;
   // }
 
+  onMouseDown(e) {
+    console.log('mouse down');
+    e.preventDefault();
+    e.stopPropagation();
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
+    const slides = {
+      A: this.slideA,
+      B: this.slideB,
+      C: this.slideC
+    };
+    const activeSlide = slides[this.state.activeSlide];
+    if (activeSlide) activeSlide.handleMouseDown(e);
+  }
+
+  onMouseUp(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
+  }
+
+  onMouseMove(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const slides = {
+      A: this.slideA,
+      B: this.slideB,
+      C: this.slideC
+    };
+    const activeSlide = slides[this.state.activeSlide];
+    if (activeSlide) activeSlide.handleMouseMove(e);
+  }
+
   onWheel(e) {
     console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
 
@@ -203,40 +243,42 @@ class LuloViewer extends Component {
         }
         return;
       }
-      console.log('MEEET', this.state.activeSlide === 'A', this.slideA);
-      if (this.state.slideALeft === 0 && this.slideA) {
-        this.slideA.onWheel(e);
-      } else if (this.state.slideBLeft === 0 && this.slideB) {
-        this.slideB.onWheel(e);
-      } else if (this.slideC) {
-        this.slideC.onWheel(e);
-      }
+
+      const slides = {
+        A: this.slideA,
+        B: this.slideB,
+        C: this.slideC
+      };
+      const activeSlide = slides[this.state.activeSlide];
+      if (activeSlide) activeSlide.handleWheel(e);
     }
   }
 
   onLeftArrowEnter() {
-    this.setState({ leftArrowColor: '#FFFFFF' });
+    this.setState({ leftArrowColor: this.constants.ARROW_HIGHLIGHT_COLOR });
   }
 
   onLeftArrowLeave() {
-    this.setState({ leftArrowColor: '#CCCCCC' });
+    this.setState({ leftArrowColor: this.constants.ARROW_DEFAULT_COLOR });
   }
 
   onRightArrowEnter() {
-    this.setState({ rightArrowColor: '#FFFFFF' });
+    this.setState({ rightArrowColor: this.constants.ARROW_HIGHLIGHT_COLOR });
   }
 
   onRightArrowLeave() {
-    this.setState({ rightArrowColor: '#CCCCCC' });
+    this.setState({ rightArrowColor: this.constants.ARROW_DEFAULT_COLOR });
   }
 
   onLeftArrowClick(e) {
     e.preventDefault();
+    e.stopPropagation();
     this.changeSlide(-1);
   }
 
   onRightArrowClick(e) {
     e.preventDefault();
+    e.stopPropagation();
     this.changeSlide(1);
   }
 
@@ -684,7 +726,11 @@ class LuloViewer extends Component {
       </div>
     );
     return (
-      <div className="viewer" ref={el => (this.mainDiv = el)}>
+      <div
+        className="viewer"
+        ref={el => (this.mainDiv = el)}
+        onMouseDown={this.onMouseDown}
+      >
         {this.constants.SHOW_ARROWS ? arrows : null}
         <div
           className="main-image-div"
@@ -713,11 +759,13 @@ class LuloViewer extends Component {
               // changeSlide={this.changeSlide}
               isFirefox={this.isFirefox}
             />
-          ) : this.imageLoadFailedArr.includes(this.state.currentSlideIndex) &&
-            this.state.activeSlide === 'A' ? (
-            <div style={{ color: 'white' }}>loud fejld</div>
+          ) : this.imageLoadFailedArr.includes(this.state.slideAImageIndex) ? (
+            <div className="message">
+              Image ${this.props.imageUrls[this.state.currentSlideIndex]} failed
+              to load.
+            </div>
           ) : (
-            <div style={{ color: 'white' }}>louding</div>
+            <div className="message">loading</div>
           )}
         </div>
         <div
@@ -747,8 +795,7 @@ class LuloViewer extends Component {
               // changeSlide={this.changeSlide}
               isFirefox={this.isFirefox}
             />
-          ) : this.imageLoadFailedArr.includes(this.state.currentSlideIndex) &&
-            this.state.activeSlide === 'B' ? (
+          ) : this.imageLoadFailedArr.includes(this.state.slideBImageIndex) ? (
             <div style={{ color: 'white' }}>
               Image ${this.props.imageUrls[this.state.currentSlideIndex]} failed
               to load.
@@ -783,14 +830,13 @@ class LuloViewer extends Component {
               SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
               // isFirefox={this.isFirefox}
             />
-          ) : this.imageLoadFailedArr.includes(this.state.currentSlideIndex) &&
-            this.state.activeSlide === 'C' ? (
-            <div style={{ color: 'white' }}>
+          ) : this.imageLoadFailedArr.includes(this.state.slideCImageIndex) ? (
+            <div className="message">
               Image ${this.props.imageUrls[this.state.currentSlideIndex]} failed
               to load.
             </div>
           ) : (
-            <div style={{ color: 'white' }}>loading</div>
+            <div className="message">Image Loading</div>
           )}
         </div>
       </div>
