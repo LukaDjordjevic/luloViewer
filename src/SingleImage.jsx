@@ -117,7 +117,7 @@ class SingleImage extends PureComponent {
       left = constrainedLeft;
       top = constrainedTop;
 
-      this.setState({ left, top, width, height }, () => {});
+      this.setState({ left, top, width, height });
     }
     // Slide image has changed
     if (
@@ -177,15 +177,6 @@ class SingleImage extends PureComponent {
     const parentBoundingRect = JSON.parse(
       JSON.stringify(this.props.parentBoundingRect)
     );
-    console.log('stringifaj:', parentBoundingRect);
-
-    const parentBoundingRect1 = { ...this.props.parentBoundingRect };
-    const parentBoundingRect2 = Object.assign(
-      {},
-      this.props.parentBoundingRect
-    );
-    console.log('spread:', parentBoundingRect1);
-    console.log('assign:', parentBoundingRect2);
 
     const imageWidth = this.state.width;
     const imageHeight = this.state.height;
@@ -209,6 +200,7 @@ class SingleImage extends PureComponent {
       imageAspectRatio,
       containerAspectRatio
     );
+
     this.setState({
       left: constrainedLeft,
       top: constrainedTop,
@@ -270,6 +262,7 @@ class SingleImage extends PureComponent {
       const imageHeight = this.state.height;
       const divWidth = this.props.parentBoundingRect.width;
       const divHeight = this.props.parentBoundingRect.height;
+
       zoomTarget = updateZoomTarget(
         imageLeft,
         imageTop,
@@ -292,18 +285,15 @@ class SingleImage extends PureComponent {
       containerAspectRatio
     );
 
-    this.setState(
-      {
-        left: constrainedLeft,
-        top: constrainedTop,
-        width,
-        height,
-        zoomFactor: newZoomFactor,
-        zoomLevel,
-        zoomTarget
-      },
-      () => {}
-    );
+    this.setState({
+      left: constrainedLeft,
+      top: constrainedTop,
+      width,
+      height,
+      zoomFactor: newZoomFactor,
+      zoomLevel,
+      zoomTarget
+    });
   }
 
   render() {
@@ -325,7 +315,6 @@ class SingleImage extends PureComponent {
             width: this.state.width,
             height: this.state.height
           }}
-          handleMouseDown={this.handleMouseDown}
         />
       </div>
     );

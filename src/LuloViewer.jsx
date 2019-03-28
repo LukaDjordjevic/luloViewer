@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SingleImage from './SingleImage';
+import ZoomController from './ZoomController';
 import Icon from './Icon';
 
 class LuloViewer extends Component {
@@ -17,7 +18,12 @@ class LuloViewer extends Component {
       ARROWS_PADDING: 5,
       ALLOW_CYCLIC: true,
       ARROW_DEFAULT_COLOR: '#CCCCCC',
-      ARROW_HIGHLIGHT_COLOR: '#FFFFFF'
+      ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
+      SHOW_ZOOM_CONTROLLER: true,
+      ZOOM_CONTROLLER_SIZE: 0.2, // width of zoomController as fraction of viewer width
+      ZOOM_CONTROLLER_PADDING: 5, // zoomController padding as viewer width percent
+      ZOOM_CONTROLLER_POSITION_X: 0.75,
+      ZOOM_CONTROLLER_POSITION_Y: 0.05
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
@@ -376,7 +382,7 @@ class LuloViewer extends Component {
   changeSlide(amount) {
     const width = this.state.mainDivRect.width;
     let activeSlide;
-
+    // if (this.zoomController) this.zoomController.forceUpdate();
     const { imagesInfo } = this.state;
     const imageInfo = JSON.parse(
       JSON.stringify(imagesInfo[this.state.currentSlideIndex])
@@ -664,6 +670,9 @@ class LuloViewer extends Component {
     const arrowSize = this.state.mainDivRect
       ? this.state.mainDivRect.height * this.constants.ARROWS_SIZE
       : 0;
+
+    //****************** arrows *****************
+    //****************** arrows *****************
     const arrows = (
       <div
         className="arrows"
@@ -725,12 +734,47 @@ class LuloViewer extends Component {
         </div>
       </div>
     );
+    //****************** arrows *****************
+    //************** zoom controller ************
+    const zoomController =
+      this.constants.SHOW_ZOOM_CONTROLLER &&
+      this.state.mainDivRect &&
+      this.state.imagesInfo[this.state.currentSlideIndex] ? (
+        <ZoomController
+          ref={el => {
+            this.zoomController = el;
+          }}
+          style={{
+            left:
+              this.state.mainDivRect.width *
+              this.constants.ZOOM_CONTROLLER_POSITION_X,
+            top:
+              this.state.mainDivRect.height *
+              this.constants.ZOOM_CONTROLLER_POSITION_Y,
+            width:
+              this.state.mainDivRect.width *
+              this.constants.ZOOM_CONTROLLER_SIZE,
+            height:
+              this.state.mainDivRect.height *
+              this.constants.ZOOM_CONTROLLER_SIZE,
+            backgroundImage: `url('${
+              this.props.imageUrls[this.state.currentSlideIndex]
+            }')`
+            // backgroundSize: 'contain',
+            // backgroundRepeat: 'no-repeat',
+            // backgroundPosition: 'center'
+          }}
+        />
+      ) : null;
+    //************** zoom controller ************
+
     return (
       <div
         className="viewer"
         ref={el => (this.mainDiv = el)}
         onMouseDown={this.onMouseDown}
       >
+        {zoomController}
         {this.constants.SHOW_ARROWS ? arrows : null}
         <div
           className="main-image-div"
