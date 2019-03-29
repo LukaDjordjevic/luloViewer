@@ -137,6 +137,7 @@ class LuloViewer extends Component {
       },
       () => {
         this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet);
+        this.updateViewRectangle();
       }
     );
   }
