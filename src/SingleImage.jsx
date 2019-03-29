@@ -211,90 +211,97 @@ class SingleImage extends PureComponent {
   }
 
   handleWheel(e) {
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    return new Promise(resolve => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
 
-    let zoomLevel = Math.round(this.state.zoomLevel - e.deltaY / 5);
-    if (zoomLevel < 0) {
-      // console.log('to little');
-      return;
-    }
-    if (zoomLevel > this.props.ZOOM_LEVELS - 1) {
-      // console.log('too much');
-      return;
-    }
+      let zoomLevel = Math.round(this.state.zoomLevel - e.deltaY / 5);
+      if (zoomLevel < 0) {
+        // console.log('to little');
+        return;
+      }
+      if (zoomLevel > this.props.ZOOM_LEVELS - 1) {
+        // console.log('too much');
+        return;
+      }
 
-    const newZoomFactor = this.props.imageInfo.zoomMultipliers[
-      zoomLevel //.toString()
-    ];
+      const newZoomFactor = this.props.imageInfo.zoomMultipliers[
+        zoomLevel //.toString()
+      ];
 
-    const parentBoundingRect = JSON.parse(
-      JSON.stringify(this.props.parentBoundingRect)
-    );
-    const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-    const containerAspectRatio = this.containerAspectRatio;
-    const eventPosition = { x: e.clientX, y: e.clientY };
-
-    const imgLeft = this.state.left;
-    const imgTop = this.state.top;
-    const oldZoomFactor = this.state.zoomFactor;
-    const { left, top, width, height } = getNewZoomTransform(
-      imgLeft,
-      imgTop,
-      newZoomFactor,
-      oldZoomFactor,
-      parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio,
-      eventPosition
-    );
-
-    console.log(!this.zooming, e.deltaY);
-
-    let zoomTarget;
-    if (!this.zoomTargetSelected && e.deltaY < 0) {
-      if (this.zoomTargetTimeout) clearTimeout(this.zoomTargetTimeout);
-      this.zoomTargetTimeout = setTimeout(() => {
-        this.zoomTargetSelected = false;
-      }, 200);
-
-      // Calculate new zoomTarget
-      const imageLeft = this.state.left;
-      const imageTop = this.state.top;
-      const imageWidth = this.state.width;
-      const imageHeight = this.state.height;
-      const divWidth = this.props.parentBoundingRect.width;
-      const divHeight = this.props.parentBoundingRect.height;
-
-      zoomTarget = updateZoomTarget(
-        imageLeft,
-        imageTop,
-        imageWidth,
-        imageHeight,
-        divWidth,
-        divHeight
+      const parentBoundingRect = JSON.parse(
+        JSON.stringify(this.props.parentBoundingRect)
       );
-    } else {
-      zoomTarget = this.state.zoomTarget;
-    }
+      const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
+      const containerAspectRatio = this.containerAspectRatio;
+      const eventPosition = { x: e.clientX, y: e.clientY };
 
-    // Constrain image position
-    const { constrainedLeft, constrainedTop } = constrainTranslate(
-      left,
-      top,
-      newZoomFactor,
-      parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
-    );
+      const imgLeft = this.state.left;
+      const imgTop = this.state.top;
+      const oldZoomFactor = this.state.zoomFactor;
+      const { left, top, width, height } = getNewZoomTransform(
+        imgLeft,
+        imgTop,
+        newZoomFactor,
+        oldZoomFactor,
+        parentBoundingRect,
+        imageAspectRatio,
+        containerAspectRatio,
+        eventPosition
+      );
 
-    this.setState({
-      left: constrainedLeft,
-      top: constrainedTop,
-      width,
-      height,
-      zoomFactor: newZoomFactor,
-      zoomLevel,
-      zoomTarget
+      console.log(!this.zooming, e.deltaY);
+
+      let zoomTarget;
+      if (!this.zoomTargetSelected && e.deltaY < 0) {
+        if (this.zoomTargetTimeout) clearTimeout(this.zoomTargetTimeout);
+        this.zoomTargetTimeout = setTimeout(() => {
+          this.zoomTargetSelected = false;
+        }, 200);
+
+        // Calculate new zoomTarget
+        const imageLeft = this.state.left;
+        const imageTop = this.state.top;
+        const imageWidth = this.state.width;
+        const imageHeight = this.state.height;
+        const divWidth = this.props.parentBoundingRect.width;
+        const divHeight = this.props.parentBoundingRect.height;
+
+        zoomTarget = updateZoomTarget(
+          imageLeft,
+          imageTop,
+          imageWidth,
+          imageHeight,
+          divWidth,
+          divHeight
+        );
+      } else {
+        zoomTarget = this.state.zoomTarget;
+      }
+
+      // Constrain image position
+      const { constrainedLeft, constrainedTop } = constrainTranslate(
+        left,
+        top,
+        newZoomFactor,
+        parentBoundingRect,
+        imageAspectRatio,
+        containerAspectRatio
+      );
+
+      this.setState(
+        {
+          left: constrainedLeft,
+          top: constrainedTop,
+          width,
+          height,
+          zoomFactor: newZoomFactor,
+          zoomLevel,
+          zoomTarget
+        },
+        () => {
+          resolve();
+        }
+      );
     });
   }
 

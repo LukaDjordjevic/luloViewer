@@ -21,10 +21,10 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_ZOOM_CONTROLLER: true,
-      ZOOM_CONTROLLER_SIZE: 0.4, // width of zoomController as fraction of viewer width
+      ZOOM_CONTROLLER_SIZE: 0.18, // width of zoomController as fraction of viewer width
       ZOOM_CONTROLLER_PADDING: 5, // zoomController padding as viewer width percent
-      ZOOM_CONTROLLER_POSITION_X: 0.55,
-      ZOOM_CONTROLLER_POSITION_Y: 0.15
+      ZOOM_CONTROLLER_POSITION_X: 0.8,
+      ZOOM_CONTROLLER_POSITION_Y: 0.05
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
@@ -79,7 +79,6 @@ class LuloViewer extends Component {
   }
 
   componentDidMount() {
-    console.log('WTF?');
     const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
     this.setState(
       {
@@ -94,6 +93,7 @@ class LuloViewer extends Component {
         this.slideAnimationsStylesheet.type = 'text/css';
         document.head.appendChild(this.slideAnimationsStylesheet);
         this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet);
+        this.updateViewRectangle();
         console.log(this.slideAnimationsStylesheet);
       }
     );
@@ -200,35 +200,13 @@ class LuloViewer extends Component {
     document.removeEventListener('mouseup', this.onMouseUp);
   }
 
-  async onMouseMove(e) {
+  onMouseMove(e) {
     e.preventDefault();
     e.stopPropagation();
-    const slides = {
-      A: this.slideA,
-      B: this.slideB,
-      C: this.slideC
-    };
-    const activeSlide = slides[this.state.activeSlide];
-    await activeSlide.handleMouseMove(e);
-    const imageLeft = activeSlide.state.left;
-    const imageTop = activeSlide.state.top;
-    const imageWidth = activeSlide.state.width;
-    const imageHeight = activeSlide.state.height;
-    if (this.zoomController) {
-      const viewRectangleTransfotm = getViewRectangleTransform(
-        imageLeft,
-        imageTop,
-        imageWidth,
-        imageHeight,
-        this.state.mainDivRect.width * this.constants.ZOOM_CONTROLLER_SIZE,
-        this.state.mainDivRect.height * this.constants.ZOOM_CONTROLLER_SIZE,
-        this.state.mainDivRect
-      );
-      this.zoomController.updateViewRectangle(viewRectangleTransfotm);
-    }
+    this.updateViewRectangle(e, 'mouseMove');
   }
 
-  onWheel(e) {
+  async onWheel(e) {
     console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
 
     e.preventDefault();
@@ -267,13 +245,7 @@ class LuloViewer extends Component {
         return;
       }
 
-      const slides = {
-        A: this.slideA,
-        B: this.slideB,
-        C: this.slideC
-      };
-      const activeSlide = slides[this.state.activeSlide];
-      if (activeSlide) activeSlide.handleWheel(e);
+      this.updateViewRectangle(e, 'wheel');
     }
   }
 
@@ -394,6 +366,37 @@ class LuloViewer extends Component {
       (currentIndex + amount + this.props.imageUrls.length) %
       this.props.imageUrls.length;
     return nextSlideIndex;
+  }
+
+  async updateViewRectangle(e, eventType) {
+    const slides = {
+      A: this.slideA,
+      B: this.slideB,
+      C: this.slideC
+    };
+    const activeSlide = slides[this.state.activeSlide];
+    if (activeSlide) {
+      const imageLeft = activeSlide.state.left;
+      const imageTop = activeSlide.state.top;
+      const imageWidth = activeSlide.state.width;
+      const imageHeight = activeSlide.state.height;
+      // if (eventType === 'changeSlide') {}
+      if (eventType === 'mouseMove') await activeSlide.handleMouseMove(e);
+      if (eventType === 'wheel') await activeSlide.handleWheel(e);
+
+      if (this.zoomController) {
+        const viewRectangleTransform = getViewRectangleTransform(
+          imageLeft,
+          imageTop,
+          imageWidth,
+          imageHeight,
+          this.state.mainDivRect.width * this.constants.ZOOM_CONTROLLER_SIZE,
+          this.state.mainDivRect.height * this.constants.ZOOM_CONTROLLER_SIZE,
+          this.state.mainDivRect
+        );
+        this.zoomController.updateViewRectangle(viewRectangleTransform);
+      }
+    }
   }
 
   changeSlide(amount) {
@@ -600,6 +603,7 @@ class LuloViewer extends Component {
         slideCAnimationName
       },
       () => {
+        this.updateViewRectangle();
         this.setState({});
       }
     );
@@ -778,10 +782,10 @@ class LuloViewer extends Component {
               this.props.imageUrls[this.state.currentSlideIndex]
             }')`
           }}
-          viewRectangleLeft={50}
-          viewRectangleTop={50}
-          viewRectangleWidth={50}
-          viewRectangleHeight={50}
+          viewRectangleLeft={0}
+          viewRectangleTop={0}
+          viewRectangleWidth={100}
+          viewRectangleHeight={100}
         />
       ) : null;
     //************** zoom controller ************

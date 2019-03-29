@@ -35,21 +35,32 @@ class ZoomController extends PureComponent {
   }
 
   render() {
+    let viewRectangleLeft = this.state.viewRectangleLeft;
+    let viewRectangleTop = this.state.viewRectangleTop;
+    let viewRectangleWidth = this.state.viewRectangleWidth;
+    let viewRectangleHeight = this.state.viewRectangleHeight;
+
+    // if (viewRectangleLeft < 0) viewRectangleLeft = 0;
+    // if (viewRectangleTop < 0) viewRectangleTop = 0;
+    // if (viewRectangleWidth > this.props.style.width)
+    //   viewRectangleWidth = Math.floor(this.props.style.width);
+    // if (viewRectangleHeight > this.props.style.height)
+    //   viewRectangleHeight = Math.floor(this.props.style.height);
     return (
       <div className="zoom-controller" style={this.props.style}>
         <div className="zoom-controller-bgd" />
         <div
           className="view-rectangle no-select"
           style={{
-            left: `${this.state.viewRectangleLeft}${'px'}`,
-            top: `${this.state.viewRectangleTop}${'px'}`,
-            width: `${this.state.viewRectangleWidth}${'px'}`,
-            height: `${this.state.viewRectangleHeight}${'px'}`,
+            left: `${viewRectangleLeft}${'px'}`,
+            top: `${viewRectangleTop}${'px'}`,
+            width: `${viewRectangleWidth}${'px'}`,
+            height: `${viewRectangleHeight}${'px'}`,
             boxShadow: `${'0 0 0 '}${
               this.props.style.width > this.props.style.height
                 ? this.props.style.width
                 : this.props.style.height
-            }${'px rgba(0, 0, 0, 0.0)'}`
+            }${'px rgba(0, 0, 0, 0.5)'}`
           }}
         />
       </div>
