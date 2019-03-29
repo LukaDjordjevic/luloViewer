@@ -16,7 +16,6 @@ class SingleImage extends PureComponent {
     this.startingLeft = this.startingX;
     this.startingTop = this.startingY;
 
-    this.inThrottle = false;
     this.zooming = false;
     this.zoomTargetSelected = false;
     this.state = {
@@ -70,13 +69,6 @@ class SingleImage extends PureComponent {
     // this.onTouchStart = this.onTouchStart.bind(this);
     // this.onTouchMove = this.onTouchMove.bind(this);
     // this.onTouchEnd = this.onTouchEnd.bind(this);
-
-    // document.onfullscreenchange = e => {
-    // };
-  }
-
-  componentDidMount() {
-    console.log('initialized');
   }
 
   componentWillReceiveProps(nextProps) {

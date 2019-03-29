@@ -72,7 +72,7 @@ class LuloViewer extends Component {
     this.onRightArrowLeave = this.onRightArrowLeave.bind(this);
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
-    this.onDoubleClick = this.onDoubleClick.bind(this);
+    // this.onDoubleClick = this.onDoubleClick.bind(this);
     // this.onAnimationEnd = this.onAnimationEnd.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
@@ -288,11 +288,11 @@ class LuloViewer extends Component {
     this.changeSlide(1);
   }
 
-  onDoubleClick(e) {
-    console.log('click');
+  // onDoubleClick(e) {
+  //   console.log('click');
 
-    e.preventDefault();
-  }
+  //   e.preventDefault();
+  // }
 
   createSlideAnimationKeyframes(styleSheet) {
     const width = this.state.mainDivRect.width;
@@ -689,7 +689,7 @@ class LuloViewer extends Component {
           onMouseLeave={this.onLeftArrowLeave}
           onMouseUp={this.onLeftArrowClick}
           onMouseDown={this.onDoubleClick}
-          onDoubleClick={this.onDoubleClick}
+          // onDoubleClick={this.onDoubleClick}
           style={{
             width: arrowSize,
             height:
@@ -713,7 +713,7 @@ class LuloViewer extends Component {
           onMouseLeave={this.onRightArrowLeave}
           onMouseUp={this.onRightArrowClick}
           onMouseDown={this.onDoubleClick}
-          onDoubleClick={this.onDoubleClick}
+          // onDoubleClick={this.onDoubleClick}
           style={{
             width: arrowSize,
             height:
@@ -799,7 +799,7 @@ class LuloViewer extends Component {
               imageInfo={this.state.imagesInfo[this.state.slideAImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
-              SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
+              // SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
               // changeSlide={this.changeSlide}
               isFirefox={this.isFirefox}
             />
@@ -835,7 +835,7 @@ class LuloViewer extends Component {
               imageInfo={this.state.imagesInfo[this.state.slideBImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
-              SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
+              // SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
               // changeSlide={this.changeSlide}
               isFirefox={this.isFirefox}
             />
@@ -871,12 +871,12 @@ class LuloViewer extends Component {
               imageInfo={this.state.imagesInfo[this.state.slideCImageIndex]}
               parentBoundingRect={this.state.mainDivRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
-              SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
+              // SWIPE_THRESHOLD={this.constants.SWIPE_THRESHOLD}
               // isFirefox={this.isFirefox}
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideCImageIndex) ? (
             <div className="message">
-              Image ${this.props.imageUrls[this.state.currentSlideIndex]} failed
+              Image {this.props.imageUrls[this.state.currentSlideIndex]} failed
               to load.
             </div>
           ) : (

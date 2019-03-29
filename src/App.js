@@ -20,7 +20,7 @@ class App extends Component {
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-1.jpg',
       'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/bad_url.jpg',
       'https://solarsystem.nasa.gov/internal_resources/3326',
-      'https://qph.fs.quoracdn.net/main-qimg-53b60475fe8386e610447a63d6d97baa',
+      // 'https://qph.fs.quoracdn.net/main-qimg-53b60475fe8386e610447a63d6d97baa',
       'http://dm.damcdn.net/pics/wp-content/uploads/2011/10/bad_url.jpg',
       'https://blog.nationalgeographic.org/wp-content/uploads/2014/05/gpw-201306-NASA-ISS035-E-34688-Earth-from-space-clouds-shadows-20130505-large-1024x681.jpg',
       'https://www.popsci.com/sites/popsci.com/files/styles/655_1x_/public/images/2018/10/comet_in_may_2015.jpg?itok=l7KMRGJf&fc=50,50'
@@ -39,11 +39,13 @@ class App extends Component {
     return (
       <div
         style={{
-          width: '550px',
-          height: '450px',
+          // width: '550px',
+          // height: '450px',
+          width: '100vw',
+          height: '100vh',
           backgroundColor: '#000',
-          top: '100px',
-          left: '30%',
+          // top: '100px',
+          // left: '30%',
           position: 'relative'
           // display: 'flex'
         }}
