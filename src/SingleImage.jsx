@@ -158,45 +158,55 @@ class SingleImage extends PureComponent {
   }
 
   handleMouseMove(e) {
-    const offset = { x: e.pageX - this.startingX, y: e.pageY - this.startingY };
+    return new Promise(resolve => {
+      const offset = {
+        x: e.pageX - this.startingX,
+        y: e.pageY - this.startingY
+      };
 
-    let newLeft = this.startingLeft + offset.x;
-    let newTop = this.startingTop + offset.y;
+      let newLeft = this.startingLeft + offset.x;
+      let newTop = this.startingTop + offset.y;
 
-    const zoomFactor = this.state.zoomFactor;
-    const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-    const containerAspectRatio = this.containerAspectRatio;
-    const parentBoundingRect = JSON.parse(
-      JSON.stringify(this.props.parentBoundingRect)
-    );
+      const zoomFactor = this.state.zoomFactor;
+      const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
+      const containerAspectRatio = this.containerAspectRatio;
+      const parentBoundingRect = JSON.parse(
+        JSON.stringify(this.props.parentBoundingRect)
+      );
 
-    const imageWidth = this.state.width;
-    const imageHeight = this.state.height;
-    const divWidth = this.props.parentBoundingRect.width;
-    const divHeight = this.props.parentBoundingRect.height;
-    //Update zoomTarget
-    const zoomTarget = updateZoomTarget(
-      newLeft,
-      newTop,
-      imageWidth,
-      imageHeight,
-      divWidth,
-      divHeight
-    );
+      const imageWidth = this.state.width;
+      const imageHeight = this.state.height;
+      const divWidth = this.props.parentBoundingRect.width;
+      const divHeight = this.props.parentBoundingRect.height;
+      //Update zoomTarget
+      const zoomTarget = updateZoomTarget(
+        newLeft,
+        newTop,
+        imageWidth,
+        imageHeight,
+        divWidth,
+        divHeight
+      );
 
-    const { constrainedLeft, constrainedTop } = constrainTranslate(
-      newLeft,
-      newTop,
-      zoomFactor,
-      parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
-    );
+      const { constrainedLeft, constrainedTop } = constrainTranslate(
+        newLeft,
+        newTop,
+        zoomFactor,
+        parentBoundingRect,
+        imageAspectRatio,
+        containerAspectRatio
+      );
 
-    this.setState({
-      left: constrainedLeft,
-      top: constrainedTop,
-      zoomTarget
+      this.setState(
+        {
+          left: constrainedLeft,
+          top: constrainedTop,
+          zoomTarget
+        },
+        () => {
+          resolve(); // Tell parent to go on and update ZoomController (it depends on this state)
+        }
+      );
     });
   }
 

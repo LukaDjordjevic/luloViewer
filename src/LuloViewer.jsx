@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import SingleImage from './SingleImage';
 import ZoomController from './ZoomController';
 import Icon from './Icon';
+import { getViewRectangleTransform } from './util';
 
 class LuloViewer extends Component {
   constructor(props) {
@@ -20,10 +21,10 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_ZOOM_CONTROLLER: true,
-      ZOOM_CONTROLLER_SIZE: 0.2, // width of zoomController as fraction of viewer width
+      ZOOM_CONTROLLER_SIZE: 0.4, // width of zoomController as fraction of viewer width
       ZOOM_CONTROLLER_PADDING: 5, // zoomController padding as viewer width percent
-      ZOOM_CONTROLLER_POSITION_X: 0.75,
-      ZOOM_CONTROLLER_POSITION_Y: 0.05
+      ZOOM_CONTROLLER_POSITION_X: 0.55,
+      ZOOM_CONTROLLER_POSITION_Y: 0.15
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
@@ -199,7 +200,7 @@ class LuloViewer extends Component {
     document.removeEventListener('mouseup', this.onMouseUp);
   }
 
-  onMouseMove(e) {
+  async onMouseMove(e) {
     e.preventDefault();
     e.stopPropagation();
     const slides = {
@@ -208,7 +209,23 @@ class LuloViewer extends Component {
       C: this.slideC
     };
     const activeSlide = slides[this.state.activeSlide];
-    if (activeSlide) activeSlide.handleMouseMove(e);
+    await activeSlide.handleMouseMove(e);
+    const imageLeft = activeSlide.state.left;
+    const imageTop = activeSlide.state.top;
+    const imageWidth = activeSlide.state.width;
+    const imageHeight = activeSlide.state.height;
+    if (this.zoomController) {
+      const viewRectangleTransfotm = getViewRectangleTransform(
+        imageLeft,
+        imageTop,
+        imageWidth,
+        imageHeight,
+        this.state.mainDivRect.width * this.constants.ZOOM_CONTROLLER_SIZE,
+        this.state.mainDivRect.height * this.constants.ZOOM_CONTROLLER_SIZE,
+        this.state.mainDivRect
+      );
+      this.zoomController.updateViewRectangle(viewRectangleTransfotm);
+    }
   }
 
   onWheel(e) {
@@ -760,10 +777,11 @@ class LuloViewer extends Component {
             backgroundImage: `url('${
               this.props.imageUrls[this.state.currentSlideIndex]
             }')`
-            // backgroundSize: 'contain',
-            // backgroundRepeat: 'no-repeat',
-            // backgroundPosition: 'center'
           }}
+          viewRectangleLeft={50}
+          viewRectangleTop={50}
+          viewRectangleWidth={50}
+          viewRectangleHeight={50}
         />
       ) : null;
     //************** zoom controller ************

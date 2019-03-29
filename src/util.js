@@ -148,10 +148,67 @@ const constrainTranslate = (
   return { constrainedLeft, constrainedTop };
 };
 
+// Calculate view rectangle transform based on image transform and bounding rectangle
+const getViewRectangleTransform = (
+  imageLeft,
+  imageTop,
+  imageWidth,
+  imageHeight,
+  zoomControllerWidth,
+  zoomControllerHeight,
+  boundingRect
+) => {
+  // let leftOffsetController;
+  // let topOffsetController;
+  let leftOffsetImage;
+  let topOffsetImage;
+  let left;
+  let top;
+  let width;
+  let height;
+  if (imageWidth / imageHeight > boundingRect.width / boundingRect.height) {
+    // Image aspect ratio > bounding rect aspect
+    // leftOffsetController = 0;
+    // topOffsetController =
+    //   (zoomControllerHeight -
+    //     zoomControllerWidth / (imageWidth / imageHeight)) /
+    //   2;
+    topOffsetImage =
+      (imageWidth / (boundingRect.width / boundingRect.height) - imageHeight) /
+      2;
+    left = ((-1 * imageLeft) / imageWidth) * zoomControllerWidth;
+    top =
+      ((-1 * imageTop + topOffsetImage) /
+        (imageWidth / (boundingRect.width / boundingRect.height))) *
+      zoomControllerHeight;
+    width =
+      Math.round((boundingRect.width / imageWidth) * zoomControllerWidth) - 2;
+    height = Math.round(width / (boundingRect.width / boundingRect.height)) - 2;
+  } else {
+    // topOffsetController = 0;
+    leftOffsetImage =
+      (imageHeight / (boundingRect.height / boundingRect.width) - imageWidth) /
+      2;
+    left =
+      ((-1 * imageLeft + leftOffsetImage) /
+        (imageHeight / (boundingRect.height / boundingRect.width))) *
+      zoomControllerWidth;
+    top = ((-1 * imageTop) / imageHeight) * zoomControllerHeight;
+
+    height =
+      Math.round((boundingRect.height / imageHeight) * zoomControllerHeight) -
+      2;
+    width = Math.round(height * (boundingRect.width / boundingRect.height)) - 2;
+  }
+  console.log('topoffset', topOffsetImage);
+  return { left, top, width, height };
+};
+
 module.exports = {
   updateZoomTarget,
   getNewZoomTransform,
   getImageTransform,
   getImageDimensions,
-  constrainTranslate
+  constrainTranslate,
+  getViewRectangleTransform
 };
