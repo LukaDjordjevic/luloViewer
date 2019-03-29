@@ -62,30 +62,18 @@
 
 .view-rectangle {
   position: absolute;
-  background: none;
-  border: solid;
-  border-width: 1px;
-  border-color: rgba(255, 255, 255, 0.3);
-  /* border-color: rgba(1, 1, 1, 0.9); */
-  border-color: rgb(119, 137, 161);
+  /* border: solid;
+  border-width: 1px; */
+  /* border-color: rgba(255, 255, 255, 0.3); */
+  /* border-color: rgb(119, 137, 161); */
   z-index: 3;
-  /* opacity: 0.5; */
-}
-
-.no-select {
-  -webkit-touch-callout: none;
-  /* iOS Safari */
-  -webkit-user-select: none;
-  /* Safari */
-  -khtml-user-select: none;
-  /* Konqueror HTML */
-  -moz-user-select: none;
-  /* Firefox */
-  -ms-user-select: none;
-  /* Internet Explorer/Edge */
-  user-select: none;
-  /* Non-prefixed version, currently
-      supported by Chrome and Opera */
+  /* border: dashed; */
+  /* background-color: red; */
+  /* box-shadow: inset 0px 0px 0px 10px red; */
+  /* outline: 1px solid red; */
+  border: 1px solid rgb(119, 137, 161);
+  box-shadow: inset 0px 0px 0px 10px red;
+  box-sizing: border-box; /* Include padding and border in element's width and height */
 }
 
 img {

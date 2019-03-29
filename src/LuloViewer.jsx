@@ -782,10 +782,10 @@ class LuloViewer extends Component {
               this.props.imageUrls[this.state.currentSlideIndex]
             }')`
           }}
-          viewRectangleLeft={0}
-          viewRectangleTop={0}
-          viewRectangleWidth={100}
-          viewRectangleHeight={100}
+          // viewRectangleLeft={}
+          // viewRectangleTop={0}
+          // viewRectangleWidth={100}
+          // viewRectangleHeight={100}
         />
       ) : null;
     //************** zoom controller ************
