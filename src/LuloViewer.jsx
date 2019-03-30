@@ -93,7 +93,7 @@ class LuloViewer extends Component {
         this.slideAnimationsStylesheet.type = 'text/css';
         document.head.appendChild(this.slideAnimationsStylesheet);
         this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet);
-        this.updateViewRectangle();
+        this.updateElements();
         console.log(this.slideAnimationsStylesheet);
       }
     );
@@ -137,7 +137,7 @@ class LuloViewer extends Component {
       },
       () => {
         this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet);
-        this.updateViewRectangle();
+        this.updateElements();
       }
     );
   }
@@ -204,7 +204,7 @@ class LuloViewer extends Component {
   onMouseMove(e) {
     e.preventDefault();
     e.stopPropagation();
-    this.updateViewRectangle(e, 'mouseMove');
+    this.updateElements(e, 'mouseMove');
   }
 
   async onWheel(e) {
@@ -213,40 +213,49 @@ class LuloViewer extends Component {
     e.preventDefault();
     e.stopPropagation();
 
-    let threshold = this.constants.SWIPE_THRESHOLD;
-    let timeout = this.constants.SLIDE_TRANSITION_TIMEOUT;
-    if (this.isFirefox) {
-      threshold = threshold * 1.5;
-      // timeout = 180;
-    }
-
     if (!this.changingSlide) {
+      let threshold = this.constants.SWIPE_THRESHOLD;
+      let timeout = this.constants.SLIDE_TRANSITION_TIMEOUT;
+      if (this.isFirefox) threshold = threshold * 1.5;
       if (Math.abs(e.deltaX) > threshold) {
         console.log('THRESHOLD');
-        if (this.zoomTimeout) clearTimeout(this.zoomTimeout);
-        this.zoomTimeout = setTimeout(() => {
-          this.changingSlide = false;
-        }, timeout);
-        this.changingSlide = true;
-        if (e.deltaX > 0) {
-          if (
-            this.constants.ALLOW_CYCLIC ||
-            this.state.currentSlideIndex !== this.props.imageUrls.length - 1
-          ) {
-            this.changeSlide(1);
+        const slides = {
+          A: this.slideA,
+          B: this.slideB,
+          C: this.slideC
+        };
+        const activeSlide = slides[this.state.activeSlide];
+        if (activeSlide) {
+          if (this.slideChangeTimeout) clearTimeout(this.slideChangeTimeout);
+          this.slideChangeTimeout = setTimeout(() => {
+            this.changingSlide = false;
+          }, timeout);
+          this.changingSlide = true;
+          if (e.deltaX > 0) {
+            if (
+              this.constants.ALLOW_CYCLIC ||
+              this.state.currentSlideIndex !== this.props.imageUrls.length - 1
+            ) {
+              if (!activeSlide.zoomTargetSelected) this.changeSlide(1);
+            }
+          } else {
+            if (
+              this.constants.ALLOW_CYCLIC ||
+              this.state.currentSlideIndex !== 0
+            ) {
+              if (!activeSlide.zoomTargetSelected) this.changeSlide(-1);
+            }
           }
         } else {
-          if (
-            this.constants.ALLOW_CYCLIC ||
-            this.state.currentSlideIndex !== 0
-          ) {
+          if (e.deltaX > 0) {
+            this.changeSlide(1);
+          } else {
             this.changeSlide(-1);
           }
         }
-        return;
+      } else {
+        this.updateElements(e, 'wheel');
       }
-
-      this.updateViewRectangle(e, 'wheel');
     }
   }
 
@@ -369,7 +378,7 @@ class LuloViewer extends Component {
     return nextSlideIndex;
   }
 
-  async updateViewRectangle(e, eventType) {
+  async updateElements(e, eventType) {
     const slides = {
       A: this.slideA,
       B: this.slideB,
@@ -604,7 +613,7 @@ class LuloViewer extends Component {
         slideCAnimationName
       },
       () => {
-        this.updateViewRectangle();
+        this.updateElements();
         this.setState({});
       }
     );
@@ -786,6 +795,7 @@ class LuloViewer extends Component {
         />
       ) : null;
     //************** zoom controller ************
+    // const mainImageDiv =
 
     return (
       <div
@@ -824,11 +834,11 @@ class LuloViewer extends Component {
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideAImageIndex) ? (
             <div className="message">
-              Image ${this.props.imageUrls[this.state.currentSlideIndex]} failed
+              Image {this.props.imageUrls[this.state.currentSlideIndex]} failed
               to load.
             </div>
           ) : (
-            <div className="message">loading</div>
+            <div className="message">Image Loading</div>
           )}
         </div>
         <div
@@ -859,12 +869,12 @@ class LuloViewer extends Component {
               isFirefox={this.isFirefox}
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideBImageIndex) ? (
-            <div style={{ color: 'white' }}>
-              Image ${this.props.imageUrls[this.state.currentSlideIndex]} failed
+            <div className="message">
+              Image {this.props.imageUrls[this.state.currentSlideIndex]} failed
               to load.
             </div>
           ) : (
-            <div style={{ color: 'white' }}>loading</div>
+            <div className="message">Image Loading</div>
           )}
         </div>
         <div

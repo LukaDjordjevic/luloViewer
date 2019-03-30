@@ -16,7 +16,6 @@ class SingleImage extends PureComponent {
     this.startingLeft = this.startingX;
     this.startingTop = this.startingY;
 
-    this.zooming = false;
     this.zoomTargetSelected = false;
     this.state = {
       zoomFactor:
@@ -248,8 +247,6 @@ class SingleImage extends PureComponent {
         containerAspectRatio,
         eventPosition
       );
-
-      console.log(!this.zooming, e.deltaY);
 
       let zoomTarget;
       if (!this.zoomTargetSelected && e.deltaY < 0) {
