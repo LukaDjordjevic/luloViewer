@@ -71,7 +71,7 @@
   /* background-color: red; */
   /* box-shadow: inset 0px 0px 0px 10px red; */
   /* outline: 1px solid red; */
-  border: 1px solid rgb(119, 137, 161);
+  border: 1px solid rgba(119, 137, 161, 0.5);
   box-shadow: inset 0px 0px 0px 10px red;
   box-sizing: border-box; /* Include padding and border in element's width and height */
 }
