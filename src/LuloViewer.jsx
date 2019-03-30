@@ -695,7 +695,7 @@ class LuloViewer extends Component {
 
     //****************** arrows *****************
     //****************** arrows *****************
-    const arrows = (
+    const arrows = this.constants.SHOW_ARROWS ? (
       <div
         className="arrows"
         style={{
@@ -755,7 +755,7 @@ class LuloViewer extends Component {
           </div>
         </div>
       </div>
-    );
+    ) : null;
     //****************** arrows *****************
     //************** zoom controller ************
     const zoomController =
@@ -783,10 +783,6 @@ class LuloViewer extends Component {
               this.props.imageUrls[this.state.currentSlideIndex]
             }')`
           }}
-          // viewRectangleLeft={}
-          // viewRectangleTop={0}
-          // viewRectangleWidth={100}
-          // viewRectangleHeight={100}
         />
       ) : null;
     //************** zoom controller ************
@@ -797,8 +793,8 @@ class LuloViewer extends Component {
         ref={el => (this.mainDiv = el)}
         onMouseDown={this.onMouseDown}
       >
+        {arrows}
         {zoomController}
-        {this.constants.SHOW_ARROWS ? arrows : null}
         <div
           className="main-image-div"
           // ref={el => {
