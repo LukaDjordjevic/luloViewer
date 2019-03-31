@@ -26,7 +26,7 @@ class LuloViewer extends Component {
       ZOOM_CONTROLLER_POSITION_X: 0.8,
       ZOOM_CONTROLLER_POSITION_Y: 0.05,
       SHOW_SLIDER: true,
-      SLIDER_POSITION: 'left',
+      SLIDER_POSITION: 'right',
       SLIDER_SIZE: 0.1 //slider thickness as fraction of viewer dimension
     };
 
@@ -99,10 +99,13 @@ class LuloViewer extends Component {
     // const slidesRect = this.slides.getBoundingClientRect();
 
     setTimeout(() => {
+      const mainDivRect = this.mainDiv.getBoundingClientRect();
       const slidesRect = this.slides.getBoundingClientRect();
-      console.log('treba da je', slidesRect);
-      this.setState({ slidesRect });
-    }, 2000);
+      console.log('123', mainDivRect);
+      // const slidesRect = this.calculateSlidesDivFromMainDiv(this.mainDivRect);
+      console.log('treba da je', slidesRect, slidesRect);
+      this.setState({ slidesRect, mainDivRect });
+    }, 0);
 
     // const sliderWidth = ['top', 'bottom'].includes(
     //   this.constants.SLIDER_POSITION
