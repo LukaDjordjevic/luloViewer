@@ -12,7 +12,6 @@ class ZoomController extends PureComponent {
   }
 
   updateViewRectangle(newState) {
-    console.log('%%%%%%%%%%', newState);
     this.setState({
       viewRectangleLeft: newState.left,
       viewRectangleTop: newState.top,
@@ -29,9 +28,9 @@ class ZoomController extends PureComponent {
 
     if (viewRectangleLeft < 0) viewRectangleLeft = 0;
     if (viewRectangleTop < 0) viewRectangleTop = 0;
-    if (viewRectangleWidth > this.props.style.width - 0)
+    if (viewRectangleWidth > this.props.style.width)
       viewRectangleWidth = Math.floor(this.props.style.width);
-    if (viewRectangleHeight > this.props.style.height - 0)
+    if (viewRectangleHeight > this.props.style.height)
       viewRectangleHeight = Math.floor(this.props.style.height);
     return (
       <div className="zoom-controller" style={this.props.style}>

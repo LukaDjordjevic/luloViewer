@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import SingleImage from './SingleImage';
 import ZoomController from './ZoomController';
-import Icon from './Icon';
+import Slider from './Slider';
+import Arrows from './Arrows';
+// import Icon from './Icon';
 import { getViewRectangleTransform } from './util';
 
 class LuloViewer extends Component {
@@ -14,20 +16,21 @@ class LuloViewer extends Component {
       SWIPE_THRESHOLD: 20,
       SLIDE_TRANSITION_DURATION: 0.3,
       SLIDE_TRANSITION_TIMEOUT: 600,
+      BACKGROUND_COLOR: 'black',
       SHOW_ARROWS: true,
-      ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
-      ARROWS_PADDING: 5,
       ALLOW_CYCLIC: true,
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
+      SHOW_SLIDER: true,
+      SLIDER_POSITION: 'top',
+      SLIDER_SIZE: 0.2, //slider thickness as fraction of viewer dimension
+      ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
+      ARROWS_PADDING: 5,
       SHOW_ZOOM_CONTROLLER: true,
       ZOOM_CONTROLLER_SIZE: 0.18, // width of zoomController as fraction of viewer width
       ZOOM_CONTROLLER_PADDING: 5, // zoomController padding as viewer width percent
       ZOOM_CONTROLLER_POSITION_X: 0.8,
-      ZOOM_CONTROLLER_POSITION_Y: 0.025,
-      SHOW_SLIDER: true,
-      SLIDER_POSITION: 'top',
-      SLIDER_SIZE: 0.2 //slider thickness as fraction of viewer dimension
+      ZOOM_CONTROLLER_POSITION_Y: 0.025
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
@@ -57,7 +60,6 @@ class LuloViewer extends Component {
       rightArrowColor: '#CCCCCC',
       mainDivRect: { left: 0, top: 0, width: 0, height: 0 },
       slidesRect: { left: 0, top: 0, width: 0, height: 0 }
-      // sliderRect: { left: 0, top: 0, width: 0, height: 0 }
     };
 
     this.imageLoadFailedArr = [];
@@ -75,9 +77,9 @@ class LuloViewer extends Component {
     this.onWheel = this.onWheel.bind(this);
     this.onLeftArrowEnter = this.onLeftArrowEnter.bind(this);
     this.onLeftArrowLeave = this.onLeftArrowLeave.bind(this);
+    this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
     this.onRightArrowEnter = this.onRightArrowEnter.bind(this);
     this.onRightArrowLeave = this.onRightArrowLeave.bind(this);
-    this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
@@ -738,83 +740,27 @@ class LuloViewer extends Component {
       '*** viewer render ***',
       this.state.slidesRect ? this.state.slidesRect.height / 2 : 0
     );
-    const arrowSize = this.state.slidesRect
-      ? this.state.slidesRect.height * this.constants.ARROWS_SIZE
-      : 0;
 
-    //****************** arrows *****************
-
-    const arrowsTop =
-      this.state.slidesRect.height / 2 -
-      (this.state.slidesRect.height * this.constants.ARROWS_SIZE) / 2 +
-      (this.state.slidesRect.top - this.state.mainDivRect.top);
-    console.log(
-      'arrowsTop',
-      arrowsTop,
-      this.state.slidesRect.height,
-      this.state.slidesRect.top
-    );
     const arrows = this.constants.SHOW_ARROWS ? (
-      <div
-        className="arrows"
-        style={{
-          top: `${arrowsTop}px`,
-
-          width:
-            ['left', 'right'].includes(this.constants.SLIDER_POSITION) &&
-            this.constants.SHOW_SLIDER
-              ? this.state.mainDivRect.width * (1 - this.constants.SLIDER_SIZE)
-              : this.state.mainDivRect.width
-        }}
-      >
-        <div
-          className="arrow"
-          onMouseEnter={this.onLeftArrowEnter}
-          onMouseLeave={this.onLeftArrowLeave}
-          onMouseUp={this.onLeftArrowClick}
-          onMouseDown={this.onDoubleClick}
-          style={{
-            width: arrowSize,
-            height:
-              this.constants.ALLOW_CYCLIC || this.state.currentSlideIndex !== 0
-                ? arrowSize
-                : '0',
-            paddingLeft: `${this.constants.ARROWS_PADDING}%`
-          }}
-        >
-          <div className="arrows-icon">
-            <Icon
-              name="arrow-left"
-              color={this.state.leftArrowColor}
-              size={'100%'}
-            />
-          </div>
-        </div>
-        <div
-          className="arrow"
-          onMouseEnter={this.onRightArrowEnter}
-          onMouseLeave={this.onRightArrowLeave}
-          onMouseUp={this.onRightArrowClick}
-          onMouseDown={this.onDoubleClick}
-          style={{
-            width: arrowSize,
-            height:
-              this.constants.ALLOW_CYCLIC ||
-              this.state.currentSlideIndex !== this.props.imageUrls.length - 1
-                ? arrowSize
-                : '0',
-            paddingRight: `${this.constants.ARROWS_PADDING}%`
-          }}
-        >
-          <div className="arrows-icon">
-            <Icon
-              name="arrow-right"
-              color={this.state.rightArrowColor}
-              size={'100%'}
-            />
-          </div>
-        </div>
-      </div>
+      <Arrows
+        ARROWS_SIZE={this.constants.ARROWS_SIZE}
+        SLIDER_SIZE={this.constants.SLIDER_SIZE}
+        SLIDER_POSITION={this.constants.SLIDER_POSITION}
+        SHOW_SLIDER={this.constants.SHOW_SLIDER}
+        ARROWS_PADDING={this.constants.ARROWS_PADDING}
+        ALLOW_CYCLIC={this.constants.ALLOW_CYCLIC}
+        mainDivRect={this.state.mainDivRect}
+        slidesRect={this.state.slidesRect}
+        leftArrowColor={this.state.leftArrowColor}
+        rightArrowColor={this.state.rightArrowColor}
+        currentSlideIndex={this.state.currentSlideIndex}
+        onLeftArrowEnter={this.onLeftArrowEnter}
+        onLeftArrowClick={this.onLeftArrowClick}
+        onLeftArrowLeave={this.onLeftArrowLeave}
+        onRightArrowEnter={this.onRightArrowEnter}
+        onRightArrowClick={this.onRightArrowClick}
+        onRightArrowLeave={this.onRightArrowLeave}
+      />
     ) : null;
     //****************** arrows *****************
     //************** zoom controller ************
@@ -978,12 +924,15 @@ class LuloViewer extends Component {
 
     const slider = (
       <div
-        className="slider-main"
+        className="layout-slider"
         style={{
           width: `${sliderWidth}%`,
           height: `${sliderHeight}%`
+          // backgroundColor: this.constants.BACKGROUND_COLOR
         }}
-      />
+      >
+        <Slider />
+      </div>
     );
 
     const start =
@@ -1023,7 +972,8 @@ class LuloViewer extends Component {
           style={{
             width: `${this.state.mainDivRect.width}px`,
             height: `${this.state.mainDivRect.height}px`,
-            flexDirection
+            flexDirection,
+            backgroundColor: this.constants.BACKGROUND_COLOR
           }}
         >
           {start}

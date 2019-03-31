@@ -93,10 +93,9 @@
 
 .slides-main {
   display: flex;
-  /* overflow: hidden; */
 }
 
-.slider-main {
+.layout-slider {
   display: flex;
   background-color: chocolate;
 }
