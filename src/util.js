@@ -181,8 +181,7 @@ const getViewRectangleTransform = (
       ((-1 * imageTop + topOffsetImage) /
         (imageWidth / (boundingRect.width / boundingRect.height))) *
       zoomControllerHeight;
-    width =
-      (boundingRect.width / imageWidth) * zoomControllerWidth;
+    width = (boundingRect.width / imageWidth) * zoomControllerWidth;
     height = width / (boundingRect.width / boundingRect.height);
   } else {
     // topOffsetController = 0;
@@ -195,12 +194,89 @@ const getViewRectangleTransform = (
       zoomControllerWidth;
     top = ((-1 * imageTop) / imageHeight) * zoomControllerHeight;
 
-    height =
-      (boundingRect.height / imageHeight) * zoomControllerHeight;
+    height = (boundingRect.height / imageHeight) * zoomControllerHeight;
     width = height * (boundingRect.width / boundingRect.height);
   }
   console.log('topoffset', topOffsetImage);
   return { left, top, width, height };
+};
+
+const createSlideAnimationKeyframes = (styleSheet, slidesRect) => {
+  const width = slidesRect.width;
+  if (styleSheet.sheet.cssRules[0]) styleSheet.sheet.deleteRule(0);
+  console.log('***********', styleSheet.sheet.cssRules);
+  styleSheet.sheet.insertRule(
+    `
+  @keyframes center-left {
+    from { left: 0px; } 
+    to { left: ${-1 * width}px; }
+  }`,
+    0
+  );
+  if (styleSheet.sheet.cssRules[1]) styleSheet.sheet.deleteRule(1);
+  styleSheet.sheet.insertRule(
+    `
+  @keyframes center-right {
+    from { left: 0px; } 
+    to { left: ${width}px; }
+  }`,
+    1
+  );
+  if (styleSheet.sheet.cssRules[2]) styleSheet.sheet.deleteRule(2);
+  styleSheet.sheet.insertRule(
+    `
+  @keyframes left-center {
+    from { left: ${-1 * width}px; } 
+    to { left: 0px; }
+  }`,
+    2
+  );
+  if (styleSheet.sheet.cssRules[3]) styleSheet.sheet.deleteRule(3);
+  styleSheet.sheet.insertRule(
+    `
+  @keyframes right-center {
+    from { left: ${width}px; } 
+    to { left: 0px; }
+  }`,
+    3
+  );
+  if (styleSheet.sheet.cssRules[4]) styleSheet.sheet.deleteRule(4);
+  styleSheet.sheet.insertRule(
+    `
+  @keyframes center-left-alt {
+    from { left: 0px; } 
+    to { left: ${-1 * width}px; }
+  }`,
+    4
+  );
+  if (styleSheet.sheet.cssRules[5]) styleSheet.sheet.deleteRule(5);
+  styleSheet.sheet.insertRule(
+    `
+  @keyframes center-right-alt {
+    from { left: 0px; } 
+    to { left: ${width}px; }
+  }`,
+    5
+  );
+  if (styleSheet.sheet.cssRules[6]) styleSheet.sheet.deleteRule(6);
+  styleSheet.sheet.insertRule(
+    `
+  @keyframes left-center-alt {
+    from { left: ${-1 * width}px; } 
+    to { left: 0px; }
+  }`,
+    6
+  );
+  if (styleSheet.sheet.cssRules[7]) styleSheet.sheet.deleteRule(7);
+  styleSheet.sheet.insertRule(
+    `
+  @keyframes right-center-alt {
+    from { left: ${width}px; } 
+    to { left: 0px; }
+  }`,
+    7
+  );
+  console.log('new animations:', styleSheet.sheet);
 };
 
 module.exports = {
@@ -209,5 +285,6 @@ module.exports = {
   getImageTransform,
   getImageDimensions,
   constrainTranslate,
-  getViewRectangleTransform
+  getViewRectangleTransform,
+  createSlideAnimationKeyframes
 };

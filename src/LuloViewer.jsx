@@ -4,7 +4,10 @@ import ZoomController from './ZoomController';
 import Slider from './Slider';
 import Arrows from './Arrows';
 // import Icon from './Icon';
-import { getViewRectangleTransform } from './util';
+import {
+  getViewRectangleTransform,
+  createSlideAnimationKeyframes
+} from './util';
 
 class LuloViewer extends Component {
   constructor(props) {
@@ -23,7 +26,7 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SLIDER_POSITION: 'bottom',
+      SLIDER_POSITION: 'left',
       SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 8, // in percent of slider div
       ARROWS_PADDING: 5,
@@ -111,7 +114,10 @@ class LuloViewer extends Component {
         this.slideAnimationsStylesheet = document.createElement('style');
         this.slideAnimationsStylesheet.type = 'text/css';
         document.head.appendChild(this.slideAnimationsStylesheet);
-        this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet);
+        createSlideAnimationKeyframes(
+          this.slideAnimationsStylesheet,
+          this.state.slidesRect
+        );
         this.updateElements();
         console.log(this.slideAnimationsStylesheet);
       }
@@ -192,7 +198,10 @@ class LuloViewer extends Component {
         slideCLeft
       },
       () => {
-        this.createSlideAnimationKeyframes(this.slideAnimationsStylesheet);
+        this.createSlideAnimationKeyframes(
+          this.slideAnimationsStylesheet,
+          this.state.slidesRect
+        );
         this.updateElements();
       }
     );
@@ -335,84 +344,6 @@ class LuloViewer extends Component {
     e.preventDefault();
     e.stopPropagation();
     this.changeSlide(1);
-  }
-
-  createSlideAnimationKeyframes(styleSheet) {
-    const width = this.state.slidesRect.width;
-    if (styleSheet.sheet.cssRules[0]) styleSheet.sheet.deleteRule(0);
-    console.log('***********', styleSheet.sheet.cssRules);
-    styleSheet.sheet.insertRule(
-      `
-    @keyframes center-left {
-      from { left: 0px; } 
-      to { left: ${-1 * width}px; }
-    }`,
-      0
-    );
-    if (styleSheet.sheet.cssRules[1]) styleSheet.sheet.deleteRule(1);
-    styleSheet.sheet.insertRule(
-      `
-    @keyframes center-right {
-      from { left: 0px; } 
-      to { left: ${width}px; }
-    }`,
-      1
-    );
-    if (styleSheet.sheet.cssRules[2]) styleSheet.sheet.deleteRule(2);
-    styleSheet.sheet.insertRule(
-      `
-    @keyframes left-center {
-      from { left: ${-1 * width}px; } 
-      to { left: 0px; }
-    }`,
-      2
-    );
-    if (styleSheet.sheet.cssRules[3]) styleSheet.sheet.deleteRule(3);
-    styleSheet.sheet.insertRule(
-      `
-    @keyframes right-center {
-      from { left: ${width}px; } 
-      to { left: 0px; }
-    }`,
-      3
-    );
-    if (styleSheet.sheet.cssRules[4]) styleSheet.sheet.deleteRule(4);
-    styleSheet.sheet.insertRule(
-      `
-    @keyframes center-left-alt {
-      from { left: 0px; } 
-      to { left: ${-1 * width}px; }
-    }`,
-      4
-    );
-    if (styleSheet.sheet.cssRules[5]) styleSheet.sheet.deleteRule(5);
-    styleSheet.sheet.insertRule(
-      `
-    @keyframes center-right-alt {
-      from { left: 0px; } 
-      to { left: ${width}px; }
-    }`,
-      5
-    );
-    if (styleSheet.sheet.cssRules[6]) styleSheet.sheet.deleteRule(6);
-    styleSheet.sheet.insertRule(
-      `
-    @keyframes left-center-alt {
-      from { left: ${-1 * width}px; } 
-      to { left: 0px; }
-    }`,
-      6
-    );
-    if (styleSheet.sheet.cssRules[7]) styleSheet.sheet.deleteRule(7);
-    styleSheet.sheet.insertRule(
-      `
-    @keyframes right-center-alt {
-      from { left: ${width}px; } 
-      to { left: 0px; }
-    }`,
-      7
-    );
-    console.log('new animations:', styleSheet.sheet);
   }
 
   getNextSlideIndex(currentIndex, amount) {
