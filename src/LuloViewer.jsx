@@ -18,13 +18,14 @@ class LuloViewer extends Component {
       SLIDE_TRANSITION_TIMEOUT: 600,
       BACKGROUND_COLOR: 'black',
       SHOW_ARROWS: true,
+      ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
       ALLOW_CYCLIC: true,
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SLIDER_POSITION: 'right',
-      SLIDER_SIZE: 0.2, //slider thickness as fraction of viewer dimension
-      ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
+      SLIDER_POSITION: 'bottom',
+      SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
+      SLIDER_ARROW_SIZE: 8, // in percent of slider div
       ARROWS_PADDING: 5,
       SHOW_ZOOM_CONTROLLER: true,
       ZOOM_CONTROLLER_SIZE: 0.18, // width of zoomController as fraction of viewer width
@@ -941,7 +942,14 @@ class LuloViewer extends Component {
           // backgroundColor: this.constants.BACKGROUND_COLOR
         }}
       >
-        <Slider />
+        <Slider
+          isHorizontal={['top', 'bottom'].includes(
+            this.constants.SLIDER_POSITION
+          )}
+          ARROW_DEFAULT_COLOR={this.constants.ARROW_DEFAULT_COLOR}
+          ARROW_HIGHLIGHT_COLOR={this.constants.ARROW_HIGHLIGHT_COLOR}
+          SLIDER_ARROW_SIZE={this.constants.SLIDER_ARROW_SIZE}
+        />
       </div>
     );
 

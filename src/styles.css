@@ -95,9 +95,32 @@
   display: flex;
 }
 
+/***********************/
+/******* Slider ********/
+/***********************/
 .layout-slider {
-  display: flex;
+  /* display: flex; */
   background-color: chocolate;
+}
+
+.slider-main {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.slider-content {
+  display: flex;
+}
+
+.slider-arrow {
+  display: flex;
+  /* margin: 5%; */
+}
+
+.slider-icon {
+  padding: 20%;
 }
 
 img {
