@@ -22,7 +22,7 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SLIDER_POSITION: 'top',
+      SLIDER_POSITION: 'right',
       SLIDER_SIZE: 0.2, //slider thickness as fraction of viewer dimension
       ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
       ARROWS_PADDING: 5,
@@ -741,6 +741,9 @@ class LuloViewer extends Component {
       this.state.slidesRect ? this.state.slidesRect.height / 2 : 0
     );
 
+    //*******************************************
+    //****************** arrows *****************
+    //*******************************************
     const arrows = this.constants.SHOW_ARROWS ? (
       <Arrows
         ARROWS_SIZE={this.constants.ARROWS_SIZE}
@@ -762,9 +765,10 @@ class LuloViewer extends Component {
         onRightArrowLeave={this.onRightArrowLeave}
       />
     ) : null;
-    //****************** arrows *****************
-    //************** zoom controller ************
 
+    //*******************************************
+    //************** zoom controller ************
+    //*******************************************
     const zoomController =
       this.constants.SHOW_ZOOM_CONTROLLER &&
       this.state.slidesRect &&
@@ -793,7 +797,10 @@ class LuloViewer extends Component {
           }}
         />
       ) : null;
-    //************** zoom controller ************
+
+    //****************************************
+    //************** Photo Slides ************
+    //****************************************
     const photoSlides = (
       <div
         className="photo-slides"
@@ -922,6 +929,9 @@ class LuloViewer extends Component {
         ? this.constants.SLIDER_SIZE * 100
         : 100;
 
+    //*******************************************
+    //***************** Slider ******************
+    //*******************************************
     const slider = (
       <div
         className="layout-slider"

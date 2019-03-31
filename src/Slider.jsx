@@ -11,7 +11,10 @@ class Slider extends PureComponent {
     return (
       <div style={{ width: '100%', height: '100%' }}>
         {/* <div className="icon-arrow-down"> */}
-        <Icon name="arrow-up" color={'#FFFFFF'} size={'10%'} />
+        <Icon name="arrow-up" color={'#FFFFFF'} size={'20%'} />
+        <Icon name="arrow-down" color={'#FFFFFF'} size={'20%'} />
+        <Icon name="arrow-left" color={'#FFFFFF'} size={'20%'} />
+        <Icon name="arrow-right" color={'#FFFFFF'} size={'20%'} />
         {/* </div> */}
         slajder
       </div>
