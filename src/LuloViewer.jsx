@@ -14,7 +14,7 @@ class LuloViewer extends Component {
     super(props);
     this.constants = {
       STARTING_SLIDE: 0,
-      MAX_PRELOADED_IMAGES: 1,
+      MAX_PRELOADED_IMAGES: 50,
       ZOOM_LEVELS: 100,
       SWIPE_THRESHOLD: 20,
       SLIDE_TRANSITION_DURATION: 0.3,
@@ -26,7 +26,7 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SLIDER_POSITION: 'top',
+      SLIDER_POSITION: 'left',
       SLIDER_SIZE: 0.10, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 5, // in percent of slider div
       ARROWS_PADDING: 5,

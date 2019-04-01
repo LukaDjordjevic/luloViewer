@@ -111,17 +111,12 @@
 }
 
 .slider-content {
-  /* display: flex; */
-  /* flex-direction: row; */
-  /* justify-content: space-between; */
   overflow: hidden;
   position: relative;
-  /* width: 100%; */
 }
 
 .slider-arrow {
   display: flex;
-  /* margin: 5%; */
 }
 
 .slider-icon {
@@ -129,15 +124,11 @@
 }
 
 .slides-strip {
-  /* display: inline-flex; */
-  position: absolute;
-  /* flex-direction: row; */
+  position: relative;
 }
 
 .single-slide {
-  /* border: 1px solid mediumseagreen; */
-  /* display: flex; */
-  position: absolute;
+  position: relative;
   background-color: teal;
   background-size: cover;
   background-repeat: no-repeat;

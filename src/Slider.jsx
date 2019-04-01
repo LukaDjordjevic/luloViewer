@@ -6,7 +6,9 @@ class Slider extends PureComponent {
     super(props);
     this.state = {
       startArrowColor: this.props.ARROW_DEFAULT_COLOR,
-      endArrowColor: this.props.ARROW_DEFAULT_COLOR
+      endArrowColor: this.props.ARROW_DEFAULT_COLOR,
+      top: 0,
+      left: 0
     };
   }
 
@@ -48,8 +50,6 @@ class Slider extends PureComponent {
         backgroundImage={imgUrl}
         index={idx}
         slideSize={this.props.slideSize}
-        left={idx * this.props.slideSize}
-        top={0}
         // onClick={this.onClick}
       />
     ));
@@ -58,18 +58,30 @@ class Slider extends PureComponent {
       <div
         className="slider-content"
         style={{
-          width: `${100 - 2 * this.props.SLIDER_ARROW_SIZE}%`,
-          height: `${contentHeight}%`
+          width: this.props.isHorizontal
+            ? `${100 - 2 * this.props.SLIDER_ARROW_SIZE}%`
+            : `${contentWidth}%`,
+          height: this.props.isHorizontal
+            ? `${contentHeight}%`
+            : `${100 - 2 * this.props.SLIDER_ARROW_SIZE}%`
         }}
       >
         <div
           className="slides-strip"
           style={{
-            width: this.props.slidesStripSize,
-            height: this.props.slideSize
+            width: this.props.isHorizontal
+              ? this.props.slidesStripSize
+              : this.props.slideSize,
+            height: this.props.isHorizontal
+              ? this.props.slideSize
+              : this.props.slidesStripSize,
+            display: this.props.isHorizontal ? 'inline-flex' : 'block',
+            left: `${this.state.left}px`,
+            top: `${this.state.top}px`
           }}
-        />
-        {slides}
+        >
+          {slides}
+        </div>
       </div>
     );
 
