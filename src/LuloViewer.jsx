@@ -40,6 +40,12 @@ class LuloViewer extends Component {
     const imagesInfo = new Array(this.props.imageUrls.length);
     imagesInfo.fill(null);
     this.state = {
+      SHOW_ARROWS: this.constants.SHOW_ARROWS,
+      SHOW_ZOOM_CONTROLLER: this.constants.SHOW_ZOOM_CONTROLLER,
+      SHOW_SLIDER: this.constants.SHOW_SLIDER,
+      SLIDER_POSITION: this.constants.SLIDER_POSITION,
+      SLIDE_TRANSITION_DURATION: this.constants.SLIDE_TRANSITION_DURATION,
+
       allLoaded: false,
       activeSlide: 'A',
       currentSlideIndex: this.constants.STARTING_SLIDE,
@@ -59,7 +65,6 @@ class LuloViewer extends Component {
       slideAAnimationName: null,
       slideBAnimationName: null,
       slideCAnimationName: null,
-      slideTransitionDuration: this.constants.SLIDE_TRANSITION_DURATION,
       leftArrowColor: '#CCCCCC',
       rightArrowColor: '#CCCCCC',
       mainDivRect: { left: 0, top: 0, width: 0, height: 0 },
@@ -134,22 +139,22 @@ class LuloViewer extends Component {
     const slidesRect = Object.assign({}, mainDivRect);
 
     const slidesWidth =
-      ['left', 'right'].includes(this.constants.SLIDER_POSITION) &&
-      this.constants.SHOW_SLIDER
+      ['left', 'right'].includes(this.state.SLIDER_POSITION) &&
+      this.state.SHOW_SLIDER
         ? mainDivRect.width * (1 - this.constants.SLIDER_SIZE)
         : mainDivRect.width;
 
     const slidesHeight =
-      ['top', 'bottom'].includes(this.constants.SLIDER_POSITION) &&
-      this.constants.SHOW_SLIDER
+      ['top', 'bottom'].includes(this.state.SLIDER_POSITION) &&
+      this.state.SHOW_SLIDER
         ? mainDivRect.height * (1 - this.constants.SLIDER_SIZE)
         : mainDivRect.height;
 
     let offsetLeft = 0;
     let offsetTop = 0;
-    if (this.constants.SLIDER_POSITION === 'left' && this.constants.SHOW_SLIDER)
+    if (this.state.SLIDER_POSITION === 'left' && this.state.SHOW_SLIDER)
       offsetLeft = mainDivRect.width * this.constants.SLIDER_SIZE;
-    if (this.constants.SLIDER_POSITION === 'top' && this.constants.SHOW_SLIDER)
+    if (this.state.SLIDER_POSITION === 'top' && this.state.SHOW_SLIDER)
       offsetTop = mainDivRect.height * this.constants.SLIDER_SIZE;
 
     slidesRect.width = slidesWidth;
@@ -677,12 +682,12 @@ class LuloViewer extends Component {
     //*******************************************
     //****************** arrows *****************
     //*******************************************
-    const arrows = this.constants.SHOW_ARROWS ? (
+    const arrows = this.state.SHOW_ARROWS ? (
       <Arrows
         ARROWS_SIZE={this.constants.ARROWS_SIZE}
         SLIDER_SIZE={this.constants.SLIDER_SIZE}
-        SLIDER_POSITION={this.constants.SLIDER_POSITION}
-        SHOW_SLIDER={this.constants.SHOW_SLIDER}
+        SLIDER_POSITION={this.state.SLIDER_POSITION}
+        SHOW_SLIDER={this.state.SHOW_SLIDER}
         ARROWS_PADDING={this.constants.ARROWS_PADDING}
         ALLOW_CYCLIC={this.constants.ALLOW_CYCLIC}
         mainDivRect={this.state.mainDivRect}
@@ -703,7 +708,7 @@ class LuloViewer extends Component {
     //************** zoom controller ************
     //*******************************************
     const zoomController =
-      this.constants.SHOW_ZOOM_CONTROLLER &&
+      this.state.SHOW_ZOOM_CONTROLLER &&
       this.state.slidesRect &&
       this.state.imagesInfo[this.state.currentSlideIndex] ? (
         <ZoomController
@@ -746,7 +751,7 @@ class LuloViewer extends Component {
           className="main-image-div"
           style={{
             animationName: this.state.slideAAnimationName,
-            animationDuration: `${this.state.slideTransitionDuration}s`,
+            animationDuration: `${this.state.SLIDE_TRANSITION_DURATION}s`,
             animationFillMode: 'forwards',
             left: `${this.state.slideALeft}px`
           }}
@@ -776,7 +781,7 @@ class LuloViewer extends Component {
           className="main-image-div"
           style={{
             animationName: this.state.slideBAnimationName,
-            animationDuration: `${this.state.slideTransitionDuration}s`,
+            animationDuration: `${this.state.SLIDE_TRANSITION_DURATION}s`,
             animationFillMode: 'forwards',
             left: `${this.state.slideBLeft}px`
           }}
@@ -806,7 +811,7 @@ class LuloViewer extends Component {
           className="main-image-div"
           style={{
             animationName: this.state.slideCAnimationName,
-            animationDuration: `${this.state.slideTransitionDuration}s`,
+            animationDuration: `${this.state.SLIDE_TRANSITION_DURATION}s`,
             animationFillMode: 'forwards',
             left: `${this.state.slideCLeft}px`
           }}
@@ -834,40 +839,36 @@ class LuloViewer extends Component {
       </div>
     );
 
-    const flexDirection = ['top', 'bottom'].includes(
-      this.constants.SLIDER_POSITION
-    )
+    const flexDirection = ['top', 'bottom'].includes(this.state.SLIDER_POSITION)
       ? 'column'
       : 'row';
 
     const slidesWidth =
-      ['left', 'right'].includes(this.constants.SLIDER_POSITION) &&
-      this.constants.SHOW_SLIDER
+      ['left', 'right'].includes(this.state.SLIDER_POSITION) &&
+      this.state.SHOW_SLIDER
         ? (1 - this.constants.SLIDER_SIZE) * 100
         : 100;
     const slidesHeight =
-      ['top', 'bottom'].includes(this.constants.SLIDER_POSITION) &&
-      this.constants.SHOW_SLIDER
+      ['top', 'bottom'].includes(this.state.SLIDER_POSITION) &&
+      this.state.SHOW_SLIDER
         ? (1 - this.constants.SLIDER_SIZE) * 100
         : 100;
 
     const sliderWidth =
-      ['left', 'right'].includes(this.constants.SLIDER_POSITION) &&
-      this.constants.SHOW_SLIDER
+      ['left', 'right'].includes(this.state.SLIDER_POSITION) &&
+      this.state.SHOW_SLIDER
         ? this.constants.SLIDER_SIZE * 100
         : 100;
     const sliderHeight =
-      ['top', 'bottom'].includes(this.constants.SLIDER_POSITION) &&
-      this.constants.SHOW_SLIDER
+      ['top', 'bottom'].includes(this.state.SLIDER_POSITION) &&
+      this.state.SHOW_SLIDER
         ? this.constants.SLIDER_SIZE * 100
         : 100;
 
     //*******************************************
     //***************** Slider ******************
     //*******************************************
-    const isHorizontal = ['top', 'bottom'].includes(
-      this.constants.SLIDER_POSITION
-    );
+    const isHorizontal = ['top', 'bottom'].includes(this.state.SLIDER_POSITION);
     const slideSize = isHorizontal
       ? this.state.mainDivRect.height * this.constants.SLIDER_SIZE
       : this.state.mainDivRect.width * this.constants.SLIDER_SIZE;
@@ -899,8 +900,8 @@ class LuloViewer extends Component {
     );
 
     const start =
-      ['left', 'top'].includes(this.constants.SLIDER_POSITION) &&
-      this.constants.SHOW_SLIDER
+      ['left', 'top'].includes(this.state.SLIDER_POSITION) &&
+      this.state.SHOW_SLIDER
         ? slider
         : null;
 
@@ -923,8 +924,8 @@ class LuloViewer extends Component {
     );
 
     const end =
-      ['right', 'bottom'].includes(this.constants.SLIDER_POSITION) &&
-      this.constants.SHOW_SLIDER
+      ['right', 'bottom'].includes(this.state.SLIDER_POSITION) &&
+      this.state.SHOW_SLIDER
         ? slider
         : null;
 
