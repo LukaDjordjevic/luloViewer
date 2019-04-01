@@ -128,7 +128,7 @@ class LuloViewer extends Component {
         console.log(this.slideAnimationsStylesheet);
       }
     );
-    document.addEventListener('wheel', this.onWheel);
+    // document.addEventListener('wheel', this.onWheel);
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
 
@@ -939,6 +939,7 @@ class LuloViewer extends Component {
             flexDirection,
             backgroundColor: this.constants.BACKGROUND_COLOR
           }}
+          onWheel={this.onWheel}
         >
           {start}
           {middle}

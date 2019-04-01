@@ -12,6 +12,13 @@ class Slider extends PureComponent {
     };
   }
 
+  onWheel(e) {
+    console.log('wheel');
+
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   render() {
     const startIconName = this.props.isHorizontal ? 'arrow-left' : 'arrow-up';
     const endIconName = this.props.isHorizontal ? 'arrow-right' : 'arrow-down';
@@ -108,6 +115,7 @@ class Slider extends PureComponent {
         style={{
           flexDirection: this.props.isHorizontal ? 'row' : 'column'
         }}
+        onWheel={this.onWheel}
       >
         {start}
         {middle}
