@@ -100,7 +100,7 @@
 /***********************/
 .layout-slider {
   /* display: flex; */
-  background-color: chocolate;
+  /* background-color: chocolate; */
 }
 
 .slider-main {
@@ -128,6 +128,7 @@
 }
 
 .single-slide {
+  margin: 5%;
   position: relative;
   background-color: teal;
   background-size: cover;

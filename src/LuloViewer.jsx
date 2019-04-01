@@ -27,7 +27,7 @@ class LuloViewer extends Component {
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
       SLIDER_POSITION: 'left',
-      SLIDER_SIZE: 0.10, //slider thickness as fraction of viewer dimension
+      SLIDER_SIZE: 0.2, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 5, // in percent of slider div
       ARROWS_PADDING: 5,
       SHOW_ZOOM_CONTROLLER: true,

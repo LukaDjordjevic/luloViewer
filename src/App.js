@@ -41,11 +41,11 @@ class App extends Component {
         style={{
           width: '600px',
           height: '600px',
-          // width: '100vw',
-          // height: '100vh',
+          width: '100vw',
+          height: '100vh',
           backgroundColor: '#000',
-          top: '20px',
-          left: '50px',
+          // top: '20px',
+          // left: '50px',
           position: 'relative',
           margin: 0
           // display: 'flex'

@@ -50,6 +50,7 @@ class Slider extends PureComponent {
         backgroundImage={imgUrl}
         index={idx}
         slideSize={this.props.slideSize}
+        isHorizontal={this.props.isHorizontal}
         // onClick={this.onClick}
       />
     ));
@@ -117,17 +118,24 @@ class Slider extends PureComponent {
 }
 
 const SingleSlide = props => {
+  const style = {
+    backgroundImage: `${"url('"}${props.backgroundImage}${"'"}`
+
+    // width: `${props.slideSize}px`,
+    // height: `${props.slideSize}px`,
+    // left: `${props.left}px`,
+    // top: `${props.top}px`
+  };
+  if (props.isHorizontal) {
+    style.width = `${props.slideSize}px`;
+    style.margin = `${0.45}%`;
+  } else {
+    style.height = `${props.slideSize}px`;
+    style.margin = `${5}%`;
+  }
+
   return (
-    <div
-      className="single-slide"
-      style={{
-        backgroundImage: `${"url('"}${props.backgroundImage}${"'"}`,
-        width: `${props.slideSize}px`,
-        height: `${props.slideSize}px`,
-        left: `${props.left}px`,
-        top: `${props.top}px`
-      }}
-    >
+    <div className="single-slide" style={style}>
       {props.slideActive ? null : <div className="photo-darken" />}
     </div>
   );
