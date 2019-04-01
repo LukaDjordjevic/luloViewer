@@ -26,9 +26,9 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SLIDER_POSITION: 'left',
-      SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
-      SLIDER_ARROW_SIZE: 8, // in percent of slider div
+      SLIDER_POSITION: 'top',
+      SLIDER_SIZE: 0.10, //slider thickness as fraction of viewer dimension
+      SLIDER_ARROW_SIZE: 5, // in percent of slider div
       ARROWS_PADDING: 5,
       SHOW_ZOOM_CONTROLLER: true,
       ZOOM_CONTROLLER_SIZE: 0.18, // width of zoomController as fraction of viewer width
@@ -72,6 +72,7 @@ class LuloViewer extends Component {
     this.images = [];
     this.isFullScreen = false;
     this.changingSlide = false;
+    this.numberOfSlides = this.props.imageUrls.length;
 
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -198,7 +199,7 @@ class LuloViewer extends Component {
         slideCLeft
       },
       () => {
-        this.createSlideAnimationKeyframes(
+        createSlideAnimationKeyframes(
           this.slideAnimationsStylesheet,
           this.state.slidesRect
         );
@@ -864,6 +865,12 @@ class LuloViewer extends Component {
     //*******************************************
     //***************** Slider ******************
     //*******************************************
+    const isHorizontal = ['top', 'bottom'].includes(
+      this.constants.SLIDER_POSITION
+    );
+    const slideSize = isHorizontal
+      ? this.state.mainDivRect.height * this.constants.SLIDER_SIZE
+      : this.state.mainDivRect.width * this.constants.SLIDER_SIZE;
     const slider = (
       <div
         className="layout-slider"
@@ -874,12 +881,19 @@ class LuloViewer extends Component {
         }}
       >
         <Slider
-          isHorizontal={['top', 'bottom'].includes(
-            this.constants.SLIDER_POSITION
-          )}
+          images={this.state.imagesInfo.map(el => {
+            if (el) {
+              return el.url;
+            }
+            return 'no-url';
+          })}
+          isHorizontal={isHorizontal}
           ARROW_DEFAULT_COLOR={this.constants.ARROW_DEFAULT_COLOR}
           ARROW_HIGHLIGHT_COLOR={this.constants.ARROW_HIGHLIGHT_COLOR}
           SLIDER_ARROW_SIZE={this.constants.SLIDER_ARROW_SIZE}
+          activeSlideIdx={this.state.currentSlideIndex}
+          slideSize={slideSize}
+          slidesStripSize={slideSize * this.numberOfSlides}
         />
       </div>
     );

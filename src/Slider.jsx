@@ -37,19 +37,42 @@ class Slider extends PureComponent {
           className={this.props.isHorizontal ? `slider-icon` : ''}
           name={startIconName}
           color={this.state.startArrowColor}
-          size={this.arrowSize}
         />
       </div>
     );
+
+    const slides = this.props.images.map((imgUrl, idx) => (
+      <SingleSlide
+        key={`${imgUrl || '.'}${idx}`}
+        slideActive={idx === this.props.activeSlideIdx}
+        backgroundImage={imgUrl}
+        index={idx}
+        slideSize={this.props.slideSize}
+        left={idx * this.props.slideSize}
+        top={0}
+        // onClick={this.onClick}
+      />
+    ));
+
     const middle = (
       <div
         className="slider-content"
         style={{
-          width: `${contentWidth}%`,
+          width: `${100 - 2 * this.props.SLIDER_ARROW_SIZE}%`,
           height: `${contentHeight}%`
         }}
-      />
+      >
+        <div
+          className="slides-strip"
+          style={{
+            width: this.props.slidesStripSize,
+            height: this.props.slideSize
+          }}
+        />
+        {slides}
+      </div>
     );
+
     const end = (
       <div
         className="slider-arrow"
@@ -62,10 +85,10 @@ class Slider extends PureComponent {
           className={this.props.isHorizontal ? `slider-icon` : ''}
           name={endIconName}
           color={this.state.endArrowColor}
-          size={this.arrowSize}
         />
       </div>
     );
+
     return (
       <div
         className="slider-main"
@@ -80,5 +103,22 @@ class Slider extends PureComponent {
     );
   }
 }
+
+const SingleSlide = props => {
+  return (
+    <div
+      className="single-slide"
+      style={{
+        backgroundImage: `${"url('"}${props.backgroundImage}${"'"}`,
+        width: `${props.slideSize}px`,
+        height: `${props.slideSize}px`,
+        left: `${props.left}px`,
+        top: `${props.top}px`
+      }}
+    >
+      {props.slideActive ? null : <div className="photo-darken" />}
+    </div>
+  );
+};
 
 export default Slider;

@@ -111,7 +111,12 @@
 }
 
 .slider-content {
-  display: flex;
+  /* display: flex; */
+  /* flex-direction: row; */
+  /* justify-content: space-between; */
+  overflow: hidden;
+  position: relative;
+  /* width: 100%; */
 }
 
 .slider-arrow {
@@ -121,6 +126,30 @@
 
 .slider-icon {
   padding: 20%;
+}
+
+.slides-strip {
+  /* display: inline-flex; */
+  position: absolute;
+  /* flex-direction: row; */
+}
+
+.single-slide {
+  /* border: 1px solid mediumseagreen; */
+  /* display: flex; */
+  position: absolute;
+  background-color: teal;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.photo-darken {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.5;
+  cursor: grab;
 }
 
 img {
