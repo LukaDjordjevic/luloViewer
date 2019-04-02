@@ -5,11 +5,13 @@ class Slider extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      startArrowColor: this.props.ARROW_DEFAULT_COLOR,
-      endArrowColor: this.props.ARROW_DEFAULT_COLOR,
+      startArrowColor: this.props.arrowDefaultColor,
+      endArrowColor: this.props.arrowDefaultColor,
       top: 0,
       left: 0
     };
+
+    this.slideClick = this.slideClick.bind(this);
   }
 
   onWheel(e) {
@@ -19,21 +21,41 @@ class Slider extends PureComponent {
     e.stopPropagation();
   }
 
+  onMouseEnter(arrow, e) {
+    if (arrow === 'start') {
+      this.setState({ startArrowColor: this.props.arrowHighlightColor });
+    } else {
+      this.setState({ endArrowColor: this.props.arrowHighlightColor });
+    }
+  }
+
+  onMouseLeave(arrow, e) {
+    if (arrow === 'start') {
+      this.setState({ startArrowColor: this.props.arrowDefaultColor });
+    } else {
+      this.setState({ endArrowColor: this.props.arrowDefaultColor });
+    }
+  }
+
+  slideClick(index) {
+    this.props.slideClick(index);
+  }
+
   render() {
     const startIconName = this.props.isHorizontal ? 'arrow-left' : 'arrow-up';
     const endIconName = this.props.isHorizontal ? 'arrow-right' : 'arrow-down';
     const arrowWidth = this.props.isHorizontal
-      ? this.props.SLIDER_ARROW_SIZE
+      ? this.props.sliderArrowSize
       : 100;
     const arrowHeight = this.props.isHorizontal
       ? 100
-      : this.props.SLIDER_ARROW_SIZE;
+      : this.props.sliderArrowSize;
     const contentWidth = this.props.isHorizontal
-      ? 100 - this.props.SLIDER_ARROW_SIZE * 2
+      ? 100 - this.props.sliderArrowSize * 2
       : 100;
     const contentHeight = this.props.isHorizontal
       ? 100
-      : 100 - this.props.SLIDER_ARROW_SIZE * 2;
+      : 100 - this.props.sliderArrowSize * 2;
     const start = (
       <div
         className="slider-arrow"
@@ -41,6 +63,8 @@ class Slider extends PureComponent {
           width: `${arrowWidth}%`,
           height: `${arrowHeight}%`
         }}
+        onMouseEnter={e => this.onMouseEnter('start', e)}
+        onMouseLeave={e => this.onMouseLeave('start', e)}
       >
         <Icon
           className={this.props.isHorizontal ? `slider-icon` : ''}
@@ -58,7 +82,7 @@ class Slider extends PureComponent {
         index={idx}
         slideSize={this.props.slideSize}
         isHorizontal={this.props.isHorizontal}
-        // onClick={this.onClick}
+        slideClick={this.slideClick}
       />
     ));
 
@@ -67,11 +91,11 @@ class Slider extends PureComponent {
         className="slider-content"
         style={{
           width: this.props.isHorizontal
-            ? `${100 - 2 * this.props.SLIDER_ARROW_SIZE}%`
+            ? `${100 - 2 * this.props.sliderArrowSize}%`
             : `${contentWidth}%`,
           height: this.props.isHorizontal
             ? `${contentHeight}%`
-            : `${100 - 2 * this.props.SLIDER_ARROW_SIZE}%`
+            : `${100 - 2 * this.props.sliderArrowSize}%`
         }}
       >
         <div
@@ -100,6 +124,8 @@ class Slider extends PureComponent {
           width: `${arrowWidth}%`,
           height: `${arrowHeight}%`
         }}
+        onMouseEnter={e => this.onMouseEnter('end', e)}
+        onMouseLeave={e => this.onMouseLeave('end', e)}
       >
         <Icon
           className={this.props.isHorizontal ? `slider-icon` : ''}
@@ -116,7 +142,6 @@ class Slider extends PureComponent {
           flexDirection: this.props.isHorizontal ? 'row' : 'column'
         }}
         onWheel={this.onWheel}
-        // onMouseDown={this.onMouseDown}
       >
         {start}
         {middle}
@@ -144,7 +169,11 @@ const SingleSlide = props => {
   }
 
   return (
-    <div className="single-slide" style={style}>
+    <div
+      className="single-slide"
+      style={style}
+      onMouseUp={e => props.slideClick(props.index, e)}
+    >
       {props.slideActive ? null : <div className="photo-darken" />}
     </div>
   );

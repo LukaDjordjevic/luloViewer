@@ -93,6 +93,7 @@ class LuloViewer extends Component {
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
     this.handleMenuClick = this.handleMenuClick.bind(this);
+    this.setViewerToSlide = this.setViewerToSlide.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
@@ -456,34 +457,42 @@ class LuloViewer extends Component {
     }
   }
 
-  changeSlide(amount) {
-    console.log('changing slide');
-    const width = this.state.slidesRect.width;
-    let activeSlide;
+  saveSlidePosition() {
     const { imagesInfo } = this.state;
     const imageInfo = JSON.parse(
       JSON.stringify(imagesInfo[this.state.currentSlideIndex])
     );
-    if (this.state.slideALeft === 0) {
-      if (imageInfo && this.slideA) {
-        imageInfo.zoomLevel = this.slideA.state.zoomLevel;
-        imageInfo.zoomTarget = this.slideA.state.zoomTarget;
-        imagesInfo[this.state.currentSlideIndex] = imageInfo;
-      }
-    } else if (this.state.slideBLeft === 0) {
-      if (imageInfo && this.slideB) {
-        imageInfo.zoomLevel = this.slideB.state.zoomLevel;
-        imageInfo.zoomTarget = this.slideB.state.zoomTarget;
-        imagesInfo[this.state.currentSlideIndex] = imageInfo;
-      }
-    } else {
-      if (imageInfo && this.slideC) {
-        imageInfo.zoomLevel = this.slideC.state.zoomLevel;
-        imageInfo.zoomTarget = this.slideC.state.zoomTarget;
-        imagesInfo[this.state.currentSlideIndex] = imageInfo;
-      }
+    switch (this.state.activeSlide) {
+      case 'A':
+        if (imageInfo && this.slideA) {
+          imageInfo.zoomLevel = this.slideA.state.zoomLevel;
+          imageInfo.zoomTarget = this.slideA.state.zoomTarget;
+          imagesInfo[this.state.currentSlideIndex] = imageInfo;
+        }
+        break;
+      case 'B':
+        if (imageInfo && this.slideB) {
+          imageInfo.zoomLevel = this.slideB.state.zoomLevel;
+          imageInfo.zoomTarget = this.slideB.state.zoomTarget;
+          imagesInfo[this.state.currentSlideIndex] = imageInfo;
+        }
+        break;
+      case 'C':
+        if (imageInfo && this.slideC) {
+          imageInfo.zoomLevel = this.slideC.state.zoomLevel;
+          imageInfo.zoomTarget = this.slideC.state.zoomTarget;
+          imagesInfo[this.state.currentSlideIndex] = imageInfo;
+        }
+        break;
+      default:
     }
+  }
 
+  changeSlide(amount) {
+    console.log('changing slide');
+    this.saveSlidePosition();
+
+    const width = this.state.slidesRect.width;
     let slideAAnimationName = this.state.slideAAnimationName;
     let slideBAnimationName = this.state.slideBAnimationName;
     let slideCAnimationName = this.state.slideCAnimationName;
@@ -494,6 +503,7 @@ class LuloViewer extends Component {
     let slideBImageIndex = this.state.slideBImageIndex;
     let slideCImageIndex = this.state.slideCImageIndex;
     let currentSlideIndex;
+    let activeSlide;
     if (amount > 0) {
       // Forwards
       currentSlideIndex = this.getNextSlideIndex(
@@ -665,6 +675,53 @@ class LuloViewer extends Component {
       }
     );
     this.checkPreload();
+  }
+
+  setViewerToSlide(index) {
+    this.saveSlidePosition();
+    switch (this.state.activeSlide) {
+      case 'A':
+        this.setState(
+          {
+            currentSlideIndex: index,
+            slideAImageIndex: index,
+            slideBImageIndex: this.getNextSlideIndex(index, 1),
+            slideCImageIndex: this.getNextSlideIndex(index, -1)
+          },
+          () => {
+            this.updateElements();
+          }
+        );
+        break;
+      case 'B':
+        this.setState(
+          {
+            currentSlideIndex: index,
+            slideAImageIndex: this.getNextSlideIndex(index, -1),
+            slideBImageIndex: index,
+            slideCImageIndex: this.getNextSlideIndex(index, 1)
+          },
+          () => {
+            this.updateElements();
+          }
+        );
+        break;
+      case 'C':
+        this.setState(
+          {
+            currentSlideIndex: index,
+            slideAImageIndex: this.getNextSlideIndex(index, 1),
+            slideBImageIndex: this.getNextSlideIndex(index, -1),
+            slideCImageIndex: index
+          },
+          () => {
+            this.updateElements();
+          }
+        );
+        break;
+      default:
+    }
+    console.log(index);
   }
 
   checkPreload() {
@@ -957,12 +1014,13 @@ class LuloViewer extends Component {
             return 'no-url';
           })}
           isHorizontal={isHorizontal}
-          ARROW_DEFAULT_COLOR={this.constants.ARROW_DEFAULT_COLOR}
-          ARROW_HIGHLIGHT_COLOR={this.constants.ARROW_HIGHLIGHT_COLOR}
-          SLIDER_ARROW_SIZE={this.constants.SLIDER_ARROW_SIZE}
+          arrowDefaultColor={this.constants.ARROW_DEFAULT_COLOR}
+          arrowHighlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
+          sliderArrowSize={this.constants.SLIDER_ARROW_SIZE}
           activeSlideIdx={this.state.currentSlideIndex}
           slideSize={slideSize}
           slidesStripSize={slideSize * this.numberOfSlides}
+          slideClick={this.setViewerToSlide}
         />
       </div>
     );

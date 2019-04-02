@@ -151,7 +151,7 @@
   position: absolute;
   padding: 1.5%;
   z-index: 2;
-  box-shadow: 10px 10px 35px rgba(0, 0, 0, 1);
+  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.7);
 }
 
 .menu-item {
