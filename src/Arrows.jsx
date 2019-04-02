@@ -1,70 +1,105 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import Icon from './Icon';
 
-const Arrows = props => {
-  const arrowSize = props.slidesRect
-    ? props.slidesRect.height * props.ARROWS_SIZE
-    : 0;
+class Arrows extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      leftArrowColor: this.props.defaultColor,
+      rightArrowColor: this.props.defaultColor
+    };
 
-  const arrowsTop =
-    props.slidesRect.height / 2 -
-    (props.slidesRect.height * props.ARROWS_SIZE) / 2 +
-    (props.slidesRect.top - props.mainDivRect.top);
-  return (
-    <div
-      className="arrows"
-      style={{
-        top: `${arrowsTop}px`,
+    this.onLeftArrowEnter = this.onLeftArrowEnter.bind(this);
+    this.onLeftArrowLeave = this.onLeftArrowLeave.bind(this);
+    this.onRightArrowEnter = this.onRightArrowEnter.bind(this);
+    this.onRightArrowLeave = this.onRightArrowLeave.bind(this);
+  }
 
-        width:
-          ['left', 'right'].includes(props.SLIDER_POSITION) && props.SHOW_SLIDER
-            ? props.mainDivRect.width * (1 - props.SLIDER_SIZE)
-            : props.mainDivRect.width
-      }}
-    >
+  onLeftArrowEnter() {
+    this.setState({ leftArrowColor: this.props.highlightColor });
+  }
+
+  onLeftArrowLeave() {
+    this.setState({ leftArrowColor: this.props.defaultColor });
+  }
+
+  onRightArrowEnter() {
+    this.setState({ rightArrowColor: this.props.highlightColor });
+  }
+
+  onRightArrowLeave() {
+    this.setState({ rightArrowColor: this.props.defaultColor });
+  }
+  render() {
+    const arrowSize = this.props.slidesRect
+      ? this.props.slidesRect.height * this.props.arrowsSize
+      : 0;
+
+    const arrowsTop =
+      this.props.slidesRect.height / 2 -
+      (this.props.slidesRect.height * this.props.arrowsSize) / 2 +
+      (this.props.slidesRect.top - this.props.mainDivRect.top);
+    return (
       <div
-        className="arrow"
-        onMouseEnter={props.onLeftArrowEnter}
-        onMouseLeave={props.onLeftArrowLeave}
-        onMouseUp={props.onLeftArrowClick}
+        className="arrows"
         style={{
-          width: arrowSize,
-          height:
-            props.ALLOW_CYCLIC || props.currentSlideIndex !== 0
-              ? arrowSize
-              : '0',
-          paddingLeft: `${props.ARROWS_PADDING}%`
+          top: `${arrowsTop}px`,
+
+          width:
+            ['left', 'right'].includes(this.props.SLIDER_POSITION) &&
+            this.props.SHOW_SLIDER
+              ? this.props.slidesRect.width * (1 - this.props.sliderSize)
+              : this.props.slidesRect.width
         }}
       >
-        <div className="arrows-icon">
-          <Icon name="arrow-left" color={props.leftArrowColor} size={'100%'} />
+        <div
+          className="arrow"
+          onMouseEnter={this.onLeftArrowEnter}
+          onMouseLeave={this.onLeftArrowLeave}
+          onMouseUp={this.props.onLeftArrowClick}
+          style={{
+            width: arrowSize,
+            height:
+              this.props.allowCyclic || this.props.currentSlideIndex !== 0
+                ? arrowSize
+                : '0',
+            paddingLeft: `${this.props.arrowsPadding}%`
+          }}
+        >
+          <div className="arrows-icon">
+            <Icon
+              name="arrow-left"
+              color={this.state.leftArrowColor}
+              size={'100%'}
+            />
+          </div>
+        </div>
+        <div
+          className="arrow"
+          onMouseEnter={this.onRightArrowEnter}
+          onMouseLeave={this.onRightArrowLeave}
+          onMouseUp={this.props.onRightArrowClick}
+          style={{
+            width: arrowSize,
+            height:
+              this.props.allowCyclic ||
+              this.props.currentSlideIndex !== this.props.imageUrlsLength - 1
+                ? arrowSize
+                : '0',
+            paddingRight: `${this.props.arrowsPadding}%`
+          }}
+        >
+          <div className="arrows-icon">
+            <Icon
+              name="arrow-right"
+              color={this.state.rightArrowColor}
+              size={'100%'}
+            />
+          </div>
         </div>
       </div>
-      <div
-        className="arrow"
-        onMouseEnter={props.onRightArrowEnter}
-        onMouseLeave={props.onRightArrowLeave}
-        onMouseUp={props.onRightArrowClick}
-        style={{
-          width: arrowSize,
-          height:
-            props.ALLOW_CYCLIC ||
-            props.currentSlideIndex !== props.imageUrlsLength - 1
-              ? arrowSize
-              : '0',
-          paddingRight: `${props.ARROWS_PADDING}%`
-        }}
-      >
-        <div className="arrows-icon">
-          <Icon
-            name="arrow-right"
-            color={props.rightArrowColor}
-            size={'100%'}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
 export default Arrows;

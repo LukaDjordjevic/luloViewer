@@ -26,6 +26,18 @@ class Menu extends PureComponent {
   // }
 
   render() {
+    const sliderPosition = this.props.showSlider ? (
+      <div className="menu-buttons">
+        <Button
+          text="Top"
+          onClick={e => this.onMouseUp('top', e)}
+          style={{ marginLeft: 0 }}
+        />
+        <Button text="Bottom" onClick={e => this.onMouseUp('bottom', e)} />
+        <Button text="Left" onClick={e => this.onMouseUp('left', e)} />
+        <Button text="Right" onClick={e => this.onMouseUp('right', e)} />
+      </div>
+    ) : null;
     return (
       <div className="menu-main" style={this.props.style}>
         <Item
@@ -36,18 +48,28 @@ class Menu extends PureComponent {
           onClick={e => this.onMouseUp('arrows', e)}
         />
         <Item
+          text="Show zoom thingy"
+          menuIconColor={this.props.menuIconColor}
+          menuTextColor={this.props.menuTextColor}
+          iconName={this.props.showZoomController ? 'check' : 'uncheck'}
+          onClick={e => this.onMouseUp('zoom', e)}
+        />
+        <Item
           text="Show slider"
           menuIconColor={this.props.menuIconColor}
           menuTextColor={this.props.menuTextColor}
           iconName={this.props.showSlider ? 'check' : 'uncheck'}
           onClick={e => this.onMouseUp('slider', e)}
         />
+        {sliderPosition}
         <Item
-          text="Show zoom thingy"
+          text="Animate slides"
           menuIconColor={this.props.menuIconColor}
           menuTextColor={this.props.menuTextColor}
-          iconName={this.props.showZoomController ? 'check' : 'uncheck'}
-          onClick={e => this.onMouseUp('zoom', e)}
+          iconName={
+            this.props.slideTransitionDuration !== 0 ? 'check' : 'uncheck'
+          }
+          onClick={e => this.onMouseUp('animate', e)}
         />
       </div>
     );
@@ -66,6 +88,18 @@ const Item = props => {
       <div style={{ width: '10%' }}>
         <Icon name={props.iconName} color={props.menuIconColor} size="100%" />
       </div>
+    </div>
+  );
+};
+
+const Button = props => {
+  return (
+    <div
+      className="menu-button no-select"
+      onMouseUp={props.onClick}
+      style={props.style}
+    >
+      {props.text}
     </div>
   );
 };

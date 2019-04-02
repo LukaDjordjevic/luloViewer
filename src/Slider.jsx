@@ -116,6 +116,7 @@ class Slider extends PureComponent {
           flexDirection: this.props.isHorizontal ? 'row' : 'column'
         }}
         onWheel={this.onWheel}
+        // onMouseDown={this.onMouseDown}
       >
         {start}
         {middle}

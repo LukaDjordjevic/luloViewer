@@ -22,6 +22,7 @@ class LuloViewer extends Component {
       SLIDE_TRANSITION_TIMEOUT: 600,
       BACKGROUND_COLOR: 'black',
       SHOW_ARROWS: true,
+      ALLOW_MENU: true,
       ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
       ALLOW_CYCLIC: true,
       ARROW_DEFAULT_COLOR: '#CCCCCC',
@@ -37,8 +38,8 @@ class LuloViewer extends Component {
       ZOOM_CONTROLLER_POSITION_X: 0.8,
       ZOOM_CONTROLLER_POSITION_Y: 0.025,
       MENU_SIZE: 30, // %
-      MENU_TEXT_COLOR: 'rgba(200, 200, 200, 1)',
-      MENU_ICON_COLOR: 'rgba(200, 200, 200, 1)',
+      MENU_TEXT_COLOR: 'lightgrey',
+      MENU_ICON_COLOR: 'lightgrey',
       MENU_BGD_COLOR: 'rgba(0, 0, 0, 0.7)'
     };
 
@@ -50,7 +51,7 @@ class LuloViewer extends Component {
       showSlider: this.constants.SHOW_SLIDER,
       sliderPosition: this.constants.SLIDER_POSITION,
       slideTransitionDuration: this.constants.SLIDE_TRANSITION_DURATION,
-      showMenu: true,
+      showMenu: false,
       allLoaded: false,
       activeSlide: 'A',
       currentSlideIndex: this.constants.STARTING_SLIDE,
@@ -90,17 +91,19 @@ class LuloViewer extends Component {
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onWheel = this.onWheel.bind(this);
-    this.onLeftArrowEnter = this.onLeftArrowEnter.bind(this);
-    this.onLeftArrowLeave = this.onLeftArrowLeave.bind(this);
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
-    this.onRightArrowEnter = this.onRightArrowEnter.bind(this);
-    this.onRightArrowLeave = this.onRightArrowLeave.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
     this.handleMenuClick = this.handleMenuClick.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
   componentDidMount() {
+    window.oncontextmenu = e => {
+      console.log('kontekst meni');
+
+      if (this.constants.ALLOW_MENU) e.preventDefault();
+    };
+
     const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
     const slidesRect = this.calculateSlidesDivFromMainDiv(mainDivRect);
 
@@ -110,12 +113,6 @@ class LuloViewer extends Component {
       // const slidesRect2 = this.calculateSlidesDivFromMainDiv(mainDivRect);
       this.setState({ slidesRect, mainDivRect });
     }, 1000);
-
-    // setTimeout(() => {
-    //   this.setState({ sliderPosition: 'left' }, () => {
-    //     this.onWindowResize();
-    //   });
-    // }, 2000);
 
     console.log('dobijo', slidesRect, mainDivRect);
 
@@ -225,6 +222,9 @@ class LuloViewer extends Component {
     );
   }
 
+  onRightClick(e) {
+    console.log('right click', e);
+  }
   onKeyDown(e) {
     // e.preventDefault()
     switch (e.key) {
@@ -258,10 +258,33 @@ class LuloViewer extends Component {
   }
 
   onMouseDown(e) {
+    console.log('e=klik', e.clientX, e.pageX, e.screenX);
+
     e.preventDefault();
     e.stopPropagation();
-    document.addEventListener('mousemove', this.onMouseMove);
-    document.addEventListener('mouseup', this.onMouseUp);
+    if (e.button === 0) {
+      // Left click
+      if (this.state.showMenu) {
+        this.setState({ showMenu: false });
+        return;
+      }
+      document.addEventListener('mousemove', this.onMouseMove);
+      document.addEventListener('mouseup', this.onMouseUp);
+    } else {
+      // Right click
+      this.setState({
+        showMenu: !this.state.showMenu,
+        menuPosition: {
+          x: e.clientX - this.state.mainDivRect.left,
+          y: e.clientY - this.state.mainDivRect.top
+        }
+      });
+      console.log(
+        'got coords',
+        e.screenX - this.state.mainDivRect.left,
+        e.screenY - this.state.mainDivRect.top
+      );
+    }
     const slides = {
       A: this.slideA,
       B: this.slideB,
@@ -336,22 +359,6 @@ class LuloViewer extends Component {
     }
   }
 
-  onLeftArrowEnter() {
-    this.setState({ leftArrowColor: this.constants.ARROW_HIGHLIGHT_COLOR });
-  }
-
-  onLeftArrowLeave() {
-    this.setState({ leftArrowColor: this.constants.ARROW_DEFAULT_COLOR });
-  }
-
-  onRightArrowEnter() {
-    this.setState({ rightArrowColor: this.constants.ARROW_HIGHLIGHT_COLOR });
-  }
-
-  onRightArrowLeave() {
-    this.setState({ rightArrowColor: this.constants.ARROW_DEFAULT_COLOR });
-  }
-
   onLeftArrowClick(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -417,7 +424,23 @@ class LuloViewer extends Component {
       case 'zoom':
         this.setState({ showZoomController: !this.state.showZoomController });
         break;
+      case 'animate':
+        this.setState({
+          slideTransitionDuration:
+            this.state.slideTransitionDuration === 0
+              ? this.constants.SLIDE_TRANSITION_DURATION
+              : 0
+        });
+        break;
+      // case 'top':
+      //   this.setState({ sliderPosition: 'top' }, () => {
+      //     this.onWindowResize();
+      //   });
+      // break;
       default:
+        this.setState({ sliderPosition: item }, () => {
+          this.onWindowResize();
+        });
     }
   }
 
@@ -715,23 +738,21 @@ class LuloViewer extends Component {
     //*******************************************
     const arrows = this.state.showArrows ? (
       <Arrows
-        ARROWS_SIZE={this.constants.ARROWS_SIZE}
-        SLIDER_SIZE={this.constants.SLIDER_SIZE}
+        arrowsSize={this.constants.ARROWS_SIZE}
+        sliderSize={this.constants.SLIDER_SIZE}
+        arrowsPadding={this.constants.ARROWS_PADDING}
+        allowCyclic={this.constants.ALLOW_CYCLIC}
+        highlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
+        defaultColor={this.constants.ARROW_DEFAULT_COLOR}
         sliderPosition={this.state.sliderPosition}
         showSlider={this.state.showSlider}
-        ARROWS_PADDING={this.constants.ARROWS_PADDING}
-        ALLOW_CYCLIC={this.constants.ALLOW_CYCLIC}
         mainDivRect={this.state.mainDivRect}
         slidesRect={this.state.slidesRect}
         leftArrowColor={this.state.leftArrowColor}
         rightArrowColor={this.state.rightArrowColor}
         currentSlideIndex={this.state.currentSlideIndex}
-        onLeftArrowEnter={this.onLeftArrowEnter}
         onLeftArrowClick={this.onLeftArrowClick}
-        onLeftArrowLeave={this.onLeftArrowLeave}
-        onRightArrowEnter={this.onRightArrowEnter}
         onRightArrowClick={this.onRightArrowClick}
-        onRightArrowLeave={this.onRightArrowLeave}
       />
     ) : null;
 
@@ -944,7 +965,6 @@ class LuloViewer extends Component {
       <div
         className="slides-main"
         ref={el => (this.slides = el)}
-        onMouseDown={this.onMouseDown}
         style={{
           width: `${slidesWidth}%`,
           height: `${slidesHeight}%`
@@ -967,10 +987,11 @@ class LuloViewer extends Component {
     const menu = this.state.showMenu ? (
       <Menu
         style={{
-          width: `${this.constants.MENU_SIZE}%`,
-          height: `${this.constants.MENU_SIZE}%`,
-          left: `${200}px`,
-          top: `${200}px`,
+          // width: `${this.constants.MENU_SIZE}%`,
+          // height: `${this.constants.MENU_SIZE}%`,
+          // height:'auto',
+          left: `${this.state.menuPosition.x}px`,
+          top: `${this.state.menuPosition.y}px`,
           backgroundColor: this.constants.MENU_BGD_COLOR
         }}
         menuIconColor={this.constants.MENU_ICON_COLOR}
@@ -979,6 +1000,7 @@ class LuloViewer extends Component {
         showArrows={this.state.showArrows}
         showSlider={this.state.showSlider}
         showZoomController={this.state.showZoomController}
+        slideTransitionDuration={this.state.slideTransitionDuration}
       />
     ) : null;
 
@@ -993,6 +1015,7 @@ class LuloViewer extends Component {
             backgroundColor: this.constants.BACKGROUND_COLOR
           }}
           onWheel={this.onWheel}
+          onMouseDown={this.onMouseDown}
         >
           {start}
           {middle}
