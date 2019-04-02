@@ -264,7 +264,7 @@ class LuloViewer extends Component {
     e.stopPropagation();
     if (e.button === 0) {
       // Left click
-      if (this.state.showMenu) {
+      if (this.state.showMenu && this.constants.ALLOW_MENU) {
         this.setState({ showMenu: false });
         return;
       }
@@ -272,13 +272,15 @@ class LuloViewer extends Component {
       document.addEventListener('mouseup', this.onMouseUp);
     } else {
       // Right click
-      this.setState({
-        showMenu: !this.state.showMenu,
-        menuPosition: {
-          x: e.clientX - this.state.mainDivRect.left,
-          y: e.clientY - this.state.mainDivRect.top
-        }
-      });
+      if (this.constants.ALLOW_MENU) {
+        this.setState({
+          showMenu: !this.state.showMenu,
+          menuPosition: {
+            x: e.clientX - this.state.mainDivRect.left,
+            y: e.clientY - this.state.mainDivRect.top
+          }
+        });
+      }
       console.log(
         'got coords',
         e.screenX - this.state.mainDivRect.left,
@@ -422,7 +424,10 @@ class LuloViewer extends Component {
         });
         break;
       case 'zoom':
-        this.setState({ showZoomController: !this.state.showZoomController });
+        this.setState({ showZoomController: !this.state.showZoomController },()=>{
+
+          this.updateElements()
+        });
         break;
       case 'animate':
         this.setState({
