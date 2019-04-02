@@ -41,6 +41,13 @@ class Menu extends PureComponent {
     return (
       <div className="menu-main" style={this.props.style}>
         <Item
+          text="Fullscreen"
+          menuIconColor={this.props.menuIconColor}
+          menuTextColor={this.props.menuTextColor}
+          iconName={this.props.isFullscreen ? 'check' : 'uncheck'}
+          onClick={e => this.onMouseUp('fullscreen', e)}
+        />
+        <Item
           text="Show arrows"
           menuIconColor={this.props.menuIconColor}
           menuTextColor={this.props.menuTextColor}

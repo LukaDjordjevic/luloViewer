@@ -29,7 +29,7 @@ class LuloViewer extends Component {
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
       SLIDER_POSITION: 'bottom',
-      SLIDER_SIZE: 0.2, //slider thickness as fraction of viewer dimension
+      SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 5, // in percent of slider div
       ARROWS_PADDING: 5,
       SHOW_ZOOM_CONTROLLER: true,
@@ -81,7 +81,6 @@ class LuloViewer extends Component {
 
     this.imageLoading = false;
     this.images = [];
-    this.isFullScreen = false;
     this.changingSlide = false;
     this.numberOfSlides = this.props.imageUrls.length;
 
@@ -222,9 +221,6 @@ class LuloViewer extends Component {
     );
   }
 
-  onRightClick(e) {
-    console.log('right click', e);
-  }
   onKeyDown(e) {
     // e.preventDefault()
     switch (e.key) {
@@ -244,12 +240,12 @@ class LuloViewer extends Component {
         }
         break;
       case 'f':
-        if (!this.isFullScreen) {
-          this.isFullScreen = true;
+        if (!this.state.isFullscreen) {
           this.mainDiv.requestFullscreen();
+          this.setState({ isFullscreen: true });
         } else {
-          this.isFullScreen = false;
           document.exitFullscreen();
+          this.setState({ isFullscreen: false });
         }
         break;
       default:
@@ -415,6 +411,15 @@ class LuloViewer extends Component {
     console.log(item);
 
     switch (item) {
+      case 'fullscreen':
+        if (this.state.isFullscreen) {
+          this.setState({ isFullscreen: false });
+          document.exitFullscreen();
+        } else {
+          this.setState({ isFullscreen: true });
+          this.mainDiv.requestFullscreen();
+        }
+        break;
       case 'arrows':
         this.setState({ showArrows: !this.state.showArrows });
         break;
@@ -424,10 +429,12 @@ class LuloViewer extends Component {
         });
         break;
       case 'zoom':
-        this.setState({ showZoomController: !this.state.showZoomController },()=>{
-
-          this.updateElements()
-        });
+        this.setState(
+          { showZoomController: !this.state.showZoomController },
+          () => {
+            this.updateElements();
+          }
+        );
         break;
       case 'animate':
         this.setState({
@@ -1006,6 +1013,7 @@ class LuloViewer extends Component {
         showSlider={this.state.showSlider}
         showZoomController={this.state.showZoomController}
         slideTransitionDuration={this.state.slideTransitionDuration}
+        isFullscreen={this.state.isFullscreen}
       />
     ) : null;
 
