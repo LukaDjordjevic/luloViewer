@@ -116,8 +116,7 @@ class SingleImage extends PureComponent {
       JSON.stringify(this.props.imageInfo)
     ) {
       const { left, top, width, height } = getImageTransform(
-        this.props.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] ||
-          1,
+        nextProps.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] || 1,
         nextProps.imageInfo.zoomTarget || { x: 0.5, y: 0.5 },
         parentBoundingRect,
         imageAspectRatio,
@@ -127,17 +126,15 @@ class SingleImage extends PureComponent {
       const { constrainedLeft, constrainedTop } = constrainTranslate(
         left,
         top,
-        this.props.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] ||
-          1,
+        nextProps.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] || 1,
         parentBoundingRect,
         imageAspectRatio,
         containerAspectRatio
       );
 
       this.setState({
-        zoomFactor: this.props.imageInfo.zoomMultipliers[
-          nextProps.imageInfo.zoomLevel
-        ],
+        zoomFactor:
+          nextProps.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel],
         zoomLevel: nextProps.imageInfo.zoomLevel,
         zoomTarget: nextProps.imageInfo.zoomTarget,
         left: constrainedLeft,
