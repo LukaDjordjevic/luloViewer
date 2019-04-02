@@ -99,8 +99,6 @@
 /******* Slider ********/
 /***********************/
 .layout-slider {
-  /* display: flex; */
-  /* background-color: chocolate; */
 }
 
 .slider-main {
@@ -142,6 +140,53 @@
   background-color: black;
   opacity: 0.5;
   cursor: grab;
+}
+
+/***********************/
+/******** Menu ********/
+/***********************/
+
+.menu-main {
+  /* background-color: rgba(12, 15, 22, 0.8); */
+  position: absolute;
+  padding: 5px;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 20px;
+}
+
+.menu-icon {
+  width: 10%;
+}
+
+.menu-text {
+  color: white;
+  width: 80%;
+}
+
+.menu-item p {
+  /* padding: 3px; */
+  margin: 0;
+}
+
+.no-select {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+      supported by Chrome and Opera */
 }
 
 img {

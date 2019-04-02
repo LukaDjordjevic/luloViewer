@@ -3,7 +3,8 @@ import SingleImage from './SingleImage';
 import ZoomController from './ZoomController';
 import Slider from './Slider';
 import Arrows from './Arrows';
-// import Icon from './Icon';
+import Menu from './Menu';
+
 import {
   getViewRectangleTransform,
   createSlideAnimationKeyframes
@@ -26,7 +27,7 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SLIDER_POSITION: 'left',
+      SLIDER_POSITION: 'bottom',
       SLIDER_SIZE: 0.2, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 5, // in percent of slider div
       ARROWS_PADDING: 5,
@@ -34,18 +35,22 @@ class LuloViewer extends Component {
       ZOOM_CONTROLLER_SIZE: 0.18, // width of zoomController as fraction of viewer width
       ZOOM_CONTROLLER_PADDING: 5, // zoomController padding as viewer width percent
       ZOOM_CONTROLLER_POSITION_X: 0.8,
-      ZOOM_CONTROLLER_POSITION_Y: 0.025
+      ZOOM_CONTROLLER_POSITION_Y: 0.025,
+      MENU_SIZE: 30, // %
+      MENU_TEXT_COLOR: 'rgba(200, 200, 200, 1)',
+      MENU_ICON_COLOR: 'rgba(200, 200, 200, 1)',
+      MENU_BGD_COLOR: 'rgba(0, 0, 0, 0.7)'
     };
 
     const imagesInfo = new Array(this.props.imageUrls.length);
     imagesInfo.fill(null);
     this.state = {
-      SHOW_ARROWS: this.constants.SHOW_ARROWS,
-      SHOW_ZOOM_CONTROLLER: this.constants.SHOW_ZOOM_CONTROLLER,
-      SHOW_SLIDER: this.constants.SHOW_SLIDER,
-      SLIDER_POSITION: this.constants.SLIDER_POSITION,
-      SLIDE_TRANSITION_DURATION: this.constants.SLIDE_TRANSITION_DURATION,
-
+      showArrows: this.constants.SHOW_ARROWS,
+      showZoomController: this.constants.SHOW_ZOOM_CONTROLLER,
+      showSlider: this.constants.SHOW_SLIDER,
+      sliderPosition: this.constants.SLIDER_POSITION,
+      slideTransitionDuration: this.constants.SLIDE_TRANSITION_DURATION,
+      showMenu: true,
       allLoaded: false,
       activeSlide: 'A',
       currentSlideIndex: this.constants.STARTING_SLIDE,
@@ -91,6 +96,7 @@ class LuloViewer extends Component {
     this.onRightArrowEnter = this.onRightArrowEnter.bind(this);
     this.onRightArrowLeave = this.onRightArrowLeave.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
+    this.handleMenuClick = this.handleMenuClick.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
@@ -104,6 +110,12 @@ class LuloViewer extends Component {
       // const slidesRect2 = this.calculateSlidesDivFromMainDiv(mainDivRect);
       this.setState({ slidesRect, mainDivRect });
     }, 1000);
+
+    // setTimeout(() => {
+    //   this.setState({ sliderPosition: 'left' }, () => {
+    //     this.onWindowResize();
+    //   });
+    // }, 2000);
 
     console.log('dobijo', slidesRect, mainDivRect);
 
@@ -139,22 +151,22 @@ class LuloViewer extends Component {
     const slidesRect = Object.assign({}, mainDivRect);
 
     const slidesWidth =
-      ['left', 'right'].includes(this.state.SLIDER_POSITION) &&
-      this.state.SHOW_SLIDER
+      ['left', 'right'].includes(this.state.sliderPosition) &&
+      this.state.showSlider
         ? mainDivRect.width * (1 - this.constants.SLIDER_SIZE)
         : mainDivRect.width;
 
     const slidesHeight =
-      ['top', 'bottom'].includes(this.state.SLIDER_POSITION) &&
-      this.state.SHOW_SLIDER
+      ['top', 'bottom'].includes(this.state.sliderPosition) &&
+      this.state.showSlider
         ? mainDivRect.height * (1 - this.constants.SLIDER_SIZE)
         : mainDivRect.height;
 
     let offsetLeft = 0;
     let offsetTop = 0;
-    if (this.state.SLIDER_POSITION === 'left' && this.state.SHOW_SLIDER)
+    if (this.state.sliderPosition === 'left' && this.state.showSlider)
       offsetLeft = mainDivRect.width * this.constants.SLIDER_SIZE;
-    if (this.state.SLIDER_POSITION === 'top' && this.state.SHOW_SLIDER)
+    if (this.state.sliderPosition === 'top' && this.state.showSlider)
       offsetTop = mainDivRect.height * this.constants.SLIDER_SIZE;
 
     slidesRect.width = slidesWidth;
@@ -387,6 +399,25 @@ class LuloViewer extends Component {
         );
         this.zoomController.updateViewRectangle(viewRectangleTransform);
       }
+    }
+  }
+
+  handleMenuClick(item) {
+    console.log(item);
+
+    switch (item) {
+      case 'arrows':
+        this.setState({ showArrows: !this.state.showArrows });
+        break;
+      case 'slider':
+        this.setState({ showSlider: !this.state.showSlider }, () => {
+          this.onWindowResize();
+        });
+        break;
+      case 'zoom':
+        this.setState({ showZoomController: !this.state.showZoomController });
+        break;
+      default:
     }
   }
 
@@ -682,12 +713,12 @@ class LuloViewer extends Component {
     //*******************************************
     //****************** arrows *****************
     //*******************************************
-    const arrows = this.state.SHOW_ARROWS ? (
+    const arrows = this.state.showArrows ? (
       <Arrows
         ARROWS_SIZE={this.constants.ARROWS_SIZE}
         SLIDER_SIZE={this.constants.SLIDER_SIZE}
-        SLIDER_POSITION={this.state.SLIDER_POSITION}
-        SHOW_SLIDER={this.state.SHOW_SLIDER}
+        sliderPosition={this.state.sliderPosition}
+        showSlider={this.state.showSlider}
         ARROWS_PADDING={this.constants.ARROWS_PADDING}
         ALLOW_CYCLIC={this.constants.ALLOW_CYCLIC}
         mainDivRect={this.state.mainDivRect}
@@ -708,7 +739,7 @@ class LuloViewer extends Component {
     //************** zoom controller ************
     //*******************************************
     const zoomController =
-      this.state.SHOW_ZOOM_CONTROLLER &&
+      this.state.showZoomController &&
       this.state.slidesRect &&
       this.state.imagesInfo[this.state.currentSlideIndex] ? (
         <ZoomController
@@ -751,7 +782,7 @@ class LuloViewer extends Component {
           className="main-image-div"
           style={{
             animationName: this.state.slideAAnimationName,
-            animationDuration: `${this.state.SLIDE_TRANSITION_DURATION}s`,
+            animationDuration: `${this.state.slideTransitionDuration}s`,
             animationFillMode: 'forwards',
             left: `${this.state.slideALeft}px`
           }}
@@ -764,7 +795,11 @@ class LuloViewer extends Component {
               slide="A"
               parentLeft={this.state.slideALeft}
               imageInfo={this.state.imagesInfo[this.state.slideAImageIndex]}
-              parentBoundingRect={this.state.slidesRect}
+              parentBoundingRect={
+                this.state.showSlider
+                  ? this.state.slidesRect
+                  : this.state.mainDivRect
+              }
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
               isFirefox={this.isFirefox}
             />
@@ -781,7 +816,7 @@ class LuloViewer extends Component {
           className="main-image-div"
           style={{
             animationName: this.state.slideBAnimationName,
-            animationDuration: `${this.state.SLIDE_TRANSITION_DURATION}s`,
+            animationDuration: `${this.state.slideTransitionDuration}s`,
             animationFillMode: 'forwards',
             left: `${this.state.slideBLeft}px`
           }}
@@ -811,7 +846,7 @@ class LuloViewer extends Component {
           className="main-image-div"
           style={{
             animationName: this.state.slideCAnimationName,
-            animationDuration: `${this.state.SLIDE_TRANSITION_DURATION}s`,
+            animationDuration: `${this.state.slideTransitionDuration}s`,
             animationFillMode: 'forwards',
             left: `${this.state.slideCLeft}px`
           }}
@@ -839,36 +874,36 @@ class LuloViewer extends Component {
       </div>
     );
 
-    const flexDirection = ['top', 'bottom'].includes(this.state.SLIDER_POSITION)
+    const flexDirection = ['top', 'bottom'].includes(this.state.sliderPosition)
       ? 'column'
       : 'row';
 
     const slidesWidth =
-      ['left', 'right'].includes(this.state.SLIDER_POSITION) &&
-      this.state.SHOW_SLIDER
+      ['left', 'right'].includes(this.state.sliderPosition) &&
+      this.state.showSlider
         ? (1 - this.constants.SLIDER_SIZE) * 100
         : 100;
     const slidesHeight =
-      ['top', 'bottom'].includes(this.state.SLIDER_POSITION) &&
-      this.state.SHOW_SLIDER
+      ['top', 'bottom'].includes(this.state.sliderPosition) &&
+      this.state.showSlider
         ? (1 - this.constants.SLIDER_SIZE) * 100
         : 100;
 
     const sliderWidth =
-      ['left', 'right'].includes(this.state.SLIDER_POSITION) &&
-      this.state.SHOW_SLIDER
+      ['left', 'right'].includes(this.state.sliderPosition) &&
+      this.state.showSlider
         ? this.constants.SLIDER_SIZE * 100
         : 100;
     const sliderHeight =
-      ['top', 'bottom'].includes(this.state.SLIDER_POSITION) &&
-      this.state.SHOW_SLIDER
+      ['top', 'bottom'].includes(this.state.sliderPosition) &&
+      this.state.showSlider
         ? this.constants.SLIDER_SIZE * 100
         : 100;
 
     //*******************************************
     //***************** Slider ******************
     //*******************************************
-    const isHorizontal = ['top', 'bottom'].includes(this.state.SLIDER_POSITION);
+    const isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
     const slideSize = isHorizontal
       ? this.state.mainDivRect.height * this.constants.SLIDER_SIZE
       : this.state.mainDivRect.width * this.constants.SLIDER_SIZE;
@@ -900,8 +935,8 @@ class LuloViewer extends Component {
     );
 
     const start =
-      ['left', 'top'].includes(this.state.SLIDER_POSITION) &&
-      this.state.SHOW_SLIDER
+      ['left', 'top'].includes(this.state.sliderPosition) &&
+      this.state.showSlider
         ? slider
         : null;
 
@@ -924,10 +959,28 @@ class LuloViewer extends Component {
     );
 
     const end =
-      ['right', 'bottom'].includes(this.state.SLIDER_POSITION) &&
-      this.state.SHOW_SLIDER
+      ['right', 'bottom'].includes(this.state.sliderPosition) &&
+      this.state.showSlider
         ? slider
         : null;
+
+    const menu = this.state.showMenu ? (
+      <Menu
+        style={{
+          width: `${this.constants.MENU_SIZE}%`,
+          height: `${this.constants.MENU_SIZE}%`,
+          left: `${200}px`,
+          top: `${200}px`,
+          backgroundColor: this.constants.MENU_BGD_COLOR
+        }}
+        menuIconColor={this.constants.MENU_ICON_COLOR}
+        menuTextColor={this.constants.MENU_TEXT_COLOR}
+        handleMenuClick={this.handleMenuClick}
+        showArrows={this.state.showArrows}
+        showSlider={this.state.showSlider}
+        showZoomController={this.state.showZoomController}
+      />
+    ) : null;
 
     return (
       <div className="viewer" ref={el => (this.mainDiv = el)}>
@@ -945,6 +998,7 @@ class LuloViewer extends Component {
           {middle}
           {end}
         </div>
+        {menu}
       </div>
     );
   }

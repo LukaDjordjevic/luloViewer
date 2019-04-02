@@ -158,8 +158,6 @@ const getViewRectangleTransform = (
   zoomControllerHeight,
   boundingRect
 ) => {
-  // let leftOffsetController;
-  // let topOffsetController;
   let leftOffsetImage;
   let topOffsetImage;
   let left;
@@ -167,12 +165,6 @@ const getViewRectangleTransform = (
   let width;
   let height;
   if (imageWidth / imageHeight > boundingRect.width / boundingRect.height) {
-    // Image aspect ratio > bounding rect aspect
-    // leftOffsetController = 0;
-    // topOffsetController =
-    //   (zoomControllerHeight -
-    //     zoomControllerWidth / (imageWidth / imageHeight)) /
-    //   2;
     topOffsetImage =
       (imageWidth / (boundingRect.width / boundingRect.height) - imageHeight) /
       2;
@@ -184,7 +176,6 @@ const getViewRectangleTransform = (
     width = (boundingRect.width / imageWidth) * zoomControllerWidth;
     height = width / (boundingRect.width / boundingRect.height);
   } else {
-    // topOffsetController = 0;
     leftOffsetImage =
       (imageHeight / (boundingRect.height / boundingRect.width) - imageWidth) /
       2;
@@ -197,7 +188,7 @@ const getViewRectangleTransform = (
     height = (boundingRect.height / imageHeight) * zoomControllerHeight;
     width = height * (boundingRect.width / boundingRect.height);
   }
-  console.log('topoffset', topOffsetImage);
+
   return { left, top, width, height };
 };
 
