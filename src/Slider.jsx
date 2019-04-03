@@ -9,8 +9,8 @@ class Slider extends PureComponent {
     this.state = {
       startArrowColor: this.props.arrowDefaultColor,
       endArrowColor: this.props.arrowDefaultColor,
-      top: 0,
-      left: 0
+      left: this.props.left,
+      top: this.props.top
     };
     this.dragging = false;
     this.slideMouseUp = this.slideMouseUp.bind(this);
@@ -19,29 +19,13 @@ class Slider extends PureComponent {
     this.onMouseMove = this.onMouseMove.bind(this);
   }
 
-  componentDidMount() {
-    console.log('did mount');
-
-    // getSliderCenterPos(
-    //   this.props.mainDivRect.width,
-    //   this.props.mainDivRect.height,
-    //   this.contentHeight,
-    //   this.contentWidth,
-    //   this.props.slidesStripSize,
-    //   this.props.isHorizontal
-    // );
-    // this.setState({ left: sliderPosition.left, top: sliderPosition.top });
-  }
-
-  componentWillReceiveProps() {
-    // getSliderCenterPos(
-    //   this.props.mainDivRect.width,
-    //   this.props.mainDivRect.height,
-    //   this.contentHeight,
-    //   this.contentWidth,
-    //   this.props.slidesStripSize,
-    //   this.props.isHorizontal
-    // );
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isHorizontal !== nextProps.isHorizontal) {
+      this.setState({
+        left: this.props.top,
+        top: this.props.left
+      });
+    }
   }
 
   onWheel(e) {
@@ -74,17 +58,22 @@ class Slider extends PureComponent {
   onMouseMove(e) {
     e.preventDefault();
 
-    console.log('slider mouse move');
+    // console.log('slider mouse move');
     this.dragging = true;
     const newPosition = {
-      x: e.clientX - this.startingClick.x + this.startingSliderPosition.x,
-      y: e.clientY - this.startingClick.y + this.startingSliderPosition.y
+      left: e.clientX - this.startingClick.x + this.startingSliderPosition.x,
+      top: e.clientY - this.startingClick.y + this.startingSliderPosition.y
     };
     if (this.props.isHorizontal) {
-      this.setState({ left: newPosition.x });
+      newPosition.top = 0;
+      this.setState({ left: newPosition.left });
     } else {
-      this.setState({ top: newPosition.y });
+      newPosition.left = 0;
+      this.setState({ top: newPosition.top });
     }
+    // console.log('saving pos', newPosition);
+
+    this.props.updateSliderPos(newPosition);
 
     console.log(newPosition);
   }

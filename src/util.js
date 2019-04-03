@@ -270,6 +270,43 @@ const createSlideAnimationKeyframes = (styleSheet, slidesRect) => {
   console.log('new animations:', styleSheet.sheet);
 };
 
+const calculateSlidesDivFromMainDiv = (
+  mainDivRect,
+  sliderPosition,
+  showSlider,
+  sliderSize
+) => {
+  const slidesRect = Object.assign({}, mainDivRect);
+
+  const slidesWidth =
+    ['left', 'right'].includes(sliderPosition) && showSlider
+      ? mainDivRect.width * (1 - sliderSize)
+      : mainDivRect.width;
+
+  const slidesHeight =
+    ['top', 'bottom'].includes(sliderPosition) && showSlider
+      ? mainDivRect.height * (1 - sliderSize)
+      : mainDivRect.height;
+
+  let offsetLeft = 0;
+  let offsetTop = 0;
+  if (sliderPosition === 'left' && showSlider)
+    offsetLeft = mainDivRect.width * sliderSize;
+  if (sliderPosition === 'top' && showSlider)
+    offsetTop = mainDivRect.height * sliderSize;
+
+  slidesRect.width = slidesWidth;
+  slidesRect.height = slidesHeight;
+  slidesRect.left = mainDivRect.left + offsetLeft;
+  slidesRect.top = mainDivRect.top + offsetTop;
+  slidesRect.x = mainDivRect.x + offsetLeft;
+  slidesRect.y = mainDivRect.y + offsetTop;
+  slidesRect.right = slidesRect.width + slidesRect.left;
+  slidesRect.bottom = slidesRect.height + slidesRect.top;
+
+  return slidesRect;
+};
+
 // const getSliderCenterPos = (
 //   viewerWidth,
 //   viewerHeight,
@@ -306,6 +343,7 @@ module.exports = {
   getImageDimensions,
   constrainTranslate,
   getViewRectangleTransform,
-  createSlideAnimationKeyframes
+  createSlideAnimationKeyframes,
+  calculateSlidesDivFromMainDiv
   // getSliderCenterPos
 };

@@ -4,6 +4,7 @@ import ZoomController from './ZoomController';
 import Slider from './Slider';
 import Arrows from './Arrows';
 import Menu from './Menu';
+import { calculateSlidesDivFromMainDiv } from './util';
 
 import {
   getViewRectangleTransform,
@@ -79,7 +80,7 @@ class LuloViewer extends Component {
     };
 
     this.imageLoadFailedArr = [];
-
+    this.lastSliderPos = { left: 0, top: 0 };
     this.imageLoading = false;
     this.images = [];
     this.changingSlide = false;
@@ -95,6 +96,7 @@ class LuloViewer extends Component {
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
     this.handleMenuClick = this.handleMenuClick.bind(this);
     this.setViewerToSlide = this.setViewerToSlide.bind(this);
+    this.updateSliderPos = this.updateSliderPos.bind(this);
     this.updateZoomController = this.updateZoomController.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
@@ -107,12 +109,16 @@ class LuloViewer extends Component {
     };
 
     const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
-    const slidesRect = this.calculateSlidesDivFromMainDiv(mainDivRect);
+    const slidesRect = calculateSlidesDivFromMainDiv(
+      mainDivRect,
+      this.state.sliderPosition,
+      this.state.showSlider,
+      this.constants.SLIDER_SIZE
+    );
 
     setTimeout(() => {
       const mainDivRect = this.mainDiv.getBoundingClientRect();
       const slidesRect = this.slides.getBoundingClientRect();
-      // const slidesRect2 = this.calculateSlidesDivFromMainDiv(mainDivRect);
       this.setState({ slidesRect, mainDivRect });
     }, 1000);
 
@@ -146,39 +152,45 @@ class LuloViewer extends Component {
     this.checkPreload();
   }
 
-  calculateSlidesDivFromMainDiv(mainDivRect) {
-    const slidesRect = Object.assign({}, mainDivRect);
+  updateSliderPos(newPosition) {
+    console.log(('saving position to', newPosition));
 
-    const slidesWidth =
-      ['left', 'right'].includes(this.state.sliderPosition) &&
-      this.state.showSlider
-        ? mainDivRect.width * (1 - this.constants.SLIDER_SIZE)
-        : mainDivRect.width;
-
-    const slidesHeight =
-      ['top', 'bottom'].includes(this.state.sliderPosition) &&
-      this.state.showSlider
-        ? mainDivRect.height * (1 - this.constants.SLIDER_SIZE)
-        : mainDivRect.height;
-
-    let offsetLeft = 0;
-    let offsetTop = 0;
-    if (this.state.sliderPosition === 'left' && this.state.showSlider)
-      offsetLeft = mainDivRect.width * this.constants.SLIDER_SIZE;
-    if (this.state.sliderPosition === 'top' && this.state.showSlider)
-      offsetTop = mainDivRect.height * this.constants.SLIDER_SIZE;
-
-    slidesRect.width = slidesWidth;
-    slidesRect.height = slidesHeight;
-    slidesRect.left = mainDivRect.left + offsetLeft;
-    slidesRect.top = mainDivRect.top + offsetTop;
-    slidesRect.x = mainDivRect.x + offsetLeft;
-    slidesRect.y = mainDivRect.y + offsetTop;
-    slidesRect.right = slidesRect.width + slidesRect.left;
-    slidesRect.bottom = slidesRect.height + slidesRect.top;
-
-    return slidesRect;
+    this.lastSliderPos = newPosition;
   }
+
+  // calculateSlidesDivFromMainDiv(mainDivRect) {
+  //   const slidesRect = Object.assign({}, mainDivRect);
+
+  //   const slidesWidth =
+  //     ['left', 'right'].includes(this.state.sliderPosition) &&
+  //     this.state.showSlider
+  //       ? mainDivRect.width * (1 - this.constants.SLIDER_SIZE)
+  //       : mainDivRect.width;
+
+  //   const slidesHeight =
+  //     ['top', 'bottom'].includes(this.state.sliderPosition) &&
+  //     this.state.showSlider
+  //       ? mainDivRect.height * (1 - this.constants.SLIDER_SIZE)
+  //       : mainDivRect.height;
+
+  //   let offsetLeft = 0;
+  //   let offsetTop = 0;
+  //   if (this.state.sliderPosition === 'left' && this.state.showSlider)
+  //     offsetLeft = mainDivRect.width * this.constants.SLIDER_SIZE;
+  //   if (this.state.sliderPosition === 'top' && this.state.showSlider)
+  //     offsetTop = mainDivRect.height * this.constants.SLIDER_SIZE;
+
+  //   slidesRect.width = slidesWidth;
+  //   slidesRect.height = slidesHeight;
+  //   slidesRect.left = mainDivRect.left + offsetLeft;
+  //   slidesRect.top = mainDivRect.top + offsetTop;
+  //   slidesRect.x = mainDivRect.x + offsetLeft;
+  //   slidesRect.y = mainDivRect.y + offsetTop;
+  //   slidesRect.right = slidesRect.width + slidesRect.left;
+  //   slidesRect.bottom = slidesRect.height + slidesRect.top;
+
+  //   return slidesRect;
+  // }
 
   componentWillUnmount() {
     console.log('#######  unmounting  ######');
@@ -195,7 +207,12 @@ class LuloViewer extends Component {
 
     const mainDivRect = this.mainDiv.getBoundingClientRect();
     // const slidesRect = this.slides.getBoundingClientRect();
-    const slidesRect = this.calculateSlidesDivFromMainDiv(mainDivRect);
+    const slidesRect = calculateSlidesDivFromMainDiv(
+      mainDivRect,
+      this.state.sliderPosition,
+      this.state.showSlider,
+      this.constants.SLIDER_SIZE
+    );
 
     let slideALeft = 0;
     let slideBLeft = 0;
@@ -350,7 +367,7 @@ class LuloViewer extends Component {
           }
         }
       } else {
-        activeSlide.handleWheel(e);
+        if (activeSlide) activeSlide.handleWheel(e);
         this.updateZoomController(e, 'wheel');
       }
     }
@@ -995,6 +1012,14 @@ class LuloViewer extends Component {
     const slideSize = isHorizontal
       ? this.state.mainDivRect.height * this.constants.SLIDER_SIZE
       : this.state.mainDivRect.width * this.constants.SLIDER_SIZE;
+    const left = isHorizontal
+      ? this.lastSliderPos.left || this.lastSliderPos.top
+      : 0;
+    const top = isHorizontal
+      ? 0
+      : this.lastSliderPos.left || this.lastSliderPos.top;
+    console.log('slider left top', left, top);
+
     const slider = (
       <div
         className="layout-slider"
@@ -1021,6 +1046,9 @@ class LuloViewer extends Component {
           slidesStripSize={slideSize * this.numberOfSlides}
           slideClick={this.setViewerToSlide}
           mainDivRect={this.state.mainDivRect}
+          left={left}
+          top={top}
+          updateSliderPos={this.updateSliderPos}
         />
       </div>
     );
