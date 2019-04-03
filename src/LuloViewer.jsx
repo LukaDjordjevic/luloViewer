@@ -95,6 +95,7 @@ class LuloViewer extends Component {
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
     this.handleMenuClick = this.handleMenuClick.bind(this);
     this.setViewerToSlide = this.setViewerToSlide.bind(this);
+    this.updateZoomController = this.updateZoomController.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
@@ -134,7 +135,7 @@ class LuloViewer extends Component {
           this.slideAnimationsStylesheet,
           this.state.slidesRect
         );
-        this.updateElements();
+        this.updateZoomController();
         console.log(this.slideAnimationsStylesheet);
       }
     );
@@ -218,7 +219,7 @@ class LuloViewer extends Component {
           this.slideAnimationsStylesheet,
           this.state.slidesRect
         );
-        this.updateElements();
+        this.updateZoomController();
       }
     );
   }
@@ -256,18 +257,18 @@ class LuloViewer extends Component {
   }
 
   onMouseDown(e) {
-    console.log('layout-main onClick', e.clientX, e.pageX, e.screenX);
+    console.log('layout-main onMouseDown', e.clientX, e.pageX, e.screenX);
 
     e.preventDefault();
-    e.stopPropagation();
+    // e.stopPropagation();
     if (e.button === 0) {
       // Left click
       if (this.state.showMenu && this.constants.ALLOW_MENU) {
         this.setState({ showMenu: false });
         return;
       }
-      document.addEventListener('mousemove', this.onMouseMove);
-      document.addEventListener('mouseup', this.onMouseUp);
+      // document.addEventListener('mousemove', this.onMouseMove);
+      // document.addEventListener('mouseup', this.onMouseUp);
     } else {
       // Right click
       if (this.constants.ALLOW_MENU) {
@@ -280,29 +281,29 @@ class LuloViewer extends Component {
         });
       }
     }
-    const slides = {
-      A: this.slideA,
-      B: this.slideB,
-      C: this.slideC
-    };
-    const activeSlide = slides[this.state.activeSlide];
-    if (activeSlide) activeSlide.handleMouseDown(e);
+    // const slides = {
+    //   A: this.slideA,
+    //   B: this.slideB,
+    //   C: this.slideC
+    // };
+    // const activeSlide = slides[this.state.activeSlide];
+    // if (activeSlide) activeSlide.handleMouseDown(e);
   }
 
   onMouseUp(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    document.removeEventListener('mousemove', this.onMouseMove);
-    document.removeEventListener('mouseup', this.onMouseUp);
+    // e.preventDefault();
+    // e.stopPropagation();
+    // document.removeEventListener('mousemove', this.onMouseMove);
+    // document.removeEventListener('mouseup', this.onMouseUp);
   }
 
   onMouseMove(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    this.updateElements(e, 'mouseMove');
+    // e.preventDefault();
+    // e.stopPropagation();
+    // this.updateZoomController(e, 'mouseMove');
   }
 
-  async onWheel(e) {
+  onWheel(e) {
     console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
 
     e.preventDefault();
@@ -312,6 +313,12 @@ class LuloViewer extends Component {
       let threshold = this.constants.SWIPE_THRESHOLD;
       let timeout = this.constants.SLIDE_TRANSITION_TIMEOUT;
       if (this.isFirefox) threshold = threshold * 1.5;
+      const slides = {
+        A: this.slideA,
+        B: this.slideB,
+        C: this.slideC
+      };
+      const activeSlide = slides[this.state.activeSlide];
       if (Math.abs(e.deltaX) > threshold) {
         console.log('THRESHOLD');
         this.changingSlide = true;
@@ -319,12 +326,6 @@ class LuloViewer extends Component {
         this.slideChangeTimeout = setTimeout(() => {
           this.changingSlide = false;
         }, timeout);
-        const slides = {
-          A: this.slideA,
-          B: this.slideB,
-          C: this.slideC
-        };
-        const activeSlide = slides[this.state.activeSlide];
         if (activeSlide) {
           if (e.deltaX > 0) {
             if (
@@ -349,7 +350,8 @@ class LuloViewer extends Component {
           }
         }
       } else {
-        this.updateElements(e, 'wheel');
+        activeSlide.handleWheel(e);
+        this.updateZoomController(e, 'wheel');
       }
     }
   }
@@ -373,7 +375,7 @@ class LuloViewer extends Component {
     return nextSlideIndex;
   }
 
-  async updateElements(e, eventType) {
+  updateZoomController(e, eventType) {
     const slides = {
       A: this.slideA,
       B: this.slideB,
@@ -386,8 +388,8 @@ class LuloViewer extends Component {
       const imageWidth = activeSlide.state.width;
       const imageHeight = activeSlide.state.height;
       // if (eventType === 'changeSlide') {}
-      if (eventType === 'mouseMove') await activeSlide.handleMouseMove(e);
-      if (eventType === 'wheel') await activeSlide.handleWheel(e);
+      // if (eventType === 'mouseMove') await activeSlide.handleMouseMove(e);
+      // if (eventType === 'wheel') await activeSlide.handleWheel(e);
 
       if (this.zoomController) {
         const viewRectangleTransform = getViewRectangleTransform(
@@ -429,7 +431,7 @@ class LuloViewer extends Component {
         this.setState(
           { showZoomController: !this.state.showZoomController },
           () => {
-            this.updateElements();
+            this.updateZoomController();
           }
         );
         break;
@@ -441,11 +443,6 @@ class LuloViewer extends Component {
               : 0
         });
         break;
-      // case 'top':
-      //   this.setState({ sliderPosition: 'top' }, () => {
-      //     this.onWindowResize();
-      //   });
-      // break;
       default:
         this.setState({ sliderPosition: item }, () => {
           this.onWindowResize();
@@ -666,7 +663,7 @@ class LuloViewer extends Component {
         slideCAnimationName
       },
       () => {
-        this.updateElements();
+        this.updateZoomController();
         this.setState({});
       }
     );
@@ -685,7 +682,7 @@ class LuloViewer extends Component {
             slideCImageIndex: this.getNextSlideIndex(index, -1)
           },
           () => {
-            this.updateElements();
+            this.updateZoomController();
           }
         );
         break;
@@ -698,7 +695,7 @@ class LuloViewer extends Component {
             slideCImageIndex: this.getNextSlideIndex(index, 1)
           },
           () => {
-            this.updateElements();
+            this.updateZoomController();
           }
         );
         break;
@@ -711,7 +708,7 @@ class LuloViewer extends Component {
             slideCImageIndex: index
           },
           () => {
-            this.updateElements();
+            this.updateZoomController();
           }
         );
         break;
@@ -889,6 +886,7 @@ class LuloViewer extends Component {
               }
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
               isFirefox={this.isFirefox}
+              updateZoomController={this.updateZoomController}
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideAImageIndex) ? (
             <div className="message">
@@ -919,6 +917,7 @@ class LuloViewer extends Component {
               parentBoundingRect={this.state.slidesRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
               isFirefox={this.isFirefox}
+              updateZoomController={this.updateZoomController}
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideBImageIndex) ? (
             <div className="message">
@@ -948,6 +947,8 @@ class LuloViewer extends Component {
               imageInfo={this.state.imagesInfo[this.state.slideCImageIndex]}
               parentBoundingRect={this.state.slidesRect}
               ZOOM_LEVELS={this.constants.ZOOM_LEVELS}
+              isFirefox={this.isFirefox}
+              updateZoomController={this.updateZoomController}
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideCImageIndex) ? (
             <div className="message">

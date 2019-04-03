@@ -52,8 +52,11 @@ class Slider extends PureComponent {
   }
 
   onMouseDown(e) {
+    // e.stopPropagation();
+    e.preventDefault();
     console.log('slider-strip onMouseDown', e.clientX, e.pageX, e.screenX);
-    this.mouseClicked = true;
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
     this.startingClick = { x: e.clientX, y: e.clientY };
     this.startingSliderPosition = { x: this.state.left, y: this.state.top };
     this.dragging = false;
@@ -62,14 +65,16 @@ class Slider extends PureComponent {
 
   onMouseUp(e) {
     console.log('slides strip mouse up');
-    this.mouseClicked = false;
-    this.dragging = false;
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
 
     // e.stopPropagation();
   }
 
   onMouseMove(e) {
-    if (!this.mouseClicked) return;
+    e.preventDefault();
+
+    console.log('slider mouse move');
     this.dragging = true;
     const newPosition = {
       x: e.clientX - this.startingClick.x + this.startingSliderPosition.x,
@@ -82,7 +87,6 @@ class Slider extends PureComponent {
     }
 
     console.log(newPosition);
-    // this.dragging = true;
   }
 
   onMouseEnter(arrow, e) {
@@ -129,6 +133,7 @@ class Slider extends PureComponent {
   render() {
     const startIconName = this.props.isHorizontal ? 'arrow-left' : 'arrow-up';
     const endIconName = this.props.isHorizontal ? 'arrow-right' : 'arrow-down';
+    this.calculateLayoutDimensions();
     const start = (
       <div
         className="slider-arrow"
@@ -185,8 +190,8 @@ class Slider extends PureComponent {
             top: `${this.state.top}px`
           }}
           onMouseDown={this.onMouseDown}
-          onMouseUp={this.onMouseUp}
-          onMouseMove={this.onMouseMove}
+          // onMouseUp={this.onMouseUp}
+          // onMouseMove={this.onMouseMove}
         >
           {slides}
         </div>

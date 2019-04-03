@@ -64,6 +64,7 @@ class SingleImage extends PureComponent {
 
     this.handleWheel = this.handleWheel.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     // this.onTouchStart = this.onTouchStart.bind(this);
     // this.onTouchMove = this.onTouchMove.bind(this);
@@ -147,63 +148,76 @@ class SingleImage extends PureComponent {
   }
 
   handleMouseDown(e) {
+    console.log('single image mouse down');
+
     this.startingX = e.pageX;
     this.startingY = e.pageY;
     this.startingLeft = this.state.left;
     this.startingTop = this.state.top;
+    document.addEventListener('mousemove', this.handleMouseMove);
+    document.addEventListener('mouseup', this.handleMouseUp);
+  }
+
+  handleMouseUp(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    document.removeEventListener('mousemove', this.handleMouseMove);
+    document.removeEventListener('mouseup', this.handleMouseUp);
   }
 
   handleMouseMove(e) {
-    return new Promise(resolve => {
-      const offset = {
-        x: e.pageX - this.startingX,
-        y: e.pageY - this.startingY
-      };
+    console.log('single image mouse move');
 
-      let newLeft = this.startingLeft + offset.x;
-      let newTop = this.startingTop + offset.y;
+    e.preventDefault();
+    e.stopPropagation();
+    const offset = {
+      x: e.pageX - this.startingX,
+      y: e.pageY - this.startingY
+    };
 
-      const zoomFactor = this.state.zoomFactor;
-      const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-      const containerAspectRatio = this.containerAspectRatio;
-      const parentBoundingRect = JSON.parse(
-        JSON.stringify(this.props.parentBoundingRect)
-      );
+    let newLeft = this.startingLeft + offset.x;
+    let newTop = this.startingTop + offset.y;
 
-      const imageWidth = this.state.width;
-      const imageHeight = this.state.height;
-      const divWidth = this.props.parentBoundingRect.width;
-      const divHeight = this.props.parentBoundingRect.height;
-      //Update zoomTarget
-      const zoomTarget = updateZoomTarget(
-        newLeft,
-        newTop,
-        imageWidth,
-        imageHeight,
-        divWidth,
-        divHeight
-      );
+    const zoomFactor = this.state.zoomFactor;
+    const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
+    const containerAspectRatio = this.containerAspectRatio;
+    const parentBoundingRect = JSON.parse(
+      JSON.stringify(this.props.parentBoundingRect)
+    );
 
-      const { constrainedLeft, constrainedTop } = constrainTranslate(
-        newLeft,
-        newTop,
-        zoomFactor,
-        parentBoundingRect,
-        imageAspectRatio,
-        containerAspectRatio
-      );
+    const imageWidth = this.state.width;
+    const imageHeight = this.state.height;
+    const divWidth = this.props.parentBoundingRect.width;
+    const divHeight = this.props.parentBoundingRect.height;
+    //Update zoomTarget
+    const zoomTarget = updateZoomTarget(
+      newLeft,
+      newTop,
+      imageWidth,
+      imageHeight,
+      divWidth,
+      divHeight
+    );
 
-      this.setState(
-        {
-          left: constrainedLeft,
-          top: constrainedTop,
-          zoomTarget
-        },
-        () => {
-          resolve(); // Tell parent to go on and update ZoomController (it depends on this state)
-        }
-      );
-    });
+    const { constrainedLeft, constrainedTop } = constrainTranslate(
+      newLeft,
+      newTop,
+      zoomFactor,
+      parentBoundingRect,
+      imageAspectRatio,
+      containerAspectRatio
+    );
+
+    this.setState(
+      {
+        left: constrainedLeft,
+        top: constrainedTop,
+        zoomTarget
+      },
+      () => {
+        this.props.updateZoomController(e, 'mouseMove');
+      }
+    );
   }
 
   handleWheel(e) {
@@ -307,6 +321,9 @@ class SingleImage extends PureComponent {
         className="image-div"
         style={{ cursor: this.state.cursor }}
         ref={el => (this.imageDiv = el)}
+        onMouseDown={this.handleMouseDown}
+        // onMouseUp={this.handleMouseUp}
+        // onMouseMove={this.handleMouseMove}
       >
         <img
           src={this.props.imageInfo.url}
