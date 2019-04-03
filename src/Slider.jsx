@@ -1,17 +1,47 @@
 import React, { PureComponent } from 'react';
+import { getSliderCenterPos } from './util';
 import Icon from './Icon';
 
 class Slider extends PureComponent {
   constructor(props) {
     super(props);
+    this.calculateLayoutDimensions();
     this.state = {
       startArrowColor: this.props.arrowDefaultColor,
       endArrowColor: this.props.arrowDefaultColor,
       top: 0,
       left: 0
     };
+    this.dragging = false;
+    this.slideMouseUp = this.slideMouseUp.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+  }
 
-    this.slideClick = this.slideClick.bind(this);
+  componentDidMount() {
+    console.log('did mount');
+
+    // getSliderCenterPos(
+    //   this.props.mainDivRect.width,
+    //   this.props.mainDivRect.height,
+    //   this.contentHeight,
+    //   this.contentWidth,
+    //   this.props.slidesStripSize,
+    //   this.props.isHorizontal
+    // );
+    // this.setState({ left: sliderPosition.left, top: sliderPosition.top });
+  }
+
+  componentWillReceiveProps() {
+    // getSliderCenterPos(
+    //   this.props.mainDivRect.width,
+    //   this.props.mainDivRect.height,
+    //   this.contentHeight,
+    //   this.contentWidth,
+    //   this.props.slidesStripSize,
+    //   this.props.isHorizontal
+    // );
   }
 
   onWheel(e) {
@@ -21,7 +51,42 @@ class Slider extends PureComponent {
     e.stopPropagation();
   }
 
+  onMouseDown(e) {
+    console.log('slider-strip onMouseDown', e.clientX, e.pageX, e.screenX);
+    this.mouseClicked = true;
+    this.startingClick = { x: e.clientX, y: e.clientY };
+    this.startingSliderPosition = { x: this.state.left, y: this.state.top };
+    this.dragging = false;
+    // console.log(this.startingClick);
+  }
+
+  onMouseUp(e) {
+    console.log('slides strip mouse up');
+    this.mouseClicked = false;
+    this.dragging = false;
+
+    // e.stopPropagation();
+  }
+
+  onMouseMove(e) {
+    if (!this.mouseClicked) return;
+    this.dragging = true;
+    const newPosition = {
+      x: e.clientX - this.startingClick.x + this.startingSliderPosition.x,
+      y: e.clientY - this.startingClick.y + this.startingSliderPosition.y
+    };
+    if (this.props.isHorizontal) {
+      this.setState({ left: newPosition.x });
+    } else {
+      this.setState({ top: newPosition.y });
+    }
+
+    console.log(newPosition);
+    // this.dragging = true;
+  }
+
   onMouseEnter(arrow, e) {
+    e.stopPropagation();
     if (arrow === 'start') {
       this.setState({ startArrowColor: this.props.arrowHighlightColor });
     } else {
@@ -30,6 +95,8 @@ class Slider extends PureComponent {
   }
 
   onMouseLeave(arrow, e) {
+    e.stopPropagation();
+
     if (arrow === 'start') {
       this.setState({ startArrowColor: this.props.arrowDefaultColor });
     } else {
@@ -37,31 +104,37 @@ class Slider extends PureComponent {
     }
   }
 
-  slideClick(index) {
-    this.props.slideClick(index);
+  slideMouseUp(index, e) {
+    console.log('slide mouseUp');
+
+    // e.stopPropagation();
+    if (!this.dragging) this.props.slideClick(index, e);
+  }
+
+  calculateLayoutDimensions() {
+    this.arrowWidth = this.props.isHorizontal
+      ? this.props.sliderArrowSize
+      : 100;
+    this.arrowHeight = this.props.isHorizontal
+      ? 100
+      : this.props.sliderArrowSize;
+    this.contentWidth = this.props.isHorizontal
+      ? 100 - this.props.sliderArrowSize * 2
+      : 100;
+    this.contentHeight = this.props.isHorizontal
+      ? 100
+      : 100 - this.props.sliderArrowSize * 2;
   }
 
   render() {
     const startIconName = this.props.isHorizontal ? 'arrow-left' : 'arrow-up';
     const endIconName = this.props.isHorizontal ? 'arrow-right' : 'arrow-down';
-    const arrowWidth = this.props.isHorizontal
-      ? this.props.sliderArrowSize
-      : 100;
-    const arrowHeight = this.props.isHorizontal
-      ? 100
-      : this.props.sliderArrowSize;
-    const contentWidth = this.props.isHorizontal
-      ? 100 - this.props.sliderArrowSize * 2
-      : 100;
-    const contentHeight = this.props.isHorizontal
-      ? 100
-      : 100 - this.props.sliderArrowSize * 2;
     const start = (
       <div
         className="slider-arrow"
         style={{
-          width: `${arrowWidth}%`,
-          height: `${arrowHeight}%`
+          width: `${this.arrowWidth}%`,
+          height: `${this.arrowHeight}%`
         }}
         onMouseEnter={e => this.onMouseEnter('start', e)}
         onMouseLeave={e => this.onMouseLeave('start', e)}
@@ -82,7 +155,7 @@ class Slider extends PureComponent {
         index={idx}
         slideSize={this.props.slideSize}
         isHorizontal={this.props.isHorizontal}
-        slideClick={this.slideClick}
+        slideClick={this.slideMouseUp}
       />
     ));
 
@@ -92,9 +165,9 @@ class Slider extends PureComponent {
         style={{
           width: this.props.isHorizontal
             ? `${100 - 2 * this.props.sliderArrowSize}%`
-            : `${contentWidth}%`,
+            : `${this.contentWidth}%`,
           height: this.props.isHorizontal
-            ? `${contentHeight}%`
+            ? `${this.contentHeight}%`
             : `${100 - 2 * this.props.sliderArrowSize}%`
         }}
       >
@@ -111,6 +184,9 @@ class Slider extends PureComponent {
             left: `${this.state.left}px`,
             top: `${this.state.top}px`
           }}
+          onMouseDown={this.onMouseDown}
+          onMouseUp={this.onMouseUp}
+          onMouseMove={this.onMouseMove}
         >
           {slides}
         </div>
@@ -121,8 +197,8 @@ class Slider extends PureComponent {
       <div
         className="slider-arrow"
         style={{
-          width: `${arrowWidth}%`,
-          height: `${arrowHeight}%`
+          width: `${this.arrowWidth}%`,
+          height: `${this.arrowHeight}%`
         }}
         onMouseEnter={e => this.onMouseEnter('end', e)}
         onMouseLeave={e => this.onMouseLeave('end', e)}
@@ -139,6 +215,7 @@ class Slider extends PureComponent {
       <div
         className="slider-main"
         style={{
+          backgroundColor: this.props.backgroundColor,
           flexDirection: this.props.isHorizontal ? 'row' : 'column'
         }}
         onWheel={this.onWheel}

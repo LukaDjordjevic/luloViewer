@@ -83,7 +83,7 @@ class Arrows extends PureComponent {
             width: arrowSize,
             height:
               this.props.allowCyclic ||
-              this.props.currentSlideIndex !== this.props.imageUrlsLength - 1
+              this.props.currentSlideIndex !== this.props.numberOfSlides - 1
                 ? arrowSize
                 : '0',
             paddingRight: `${this.props.arrowsPadding}%`

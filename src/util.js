@@ -270,6 +270,35 @@ const createSlideAnimationKeyframes = (styleSheet, slidesRect) => {
   console.log('new animations:', styleSheet.sheet);
 };
 
+// const getSliderCenterPos = (
+//   viewerWidth,
+//   viewerHeight,
+//   widthPercentage,
+//   heightPercentage,
+//   slidesStripSize,
+//   isHorizontal
+// ) => {
+//   console.log(
+//     viewerWidth,
+//     viewerHeight,
+//     heightPercentage,
+//     widthPercentage,
+//     slidesStripSize,
+//     isHorizontal
+//   );
+//   let left;
+//   let top;
+//   const contentWidth = widthPercentage * viewerWidth;
+//   const contentHeight = heightPercentage * viewerHeight;
+//   if (isHorizontal) {
+//     left = (contentWidth - slidesStripSize) / 2;
+//   } else {
+//     top = (contentHeight - slidesStripSize) / 2;
+//   }
+//   console.log('88888888', { left, top });
+//   return { left, top };
+// };
+
 module.exports = {
   updateZoomTarget,
   getNewZoomTransform,
@@ -278,4 +307,5 @@ module.exports = {
   constrainTranslate,
   getViewRectangleTransform,
   createSlideAnimationKeyframes
+  // getSliderCenterPos
 };

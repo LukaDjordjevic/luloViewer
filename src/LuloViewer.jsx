@@ -21,6 +21,7 @@ class LuloViewer extends Component {
       SLIDE_TRANSITION_DURATION: 0.3,
       SLIDE_TRANSITION_TIMEOUT: 600,
       BACKGROUND_COLOR: 'black',
+      // BACKGROUND_COLOR: 'darkslategray',
       SHOW_ARROWS: true,
       ALLOW_MENU: true,
       ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
@@ -255,7 +256,7 @@ class LuloViewer extends Component {
   }
 
   onMouseDown(e) {
-    console.log('e=klik', e.clientX, e.pageX, e.screenX);
+    console.log('layout-main onClick', e.clientX, e.pageX, e.screenX);
 
     e.preventDefault();
     e.stopPropagation();
@@ -278,11 +279,6 @@ class LuloViewer extends Component {
           }
         });
       }
-      console.log(
-        'got coords',
-        e.screenX - this.state.mainDivRect.left,
-        e.screenY - this.state.mainDivRect.top
-      );
     }
     const slides = {
       A: this.slideA,
@@ -677,7 +673,7 @@ class LuloViewer extends Component {
     this.checkPreload();
   }
 
-  setViewerToSlide(index) {
+  setViewerToSlide(index, e) {
     this.saveSlidePosition();
     switch (this.state.activeSlide) {
       case 'A':
@@ -822,6 +818,7 @@ class LuloViewer extends Component {
         currentSlideIndex={this.state.currentSlideIndex}
         onLeftArrowClick={this.onLeftArrowClick}
         onRightArrowClick={this.onRightArrowClick}
+        numberOfSlides={this.numberOfSlides}
       />
     ) : null;
 
@@ -1014,6 +1011,7 @@ class LuloViewer extends Component {
             return 'no-url';
           })}
           isHorizontal={isHorizontal}
+          backgroundColor={this.state.backgroundColor}
           arrowDefaultColor={this.constants.ARROW_DEFAULT_COLOR}
           arrowHighlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
           sliderArrowSize={this.constants.SLIDER_ARROW_SIZE}
@@ -1021,6 +1019,7 @@ class LuloViewer extends Component {
           slideSize={slideSize}
           slidesStripSize={slideSize * this.numberOfSlides}
           slideClick={this.setViewerToSlide}
+          mainDivRect={this.state.mainDivRect}
         />
       </div>
     );
