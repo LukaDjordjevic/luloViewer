@@ -92,6 +92,9 @@ class LuloViewer extends Component {
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onWheel = this.onWheel.bind(this);
+    this.updateImageFromZoomController = this.updateImageFromZoomController.bind(
+      this
+    );
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
     this.handleMenuClick = this.handleMenuClick.bind(this);
@@ -156,6 +159,28 @@ class LuloViewer extends Component {
     console.log(('saving position to', newPosition));
 
     this.lastSliderPos = newPosition;
+  }
+
+  getActiveSlide() {
+    const slides = {
+      A: this.slideA,
+      B: this.slideB,
+      C: this.slideC
+    };
+    return slides[this.state.activeSlide];
+  }
+
+  updateImageFromZoomController(imageTranslationDelta) {
+    const activeSlide = this.getActiveSlide();
+    const zoomFactor = activeSlide ? activeSlide.state.zoomFactor : 0;
+    const newState = {
+      left: imageTranslationDelta.left * zoomFactor,
+      top: imageTranslationDelta.top * zoomFactor
+    };
+    activeSlide.setState(newState, () => {
+      this.updateZoomController();
+    });
+    // this.setState(newState)
   }
 
   // calculateSlidesDivFromMainDiv(mainDivRect) {
@@ -330,12 +355,7 @@ class LuloViewer extends Component {
       let threshold = this.constants.SWIPE_THRESHOLD;
       let timeout = this.constants.SLIDE_TRANSITION_TIMEOUT;
       if (this.isFirefox) threshold = threshold * 1.5;
-      const slides = {
-        A: this.slideA,
-        B: this.slideB,
-        C: this.slideC
-      };
-      const activeSlide = slides[this.state.activeSlide];
+      const activeSlide = this.getActiveSlide();
       if (Math.abs(e.deltaX) > threshold) {
         console.log('THRESHOLD');
         this.changingSlide = true;
@@ -393,12 +413,7 @@ class LuloViewer extends Component {
   }
 
   updateZoomController(e, eventType) {
-    const slides = {
-      A: this.slideA,
-      B: this.slideB,
-      C: this.slideC
-    };
-    const activeSlide = slides[this.state.activeSlide];
+    const activeSlide = this.getActiveSlide();
     if (activeSlide) {
       const imageLeft = activeSlide.state.left;
       const imageTop = activeSlide.state.top;
@@ -812,6 +827,9 @@ class LuloViewer extends Component {
       this.state.slidesRect ? this.state.slidesRect.height / 2 : 0
     );
 
+    const activeSlide = this.getActiveSlide();
+    console.log('active slide', this.state.activeSlide, activeSlide);
+
     //*******************************************
     //****************** arrows *****************
     //*******************************************
@@ -865,6 +883,9 @@ class LuloViewer extends Component {
               this.props.imageUrls[this.state.currentSlideIndex]
             }')`
           }}
+          imageZoomFactor={activeSlide ? activeSlide.state.zoomFactor : 0}
+          zoomControllerRatio={1 / this.constants.ZOOM_CONTROLLER_SIZE}
+          updateImageFromZoomController={this.updateImageFromZoomController}
         />
       ) : null;
 

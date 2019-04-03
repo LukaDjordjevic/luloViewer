@@ -9,6 +9,67 @@ class ZoomController extends PureComponent {
       viewRectangleWidth: this.props.style.width,
       viewRectangleHeight: this.props.style.height
     };
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+  }
+
+  onMouseDown(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log('view rect onMouseDown', e.clientX, e.pageX, e.screenX);
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
+    this.startingClick = { x: e.clientX, y: e.clientY };
+    this.startingSliderPosition = {
+      x: this.state.viewRectangleLeft,
+      y: this.state.viewRectangleTop
+    };
+    // this.dragging = false;
+    // console.log(this.startingClick);
+  }
+
+  onMouseUp(e) {
+    console.log('slides strip mouse up');
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
+
+    // e.stopPropagation();
+  }
+
+  onMouseMove(e) {
+    e.preventDefault();
+    console.log(
+      'ratio',
+      this.props.zoomControllerRatio,
+      'image factor',
+      this.props.imageZoomFactor
+    );
+
+    // console.log('slider mouse move');
+    // this.dragging = true;
+    console.log(
+      e.clientX - this.startingClick.x + this.startingSliderPosition.x
+    );
+    const newPosition = {
+      left:
+        (e.clientX - this.startingClick.x + this.startingSliderPosition.x) *
+        -1 *
+        this.props.zoomControllerRatio, // *
+      // this.props.imageZoomFactor,
+      top:
+        (e.clientY - this.startingClick.y + this.startingSliderPosition.y) *
+        -1 *
+        this.props.zoomControllerRatio // *
+      // this.props.imageZoomFactor
+    };
+
+    this.props.updateImageFromZoomController({
+      left: newPosition.left,
+      top: newPosition.top
+    });
+
+    console.log(newPosition);
   }
 
   updateViewRectangle(newState) {
@@ -48,6 +109,7 @@ class ZoomController extends PureComponent {
                 : this.props.style.height
             }${'px rgba(0, 0, 0, 0.5)'}`
           }}
+          onMouseDown={this.onMouseDown}
         />
       </div>
     );

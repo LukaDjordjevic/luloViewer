@@ -41,6 +41,8 @@ class App extends Component {
         style={{
           width: '600px',
           height: '600px',
+          // width: '80px',
+          // height: '80px',
           // width: '100vw',
           // height: '100vh',
           backgroundColor: '#000',

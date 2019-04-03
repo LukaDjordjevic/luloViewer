@@ -74,6 +74,7 @@
   border: 1px solid rgba(119, 137, 161, 0.5);
   box-shadow: inset 0px 0px 0px 10px red;
   box-sizing: border-box; /* Include padding and border in element's width and height */
+  cursor: grab;
 }
 
 .layout-main {
@@ -124,6 +125,7 @@
 
 .slides-strip {
   position: relative;
+  cursor: grab;
 }
 
 .single-slide {
@@ -140,7 +142,7 @@
   height: 100%;
   background-color: black;
   opacity: 0.5;
-  cursor: grab;
+  cursor: pointer;
 }
 
 /***********************/
@@ -152,7 +154,7 @@
   position: absolute;
   padding: 1.5%;
   z-index: 2;
-  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.7);
+  box-shadow: 7px 7px 14px rgba(0, 0, 0, 0.5);
 }
 
 .menu-item {
