@@ -4,7 +4,7 @@ import ZoomController from './ZoomController';
 import Slider from './Slider';
 import Arrows from './Arrows';
 import Menu from './Menu';
-import { calculateSlidesDivFromMainDiv } from './util';
+import { calculateSlidesDivFromMainDiv, updateZoomTarget } from './util';
 
 import {
   getViewRectangleTransform,
@@ -78,7 +78,12 @@ class LuloViewer extends Component {
       mainDivRect: { left: 0, top: 0, width: 0, height: 0 },
       slidesRect: { left: 0, top: 0, width: 0, height: 0 }
     };
-
+    this.zoomControllerTransform = {
+      left: 0,
+      top: 0,
+      width: 0,
+      height: 0
+    };
     this.imageLoadFailedArr = [];
     this.lastSliderPos = { left: 0, top: 0 };
     this.imageLoading = false;
@@ -101,6 +106,7 @@ class LuloViewer extends Component {
     this.setViewerToSlide = this.setViewerToSlide.bind(this);
     this.updateSliderPos = this.updateSliderPos.bind(this);
     this.updateZoomController = this.updateZoomController.bind(this);
+    this.saveSlidePosition = this.saveSlidePosition.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
@@ -118,11 +124,13 @@ class LuloViewer extends Component {
       this.state.showSlider,
       this.constants.SLIDER_SIZE
     );
+    this.updateZoomControllerTransform();
 
     setTimeout(() => {
       const mainDivRect = this.mainDiv.getBoundingClientRect();
       const slidesRect = this.slides.getBoundingClientRect();
       this.setState({ slidesRect, mainDivRect });
+      this.updateZoomControllerTransform();
     }, 1000);
 
     console.log('dobijo', slidesRect, mainDivRect);
@@ -172,28 +180,16 @@ class LuloViewer extends Component {
 
   updateImageFromZoomController(e, startingZoomPos, startingClick) {
     const activeSlide = this.getActiveSlide();
-    const zoomFactor = activeSlide ? activeSlide.state.zoomFactor : 0;
     const activeSlideWidth = activeSlide ? activeSlide.state.width : 0;
     const activeSlideHeight = activeSlide ? activeSlide.state.height : 0;
-    const controllerPositionX =
-      this.state.slidesRect.width * this.constants.ZOOM_CONTROLLER_POSITION_X +
-      (this.state.slidesRect.left - this.state.mainDivRect.left);
-    const controllerPositionY =
-      this.state.slidesRect.height * this.constants.ZOOM_CONTROLLER_POSITION_Y +
-      (this.state.slidesRect.top - this.state.mainDivRect.top);
-    const zoomControllerWidth =
-      this.state.slidesRect.width * this.constants.ZOOM_CONTROLLER_SIZE;
-    const zoomControllerHeight =
-      this.state.slidesRect.height * this.constants.ZOOM_CONTROLLER_SIZE;
+
     console.log(
       e.clientX,
-      controllerPositionX,
-      controllerPositionY,
+      this.zoomControllerTransform.x,
+      this.zoomControllerTransform.y,
       startingZoomPos,
       startingClick
     );
-
-    // const newImageLeft
 
     const delta = {
       x: e.clientX - startingClick.x,
@@ -205,57 +201,34 @@ class LuloViewer extends Component {
       y: startingZoomPos.y + delta.y
     };
 
+    const newLeft =
+      -1 *
+      (newViewRectPos.x / this.zoomControllerTransform.width) *
+      activeSlideWidth;
+    const newTop =
+      -1 *
+      (newViewRectPos.y / this.zoomControllerTransform.height) *
+      activeSlideHeight;
     console.log('delta', delta);
 
+    const zoomTarget = updateZoomTarget(
+      newLeft,
+      newTop,
+      activeSlideWidth,
+      activeSlideHeight,
+      this.state.slidesRect.width,
+      this.state.slidesRect.width
+    );
+
     const newState = {
-      left:
-        -1 *
-        (newViewRectPos.x / zoomControllerWidth) *
-        activeSlideWidth,
-      top:
-        -1 *
-        (newViewRectPos.y / zoomControllerHeight) *
-        activeSlideHeight
+      left: newLeft,
+      top: newTop,
+      zoomTarget
     };
     activeSlide.setState(newState, () => {
       this.updateZoomController();
     });
-    // this.setState(newState)
   }
-
-  // calculateSlidesDivFromMainDiv(mainDivRect) {
-  //   const slidesRect = Object.assign({}, mainDivRect);
-
-  //   const slidesWidth =
-  //     ['left', 'right'].includes(this.state.sliderPosition) &&
-  //     this.state.showSlider
-  //       ? mainDivRect.width * (1 - this.constants.SLIDER_SIZE)
-  //       : mainDivRect.width;
-
-  //   const slidesHeight =
-  //     ['top', 'bottom'].includes(this.state.sliderPosition) &&
-  //     this.state.showSlider
-  //       ? mainDivRect.height * (1 - this.constants.SLIDER_SIZE)
-  //       : mainDivRect.height;
-
-  //   let offsetLeft = 0;
-  //   let offsetTop = 0;
-  //   if (this.state.sliderPosition === 'left' && this.state.showSlider)
-  //     offsetLeft = mainDivRect.width * this.constants.SLIDER_SIZE;
-  //   if (this.state.sliderPosition === 'top' && this.state.showSlider)
-  //     offsetTop = mainDivRect.height * this.constants.SLIDER_SIZE;
-
-  //   slidesRect.width = slidesWidth;
-  //   slidesRect.height = slidesHeight;
-  //   slidesRect.left = mainDivRect.left + offsetLeft;
-  //   slidesRect.top = mainDivRect.top + offsetTop;
-  //   slidesRect.x = mainDivRect.x + offsetLeft;
-  //   slidesRect.y = mainDivRect.y + offsetTop;
-  //   slidesRect.right = slidesRect.width + slidesRect.left;
-  //   slidesRect.bottom = slidesRect.height + slidesRect.top;
-
-  //   return slidesRect;
-  // }
 
   componentWillUnmount() {
     console.log('#######  unmounting  ######');
@@ -265,6 +238,21 @@ class LuloViewer extends Component {
     );
     window.removeEventListener('resize', this.onWindowResize);
     document.removeEventListener('keydown', this.onKeyDown, false);
+  }
+
+  updateZoomControllerTransform() {
+    this.zoomControllerTransform = {
+      left:
+        this.state.slidesRect.width *
+          this.constants.ZOOM_CONTROLLER_POSITION_X +
+        (this.state.slidesRect.left - this.state.mainDivRect.left),
+      top:
+        this.state.slidesRect.height *
+          this.constants.ZOOM_CONTROLLER_POSITION_Y +
+        (this.state.slidesRect.top - this.state.mainDivRect.top),
+      width: this.state.slidesRect.width * this.constants.ZOOM_CONTROLLER_SIZE,
+      height: this.state.slidesRect.height * this.constants.ZOOM_CONTROLLER_SIZE
+    };
   }
 
   onWindowResize() {
@@ -278,6 +266,8 @@ class LuloViewer extends Component {
       this.state.showSlider,
       this.constants.SLIDER_SIZE
     );
+
+    this.updateZoomControllerTransform();
 
     let slideALeft = 0;
     let slideBLeft = 0;
@@ -363,13 +353,6 @@ class LuloViewer extends Component {
         });
       }
     }
-    // const slides = {
-    //   A: this.slideA,
-    //   B: this.slideB,
-    //   C: this.slideC
-    // };
-    // const activeSlide = slides[this.state.activeSlide];
-    // if (activeSlide) activeSlide.handleMouseDown(e);
   }
 
   onMouseUp(e) {
@@ -523,34 +506,20 @@ class LuloViewer extends Component {
   }
 
   saveSlidePosition() {
-    const { imagesInfo } = this.state;
+    console.log('saving slide');
+
+    const activeSlide = this.getActiveSlide();
+    const imagesInfo = JSON.parse(JSON.stringify(this.state.imagesInfo));
     const imageInfo = JSON.parse(
       JSON.stringify(imagesInfo[this.state.currentSlideIndex])
     );
-    switch (this.state.activeSlide) {
-      case 'A':
-        if (imageInfo && this.slideA) {
-          imageInfo.zoomLevel = this.slideA.state.zoomLevel;
-          imageInfo.zoomTarget = this.slideA.state.zoomTarget;
-          imagesInfo[this.state.currentSlideIndex] = imageInfo;
-        }
-        break;
-      case 'B':
-        if (imageInfo && this.slideB) {
-          imageInfo.zoomLevel = this.slideB.state.zoomLevel;
-          imageInfo.zoomTarget = this.slideB.state.zoomTarget;
-          imagesInfo[this.state.currentSlideIndex] = imageInfo;
-        }
-        break;
-      case 'C':
-        if (imageInfo && this.slideC) {
-          imageInfo.zoomLevel = this.slideC.state.zoomLevel;
-          imageInfo.zoomTarget = this.slideC.state.zoomTarget;
-          imagesInfo[this.state.currentSlideIndex] = imageInfo;
-        }
-        break;
-      default:
+
+    if (activeSlide && imageInfo) {
+      imageInfo.zoomLevel = activeSlide.state.zoomLevel;
+      imageInfo.zoomTarget = activeSlide.state.zoomTarget;
+      imagesInfo[this.state.currentSlideIndex] = imageInfo;
     }
+    this.setState({ imagesInfo });
   }
 
   changeSlide(amount) {
@@ -736,7 +705,6 @@ class LuloViewer extends Component {
       },
       () => {
         this.updateZoomController();
-        this.setState({});
       }
     );
     this.checkPreload();
@@ -906,25 +874,17 @@ class LuloViewer extends Component {
             this.zoomController = el;
           }}
           style={{
-            left:
-              this.state.slidesRect.width *
-                this.constants.ZOOM_CONTROLLER_POSITION_X +
-              (this.state.slidesRect.left - this.state.mainDivRect.left),
-            top:
-              this.state.slidesRect.height *
-                this.constants.ZOOM_CONTROLLER_POSITION_Y +
-              (this.state.slidesRect.top - this.state.mainDivRect.top),
-            width:
-              this.state.slidesRect.width * this.constants.ZOOM_CONTROLLER_SIZE,
-            height:
-              this.state.slidesRect.height *
-              this.constants.ZOOM_CONTROLLER_SIZE,
+            left: this.zoomControllerTransform.left,
+            top: this.zoomControllerTransform.top,
+            width: this.zoomControllerTransform.width,
+            height: this.zoomControllerTransform.height,
             backgroundImage: `url('${
               this.props.imageUrls[this.state.currentSlideIndex]
             }')`
           }}
           // offsetX={}
           updateImageFromZoomController={this.updateImageFromZoomController}
+          saveSlidePosition={this.saveSlidePosition}
         />
       ) : null;
 

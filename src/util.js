@@ -10,6 +10,8 @@ const updateZoomTarget = (
 ) => {
   const zoomTargetX = (-1 * imageLeft + boundingRectWidth / 2) / imageWidth;
   const zoomTargetY = (-1 * imageTop + boundingRectHeight / 2) / imageHeight;
+  console.log(('new zoom target', { x: zoomTargetX, y: zoomTargetY }));
+
   return { x: zoomTargetX, y: zoomTargetY };
 };
 

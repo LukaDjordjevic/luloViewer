@@ -28,13 +28,14 @@ class ZoomController extends PureComponent {
   }
 
   onMouseUp(e) {
-    console.log('slides strip mouse up');
+    console.log('view rect mouse up');
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
+    // this.props.saveSlidePosition();
   }
 
   onMouseMove(e) {
-    console.log(e.screenY, e.clientY, e.pageY, this.props.style.top);
+    // console.log(e.screenY, e.clientY, e.pageY, this.props.style.top);
 
     e.preventDefault();
     // const newPosition = {
