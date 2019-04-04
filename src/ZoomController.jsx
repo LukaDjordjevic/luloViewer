@@ -21,55 +21,37 @@ class ZoomController extends PureComponent {
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
     this.startingClick = { x: e.clientX, y: e.clientY };
-    this.startingSliderPosition = {
+    this.startingZoomControllerPos = {
       x: this.state.viewRectangleLeft,
       y: this.state.viewRectangleTop
     };
-    // this.dragging = false;
-    // console.log(this.startingClick);
   }
 
   onMouseUp(e) {
     console.log('slides strip mouse up');
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
-
-    // e.stopPropagation();
   }
 
   onMouseMove(e) {
+    console.log(e.screenY, e.clientY, e.pageY, this.props.style.top);
+
     e.preventDefault();
-    console.log(
-      'ratio',
-      this.props.zoomControllerRatio,
-      'image factor',
-      this.props.imageZoomFactor
-    );
-
-    // console.log('slider mouse move');
-    // this.dragging = true;
-    console.log(
-      e.clientX - this.startingClick.x + this.startingSliderPosition.x
-    );
+    // const newPosition = {
+    //   left: e.clientX - this.startingZoomControllerPos.x,
+    //   top: e.clientY - this.startingZoomControllerPos.y
+    // };
     const newPosition = {
-      left:
-        (e.clientX - this.startingClick.x + this.startingSliderPosition.x) *
-        -1 *
-        this.props.zoomControllerRatio, // *
-      // this.props.imageZoomFactor,
-      top:
-        (e.clientY - this.startingClick.y + this.startingSliderPosition.y) *
-        -1 *
-        this.props.zoomControllerRatio // *
-      // this.props.imageZoomFactor
+      left: e.clientX,
+      top: e.clientY
     };
+    this.props.updateImageFromZoomController(
+      e,
+      this.startingZoomControllerPos,
+      this.startingClick
+    );
 
-    this.props.updateImageFromZoomController({
-      left: newPosition.left,
-      top: newPosition.top
-    });
-
-    console.log(newPosition);
+    // console.log(newPosition);
   }
 
   updateViewRectangle(newState) {

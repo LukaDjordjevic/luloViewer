@@ -30,7 +30,7 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SLIDER_POSITION: 'bottom',
+      SLIDER_POSITION: 'top',
       SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 5, // in percent of slider div
       ARROWS_PADDING: 5,
@@ -170,12 +170,52 @@ class LuloViewer extends Component {
     return slides[this.state.activeSlide];
   }
 
-  updateImageFromZoomController(imageTranslationDelta) {
+  updateImageFromZoomController(e, startingZoomPos, startingClick) {
     const activeSlide = this.getActiveSlide();
     const zoomFactor = activeSlide ? activeSlide.state.zoomFactor : 0;
+    const activeSlideWidth = activeSlide ? activeSlide.state.width : 0;
+    const activeSlideHeight = activeSlide ? activeSlide.state.height : 0;
+    const controllerPositionX =
+      this.state.slidesRect.width * this.constants.ZOOM_CONTROLLER_POSITION_X +
+      (this.state.slidesRect.left - this.state.mainDivRect.left);
+    const controllerPositionY =
+      this.state.slidesRect.height * this.constants.ZOOM_CONTROLLER_POSITION_Y +
+      (this.state.slidesRect.top - this.state.mainDivRect.top);
+    const zoomControllerWidth =
+      this.state.slidesRect.width * this.constants.ZOOM_CONTROLLER_SIZE;
+    const zoomControllerHeight =
+      this.state.slidesRect.height * this.constants.ZOOM_CONTROLLER_SIZE;
+    console.log(
+      e.clientX,
+      controllerPositionX,
+      controllerPositionY,
+      startingZoomPos,
+      startingClick
+    );
+
+    // const newImageLeft
+
+    const delta = {
+      x: e.clientX - startingClick.x,
+      y: e.clientY - startingClick.y
+    };
+
+    const newViewRectPos = {
+      x: startingZoomPos.x + delta.x,
+      y: startingZoomPos.y + delta.y
+    };
+
+    console.log('delta', delta);
+
     const newState = {
-      left: imageTranslationDelta.left * zoomFactor,
-      top: imageTranslationDelta.top * zoomFactor
+      left:
+        -1 *
+        (newViewRectPos.x / zoomControllerWidth) *
+        activeSlideWidth,
+      top:
+        -1 *
+        (newViewRectPos.y / zoomControllerHeight) *
+        activeSlideHeight
     };
     activeSlide.setState(newState, () => {
       this.updateZoomController();
@@ -827,8 +867,8 @@ class LuloViewer extends Component {
       this.state.slidesRect ? this.state.slidesRect.height / 2 : 0
     );
 
-    const activeSlide = this.getActiveSlide();
-    console.log('active slide', this.state.activeSlide, activeSlide);
+    // const activeSlide = this.getActiveSlide();
+    // console.log('active slide', this.state.activeSlide, activeSlide);
 
     //*******************************************
     //****************** arrows *****************
@@ -883,8 +923,7 @@ class LuloViewer extends Component {
               this.props.imageUrls[this.state.currentSlideIndex]
             }')`
           }}
-          imageZoomFactor={activeSlide ? activeSlide.state.zoomFactor : 0}
-          zoomControllerRatio={1 / this.constants.ZOOM_CONTROLLER_SIZE}
+          // offsetX={}
           updateImageFromZoomController={this.updateImageFromZoomController}
         />
       ) : null;
