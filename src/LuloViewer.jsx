@@ -4,7 +4,11 @@ import ZoomController from './ZoomController';
 import Slider from './Slider';
 import Arrows from './Arrows';
 import Menu from './Menu';
-import { calculateSlidesDivFromMainDiv, updateZoomTarget } from './util';
+import {
+  calculateSlidesDivFromMainDiv,
+  updateZoomTarget,
+  constrainTranslate
+} from './util';
 
 import {
   getViewRectangleTransform,
@@ -30,7 +34,7 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SHOW_SLIDER_ARROWS: true,
+      SHOW_SLIDER_ARROWS: false,
       SLIDER_POSITION: 'top',
       SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 5, // in percent of slider div
@@ -187,6 +191,7 @@ class LuloViewer extends Component {
     const imageTop = activeSlide ? activeSlide.state.top : 0;
     const imageWidth = activeSlide ? activeSlide.state.width : 0;
     const imageHeight = activeSlide ? activeSlide.state.height : 0;
+    const zoomFactor = activeSlide ? activeSlide.state.zoomFactor : 0;
 
     const factor = imageWidth / this.zoomControllerTransform.width;
     const newLeft = imageLeft - moveDelta.x * factor;
@@ -201,9 +206,20 @@ class LuloViewer extends Component {
       this.state.slidesRect.width
     );
 
+    const { constrainedLeft, constrainedTop } = constrainTranslate(
+      newLeft,
+      newTop,
+      zoomFactor,
+      this.state.slidesRect,
+      this.state.imagesInfo[this.state.currentSlideIndex].imageAspectRatio,
+      this.state.slidesRect.width / this.state.slidesRect.height
+    );
+
     const newState = {
-      left: newLeft,
-      top: newTop,
+      left: constrainedLeft,
+      top: constrainedTop,
+      // left: newLeft,
+      // top: newTop,
       zoomTarget
     };
     activeSlide.setState(newState, () => {
