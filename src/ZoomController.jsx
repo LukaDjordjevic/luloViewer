@@ -21,42 +21,24 @@ class ZoomController extends PureComponent {
     console.log('view rect onMouseDown', e.clientX, e.pageX, e.screenX);
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
-    this.startingClick = { x: e.clientX, y: e.clientY };
-    this.startingZoomControllerPos = {
-      x: this.state.viewRectangleLeft,
-      y: this.state.viewRectangleTop
-    };
+    this.lastMovePos = { x: e.clientX, y: e.clientY };
   }
 
   onMouseUp(e) {
     console.log('view rect mouse up');
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
-    // this.props.saveSlidePosition();
   }
 
   onMouseMove(e) {
-    // console.log(e.screenY, e.clientY, e.pageY, this.props.style.top);
     const moveDelta = {
       x: e.clientX - this.lastMovePos.x,
       y: e.clientY - this.lastMovePos.y
     };
     e.preventDefault();
-    // const newPosition = {
-    //   left: e.clientX - this.startingZoomControllerPos.x,
-    //   top: e.clientY - this.startingZoomControllerPos.y
-    // };
-    const newPosition = {
-      left: e.clientX,
-      top: e.clientY
-    };
-    this.props.updateImageFromZoomController(
-      e,
-      this.startingZoomControllerPos,
-      this.startingClick
-    );
+
+    this.props.updateImageFromZoomController(moveDelta);
     this.lastMovePos = { x: e.clientX, y: e.clientY };
-    // console.log(newPosition);
   }
 
   updateViewRectangle(newState) {
