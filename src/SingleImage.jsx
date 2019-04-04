@@ -26,10 +26,6 @@ class SingleImage extends PureComponent {
       zoomTarget: this.props.imageInfo.zoomTarget || { x: 0.5, y: 0.5 }
     };
 
-    this.containerAspectRatio =
-      this.props.parentBoundingRect.width /
-      this.props.parentBoundingRect.height;
-
     // const parentBoundingRect = { ...this.props.parentBoundingRect };
     const parentBoundingRect = {
       left: this.props.parentBoundingRect.left,
@@ -39,13 +35,11 @@ class SingleImage extends PureComponent {
     };
 
     const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-    const containerAspectRatio = this.containerAspectRatio;
     const { left, top, width, height } = getImageTransform(
       this.state.zoomFactor,
       this.state.zoomTarget,
       parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
+      imageAspectRatio
     );
 
     const { constrainedLeft, constrainedTop } = constrainTranslate(
@@ -53,8 +47,7 @@ class SingleImage extends PureComponent {
       top,
       this.state.zoomFactor,
       parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
+      imageAspectRatio
     );
 
     this.state.left = constrainedLeft;
@@ -76,10 +69,6 @@ class SingleImage extends PureComponent {
       JSON.stringify(nextProps.parentBoundingRect)
     );
     const imageAspectRatio = nextProps.imageInfo.imageAspectRatio;
-    const containerAspectRatio =
-      nextProps.parentBoundingRect.width / nextProps.parentBoundingRect.height;
-
-    this.containerAspectRatio = containerAspectRatio;
 
     // Window resize or toggling fullscreen
     if (
@@ -93,8 +82,7 @@ class SingleImage extends PureComponent {
         zoomFactor,
         zoomTarget,
         parentBoundingRect,
-        imageAspectRatio,
-        containerAspectRatio
+        imageAspectRatio
       );
 
       const { constrainedLeft, constrainedTop } = constrainTranslate(
@@ -102,8 +90,7 @@ class SingleImage extends PureComponent {
         top,
         zoomFactor,
         parentBoundingRect,
-        imageAspectRatio,
-        containerAspectRatio
+        imageAspectRatio
       );
 
       left = constrainedLeft;
@@ -120,8 +107,7 @@ class SingleImage extends PureComponent {
         nextProps.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] || 1,
         nextProps.imageInfo.zoomTarget || { x: 0.5, y: 0.5 },
         parentBoundingRect,
-        imageAspectRatio,
-        containerAspectRatio
+        imageAspectRatio
       );
 
       const { constrainedLeft, constrainedTop } = constrainTranslate(
@@ -129,8 +115,7 @@ class SingleImage extends PureComponent {
         top,
         nextProps.imageInfo.zoomMultipliers[nextProps.imageInfo.zoomLevel] || 1,
         parentBoundingRect,
-        imageAspectRatio,
-        containerAspectRatio
+        imageAspectRatio
       );
 
       this.setState({
@@ -180,7 +165,6 @@ class SingleImage extends PureComponent {
 
     const zoomFactor = this.state.zoomFactor;
     const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-    const containerAspectRatio = this.containerAspectRatio;
     const parentBoundingRect = JSON.parse(
       JSON.stringify(this.props.parentBoundingRect)
     );
@@ -204,8 +188,7 @@ class SingleImage extends PureComponent {
       newTop,
       zoomFactor,
       parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
+      imageAspectRatio
     );
 
     this.setState(
@@ -242,7 +225,6 @@ class SingleImage extends PureComponent {
       JSON.stringify(this.props.parentBoundingRect)
     );
     const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-    const containerAspectRatio = this.containerAspectRatio;
     const eventPosition = { x: e.clientX, y: e.clientY };
 
     const imgLeft = this.state.left;
@@ -255,7 +237,6 @@ class SingleImage extends PureComponent {
       oldZoomFactor,
       parentBoundingRect,
       imageAspectRatio,
-      containerAspectRatio,
       eventPosition
     );
 
@@ -292,8 +273,7 @@ class SingleImage extends PureComponent {
       top,
       newZoomFactor,
       parentBoundingRect,
-      imageAspectRatio,
-      containerAspectRatio
+      imageAspectRatio
     );
 
     this.setState(

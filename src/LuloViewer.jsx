@@ -193,7 +193,11 @@ class LuloViewer extends Component {
     const imageHeight = activeSlide ? activeSlide.state.height : 0;
     const zoomFactor = activeSlide ? activeSlide.state.zoomFactor : 0;
 
-    const factor = imageWidth / this.zoomControllerTransform.width;
+    const factor =
+      this.state.slidesRect.width / this.state.slidesRect.height >
+      this.state.imagesInfo[this.state.currentSlideIndex].imageAspectRatio
+        ? imageHeight / this.zoomControllerTransform.height
+        : imageWidth / this.zoomControllerTransform.width;
     const newLeft = imageLeft - moveDelta.x * factor;
     const newTop = imageTop - moveDelta.y * factor;
 
@@ -203,7 +207,7 @@ class LuloViewer extends Component {
       imageWidth,
       imageHeight,
       this.state.slidesRect.width,
-      this.state.slidesRect.width
+      this.state.slidesRect.height
     );
 
     const { constrainedLeft, constrainedTop } = constrainTranslate(
@@ -211,15 +215,23 @@ class LuloViewer extends Component {
       newTop,
       zoomFactor,
       this.state.slidesRect,
-      this.state.imagesInfo[this.state.currentSlideIndex].imageAspectRatio,
-      this.state.slidesRect.width / this.state.slidesRect.height
+      this.state.imagesInfo[this.state.currentSlideIndex].imageAspectRatio
     );
 
+    // const zoomTarget = updateZoomTarget(
+    //   constrainedLeft,
+    //   constrainedTop,
+    //   imageWidth,
+    //   imageHeight,
+    //   this.state.slidesRect.width,
+    //   this.state.slidesRect.width
+    // );
+
     const newState = {
-      left: constrainedLeft,
-      top: constrainedTop,
-      // left: newLeft,
-      // top: newTop,
+      // left: constrainedLeft,
+      // top: constrainedTop,
+      left: newLeft,
+      top: newTop,
       zoomTarget
     };
     activeSlide.setState(newState, () => {

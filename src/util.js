@@ -23,9 +23,10 @@ const getNewZoomTransform = (
   oldZoomFactor,
   parentBoundingRect,
   imageAspectRatio,
-  containerAspectRatio,
   eventPosition
 ) => {
+  const containerAspectRatio =
+    parentBoundingRect.width / parentBoundingRect.height;
   let width;
   let height;
   let oldWidth;
@@ -66,9 +67,10 @@ const getImageTransform = (
   zoomFactor,
   zoomTarget,
   parentBoundingRect,
-  imageAspectRatio,
-  containerAspectRatio
+  imageAspectRatio
 ) => {
+  const containerAspectRatio =
+    parentBoundingRect.width / parentBoundingRect.height;
   const { width, height } = getImageDimensions(
     zoomFactor,
     parentBoundingRect,
@@ -107,9 +109,10 @@ const constrainTranslate = (
   top,
   zoomFactor,
   parentBoundingRect,
-  imageAspectRatio,
-  containerAspectRatio
+  imageAspectRatio
 ) => {
+  const containerAspectRatio =
+    parentBoundingRect.width / parentBoundingRect.height;
   let constrainedLeft = left;
   let constrainedTop = top;
   let leftOffset = 0;
