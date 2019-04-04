@@ -43,6 +43,7 @@ class ZoomController extends PureComponent {
 
   onWheel(e) {
     e.stopPropagation();
+    e.preventDefault();
   }
 
   updateViewRectangle(newState) {

@@ -30,6 +30,7 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
+      SHOW_SLIDER_ARROWS: true,
       SLIDER_POSITION: 'top',
       SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 5, // in percent of slider div
@@ -1075,6 +1076,7 @@ class LuloViewer extends Component {
           left={left}
           top={top}
           updateSliderPos={this.updateSliderPos}
+          showArrows={this.constants.SHOW_SLIDER_ARROWS}
         />
       </div>
     );

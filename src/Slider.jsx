@@ -115,25 +115,19 @@ class Slider extends PureComponent {
   }
 
   calculateLayoutDimensions() {
-    this.arrowWidth = this.props.isHorizontal
-      ? this.props.sliderArrowSize
-      : 100;
-    this.arrowHeight = this.props.isHorizontal
-      ? 100
-      : this.props.sliderArrowSize;
-    this.contentWidth = this.props.isHorizontal
-      ? 100 - this.props.sliderArrowSize * 2
-      : 100;
-    this.contentHeight = this.props.isHorizontal
-      ? 100
-      : 100 - this.props.sliderArrowSize * 2;
+    const arrowSize = this.props.showArrows ? this.props.sliderArrowSize : 0;
+
+    this.arrowWidth = this.props.isHorizontal ? arrowSize : 100;
+    this.arrowHeight = this.props.isHorizontal ? 100 : arrowSize;
+    this.contentWidth = this.props.isHorizontal ? 100 - arrowSize * 2 : 100;
+    this.contentHeight = this.props.isHorizontal ? 100 : 100 - arrowSize * 2;
   }
 
   render() {
     const startIconName = this.props.isHorizontal ? 'arrow-left' : 'arrow-up';
     const endIconName = this.props.isHorizontal ? 'arrow-right' : 'arrow-down';
     this.calculateLayoutDimensions();
-    const start = (
+    const start = this.props.showArrows ? (
       <div
         className="slider-arrow"
         style={{
@@ -149,7 +143,7 @@ class Slider extends PureComponent {
           color={this.state.startArrowColor}
         />
       </div>
-    );
+    ) : null;
 
     const slides = this.props.images.map((imgUrl, idx) => (
       <SingleSlide
@@ -167,12 +161,8 @@ class Slider extends PureComponent {
       <div
         className="slider-content"
         style={{
-          width: this.props.isHorizontal
-            ? `${100 - 2 * this.props.sliderArrowSize}%`
-            : `${this.contentWidth}%`,
-          height: this.props.isHorizontal
-            ? `${this.contentHeight}%`
-            : `${100 - 2 * this.props.sliderArrowSize}%`
+          width: `${this.contentWidth}%`,
+          height: `${this.contentHeight}%`
         }}
       >
         <div
@@ -197,7 +187,7 @@ class Slider extends PureComponent {
       </div>
     );
 
-    const end = (
+    const end = this.props.showArrows ? (
       <div
         className="slider-arrow"
         style={{
@@ -213,7 +203,7 @@ class Slider extends PureComponent {
           color={this.state.endArrowColor}
         />
       </div>
-    );
+    ) : null;
 
     return (
       <div
