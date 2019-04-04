@@ -12,6 +12,7 @@ class ZoomController extends PureComponent {
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
+    this.lastMovePos = { x: 0, y: 0 };
   }
 
   onMouseDown(e) {
@@ -36,7 +37,10 @@ class ZoomController extends PureComponent {
 
   onMouseMove(e) {
     // console.log(e.screenY, e.clientY, e.pageY, this.props.style.top);
-
+    const moveDelta = {
+      x: e.clientX - this.lastMovePos.x,
+      y: e.clientY - this.lastMovePos.y
+    };
     e.preventDefault();
     // const newPosition = {
     //   left: e.clientX - this.startingZoomControllerPos.x,
@@ -51,7 +55,7 @@ class ZoomController extends PureComponent {
       this.startingZoomControllerPos,
       this.startingClick
     );
-
+    this.lastMovePos = { x: e.clientX, y: e.clientY };
     // console.log(newPosition);
   }
 
