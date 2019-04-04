@@ -17,6 +17,7 @@ class Slider extends PureComponent {
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
+    this.onWheel = this.onWheel.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -33,6 +34,15 @@ class Slider extends PureComponent {
 
     e.preventDefault();
     e.stopPropagation();
+    const factor = 1;
+    const left = this.state.left - e.deltaX / factor;
+    const top = this.state.top - e.deltaY / factor;
+    if (this.props.isHorizontal) {
+      this.setState({ left });
+    } else {
+      this.setState({ top });
+    }
+    this.props.updateSliderPos({ left, top });
   }
 
   onMouseDown(e) {

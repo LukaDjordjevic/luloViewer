@@ -186,7 +186,6 @@ class LuloViewer extends Component {
     const imageTop = activeSlide ? activeSlide.state.top : 0;
     const imageWidth = activeSlide ? activeSlide.state.width : 0;
     const imageHeight = activeSlide ? activeSlide.state.height : 0;
-    const zoomFactor = activeSlide ? activeSlide.state.zoomFactor : 0;
 
     const factor = imageWidth / this.zoomControllerTransform.width;
     const newLeft = imageLeft - moveDelta.x * factor;
@@ -250,7 +249,7 @@ class LuloViewer extends Component {
       left,
       top,
       width,
-      height,
+      height
       // offsetX,
       // offsetY
     };
@@ -891,9 +890,7 @@ class LuloViewer extends Component {
               this.props.imageUrls[this.state.currentSlideIndex]
             }')`
           }}
-          // offsetX={}
           updateImageFromZoomController={this.updateImageFromZoomController}
-          saveSlidePosition={this.saveSlidePosition}
         />
       ) : null;
 

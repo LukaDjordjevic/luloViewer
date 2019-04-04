@@ -41,6 +41,10 @@ class ZoomController extends PureComponent {
     this.lastMovePos = { x: e.clientX, y: e.clientY };
   }
 
+  onWheel(e) {
+    e.stopPropagation();
+  }
+
   updateViewRectangle(newState) {
     this.setState({
       viewRectangleLeft: newState.left,
@@ -63,7 +67,11 @@ class ZoomController extends PureComponent {
     if (viewRectangleHeight > this.props.style.height)
       viewRectangleHeight = Math.floor(this.props.style.height);
     return (
-      <div className="zoom-controller" style={this.props.style}>
+      <div
+        className="zoom-controller"
+        style={this.props.style}
+        onWheel={this.onWheel}
+      >
         <div className="zoom-controller-bgd" />
         <div
           className="view-rectangle"
