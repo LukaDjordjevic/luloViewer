@@ -216,3 +216,7 @@
 img {
   position: relative;
 }
+
+body {
+  touch-action: none;
+}

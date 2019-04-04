@@ -7,10 +7,7 @@ import Menu from './Menu';
 import {
   calculateSlidesDivFromMainDiv,
   updateZoomTarget,
-  constrainTranslate
-} from './util';
-
-import {
+  constrainTranslate,
   getViewRectangleTransform,
   createSlideAnimationKeyframes
 } from './util';
@@ -25,8 +22,8 @@ class LuloViewer extends Component {
       SWIPE_THRESHOLD: 20,
       SLIDE_TRANSITION_DURATION: 0.3,
       SLIDE_TRANSITION_TIMEOUT: 600,
-      // BACKGROUND_COLOR: 'black',
-      BACKGROUND_COLOR: 'darkslategray',
+      BACKGROUND_COLOR: 'black',
+      // BACKGROUND_COLOR: 'darkslategray',
       SHOW_ARROWS: true,
       ALLOW_MENU: true,
       ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
@@ -37,7 +34,7 @@ class LuloViewer extends Component {
       SHOW_SLIDER_ARROWS: true,
       SLIDER_POSITION: 'bottom',
       SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
-      SLIDER_ARROW_SIZE: 5, // in percent of slider div
+      SLIDER_ARROW_SIZE: 3, // in percent of slider div
       ARROWS_PADDING: 5,
       SHOW_ZOOM_CONTROLLER: true,
       ZOOM_CONTROLLER_SIZE: 0.18, // width of zoomController as fraction of viewer width
@@ -112,8 +109,19 @@ class LuloViewer extends Component {
     this.updateSliderPos = this.updateSliderPos.bind(this);
     this.updateZoomController = this.updateZoomController.bind(this);
     this.saveSlidePosition = this.saveSlidePosition.bind(this);
+    // this.onTouchStart = this.onTouchStart.bind(this);
+    // this.onTouchMove = this.onTouchMove.bind(this);
+    // this.onTouchEnd = this.onTouchEnd.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
+
+  // onTouchStart(e) {
+  //   e.preventDefault();
+  // }
+
+  // onTouchMove(e) {
+  //   e.preventDefault();
+  // }
 
   componentDidMount() {
     window.oncontextmenu = e => {
@@ -131,14 +139,14 @@ class LuloViewer extends Component {
     );
     this.updateZoomControllerTransform(mainDivRect, slidesRect);
 
-    setTimeout(() => {
-      // const mainDivRect = this.mainDiv.getBoundingClientRect();
-      // const slidesRect = this.slides.getBoundingClientRect();
-      // this.setState({ slidesRect, mainDivRect }, () => {
-      //   this.updateZoomControllerTransform();
-      // });
-      this.onWindowResize();
-    }, 1000);
+    // setTimeout(() => {
+    //   // const mainDivRect = this.mainDiv.getBoundingClientRect();
+    //   // const slidesRect = this.slides.getBoundingClientRect();
+    //   // this.setState({ slidesRect, mainDivRect }, () => {
+    //   //   this.updateZoomControllerTransform();
+    //   // });
+    //   this.onWindowResize();
+    // }, 1000);
 
     console.log('dobijo', slidesRect, mainDivRect);
 
@@ -399,7 +407,7 @@ class LuloViewer extends Component {
   }
 
   onWheel(e) {
-    console.log('on wheel', e.deltaX, e.deltaY, e.ctrlKey);
+    console.log('main onwheel', e.deltaX, e.deltaY, e.ctrlKey, e.button);
 
     e.preventDefault();
     e.stopPropagation();

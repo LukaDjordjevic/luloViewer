@@ -39,16 +39,16 @@ class App extends Component {
     return (
       <div
         style={{
-          // width: '300px',
-          // height: '300px',
+          width: '300px',
+          height: '300px',
           // height: '80%',
           // height: '80%',
           // width: '90%',
           // height: '90%',
           // width: '80px',
           // height: '80px',
-          width: '100vw',
-          height: '100vh',
+          // width: '100vw',
+          // height: '100vh',
           backgroundColor: '#000',
           top: '20px',
           // left: '50px',

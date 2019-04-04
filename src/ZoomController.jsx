@@ -51,6 +51,7 @@ class ZoomController extends PureComponent {
   }
 
   onWheel(e) {
+    console.log('zoomController on wheel');
     e.stopPropagation();
     e.preventDefault();
   }
