@@ -22,12 +22,21 @@ class ZoomController extends PureComponent {
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
     this.lastMovePos = { x: e.clientX, y: e.clientY };
+
+    // this.zoomController.requestPointerLock =
+    //   this.zoomController.requestPointerLock ||
+    //   this.zoomController.mozRequestPointerLock;
+    // this.zoomController.requestPointerLock();
   }
 
   onMouseUp(e) {
     console.log('view rect mouse up');
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
+
+    // document.exitPointerLock =
+    //   document.exitPointerLock || document.mozExitPointerLock;
+    // document.exitPointerLock();
   }
 
   onMouseMove(e) {
@@ -72,6 +81,7 @@ class ZoomController extends PureComponent {
         className="zoom-controller"
         style={this.props.style}
         onWheel={this.onWheel}
+        ref={el => (this.zoomController = el)}
       >
         <div className="zoom-controller-bgd" />
         <div

@@ -25,8 +25,8 @@ class LuloViewer extends Component {
       SWIPE_THRESHOLD: 20,
       SLIDE_TRANSITION_DURATION: 0.3,
       SLIDE_TRANSITION_TIMEOUT: 600,
-      BACKGROUND_COLOR: 'black',
-      // BACKGROUND_COLOR: 'darkslategray',
+      // BACKGROUND_COLOR: 'black',
+      BACKGROUND_COLOR: 'darkslategray',
       SHOW_ARROWS: true,
       ALLOW_MENU: true,
       ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
@@ -34,8 +34,8 @@ class LuloViewer extends Component {
       ARROW_DEFAULT_COLOR: '#CCCCCC',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
-      SHOW_SLIDER_ARROWS: false,
-      SLIDER_POSITION: 'top',
+      SHOW_SLIDER_ARROWS: true,
+      SLIDER_POSITION: 'bottom',
       SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 5, // in percent of slider div
       ARROWS_PADDING: 5,

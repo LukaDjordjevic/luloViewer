@@ -9,8 +9,8 @@ class Slider extends PureComponent {
     this.state = {
       startArrowColor: this.props.arrowDefaultColor,
       endArrowColor: this.props.arrowDefaultColor,
-      left: this.props.left,
-      top: this.props.top
+      left: 0,
+      top: 0
     };
     this.dragging = false;
     this.slideMouseUp = this.slideMouseUp.bind(this);
@@ -30,19 +30,64 @@ class Slider extends PureComponent {
   }
 
   onWheel(e) {
-    console.log('wheel');
+    console.log('slider wheel');
 
     e.preventDefault();
     e.stopPropagation();
     const factor = 1;
+    console.log(this.state.left, e.deltaX, factor);
+
     const left = this.state.left - e.deltaX / factor;
     const top = this.state.top - e.deltaY / factor;
+    console.log('got', left, top);
+
+    const constrainedPos = this.constrainMovement({ left, top });
     if (this.props.isHorizontal) {
-      this.setState({ left });
+      this.setState({ left: constrainedPos.left });
     } else {
-      this.setState({ top });
+      this.setState({ top: constrainedPos.top });
     }
-    this.props.updateSliderPos({ left, top });
+    this.props.updateSliderPos({
+      left: constrainedPos.left,
+      top: constrainedPos.top
+    });
+    console.log(left, top, constrainedPos);
+  }
+
+  constrainMovement(pos) {
+    let left = pos.left;
+    let top = pos.top;
+
+    if (this.props.isHorizontal) {
+      const contentSize =
+        this.props.mainDivRect.width * ((100 - 2 * this.arrowWidth) / 100);
+      if (this.props.slidesStripSize > contentSize) {
+        if (left > 0) left = 0;
+        if (left < contentSize - this.props.slidesStripSize)
+          left = contentSize - this.props.slidesStripSize;
+      } else {
+        if (left > contentSize - this.props.slidesStripSize)
+          left = contentSize - this.props.slidesStripSize;
+        if (left < 0) left = 0;
+      }
+      console.log('contentSize', contentSize);
+    } else {
+      const contentSize =
+        this.props.mainDivRect.height * ((100 - 2 * this.arrowHeight) / 100);
+
+      if (this.props.slidesStripSize > contentSize) {
+        if (top > 0) top = 0;
+        if (top < contentSize - this.props.slidesStripSize)
+          top = contentSize - this.props.slidesStripSize;
+      } else {
+        if (top > contentSize - this.props.slidesStripSize)
+          top = contentSize - this.props.slidesStripSize;
+        if (top < 0) top = 0;
+      }
+    }
+    // if (pos.left > 0) po
+
+    return { left, top };
   }
 
   onMouseDown(e) {
@@ -74,16 +119,19 @@ class Slider extends PureComponent {
       left: e.clientX - this.startingClick.x + this.startingSliderPosition.x,
       top: e.clientY - this.startingClick.y + this.startingSliderPosition.y
     };
+    // console.log('saving pos', newPosition);
+    const constrainedPos = this.constrainMovement({
+      left: newPosition.left,
+      top: newPosition.top
+    });
     if (this.props.isHorizontal) {
       newPosition.top = 0;
-      this.setState({ left: newPosition.left });
+      this.setState({ left: constrainedPos.left });
     } else {
       newPosition.left = 0;
-      this.setState({ top: newPosition.top });
+      this.setState({ top: constrainedPos.top });
     }
-    // console.log('saving pos', newPosition);
-
-    this.props.updateSliderPos(newPosition);
+    this.props.updateSliderPos(constrainedPos);
 
     console.log(newPosition);
   }
