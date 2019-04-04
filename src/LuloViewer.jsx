@@ -228,10 +228,10 @@ class LuloViewer extends Component {
     // );
 
     const newState = {
-      // left: constrainedLeft,
-      // top: constrainedTop,
-      left: newLeft,
-      top: newTop,
+      left: constrainedLeft,
+      top: constrainedTop,
+      // left: newLeft,
+      // top: newTop,
       zoomTarget
     };
     activeSlide.setState(newState, () => {
