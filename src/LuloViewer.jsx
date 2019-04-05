@@ -33,7 +33,7 @@ class LuloViewer extends Component {
       SHOW_SLIDER: true,
       SHOW_SLIDER_ARROWS: true,
       SLIDER_POSITION: 'bottom',
-      SLIDER_SIZE: 0.15, //slider thickness as fraction of viewer dimension
+      SLIDER_SIZE: 0.10, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 3, // in percent of slider div
       ARROWS_PADDING: 5,
       SHOW_ZOOM_CONTROLLER: true,
@@ -139,14 +139,14 @@ class LuloViewer extends Component {
     );
     this.updateZoomControllerTransform(mainDivRect, slidesRect);
 
-    // setTimeout(() => {
-    //   // const mainDivRect = this.mainDiv.getBoundingClientRect();
-    //   // const slidesRect = this.slides.getBoundingClientRect();
-    //   // this.setState({ slidesRect, mainDivRect }, () => {
-    //   //   this.updateZoomControllerTransform();
-    //   // });
-    //   this.onWindowResize();
-    // }, 1000);
+    setTimeout(() => {
+      // const mainDivRect = this.mainDiv.getBoundingClientRect();
+      // const slidesRect = this.slides.getBoundingClientRect();
+      // this.setState({ slidesRect, mainDivRect }, () => {
+      //   this.updateZoomControllerTransform();
+      // });
+      this.onWindowResize();
+    }, 1000);
 
     console.log('dobijo', slidesRect, mainDivRect);
 
@@ -179,7 +179,7 @@ class LuloViewer extends Component {
   }
 
   updateSliderPos(newPosition) {
-    console.log(('saving position to', newPosition));
+    // console.log(('saving position to', newPosition));
 
     this.lastSliderPos = newPosition;
   }
