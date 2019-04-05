@@ -1109,6 +1109,8 @@ class LuloViewer extends Component {
           showArrows={this.constants.SHOW_SLIDER_ARROWS}
           imagesInfo={this.state.imagesInfo}
           sliderCallback={this.props.sliderCallback}
+          slideAnimationsStylesheet={this.slideAnimationsStylesheet}
+          slideTransitionDuration={this.constants.SLIDE_TRANSITION_DURATION}
         />
       </div>
     );
