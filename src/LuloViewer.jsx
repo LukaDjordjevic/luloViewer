@@ -28,11 +28,12 @@ class LuloViewer extends Component {
       ALLOW_MENU: true,
       ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
       ALLOW_CYCLIC: true,
-      ARROW_DEFAULT_COLOR: '#CCCCCC',
+      ARROW_DEFAULT_COLOR: '#AAAAAA',
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
+      ARROW_DISABLED_COLOR: '#333333',
       SHOW_SLIDER: true,
       SHOW_SLIDER_ARROWS: true,
-      SLIDER_POSITION: 'left',
+      SLIDER_POSITION: 'bottom',
       SLIDER_SIZE: 0.1, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 3, // in percent of slider div
       ARROWS_PADDING: 5,
@@ -87,7 +88,7 @@ class LuloViewer extends Component {
       height: 0
     };
     this.imageLoadFailedArr = [];
-    this.lastSliderPos = { left: 0, top: 0 };
+    // this.lastSliderPos = { left: 0, top: 0 };
     this.imageLoading = false;
     this.images = [];
     this.changingSlide = false;
@@ -106,7 +107,7 @@ class LuloViewer extends Component {
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
     this.handleMenuClick = this.handleMenuClick.bind(this);
     this.setViewerToSlide = this.setViewerToSlide.bind(this);
-    this.updateSliderPos = this.updateSliderPos.bind(this);
+    // this.updateSliderPos = this.updateSliderPos.bind(this);
     this.updateZoomController = this.updateZoomController.bind(this);
     this.saveSlidePosition = this.saveSlidePosition.bind(this);
     // this.onTouchStart = this.onTouchStart.bind(this);
@@ -178,11 +179,11 @@ class LuloViewer extends Component {
     this.checkPreload();
   }
 
-  updateSliderPos(newPosition) {
-    // console.log(('saving position to', newPosition));
+  // updateSliderPos(newPosition) {
+  //   // console.log(('saving position to', newPosition));
 
-    this.lastSliderPos = newPosition;
-  }
+  //   this.lastSliderPos = newPosition;
+  // }
 
   getActiveSlide() {
     const slides = {
@@ -751,9 +752,9 @@ class LuloViewer extends Component {
       },
       () => {
         this.updateZoomController();
+        this.checkPreload();
       }
     );
-    this.checkPreload();
   }
 
   setViewerToSlide(index, e) {
@@ -810,13 +811,27 @@ class LuloViewer extends Component {
     //First figure out which images should be preloaded based on current image index & MAX_PRELOADED_IMAGES
     const requiredImages = [];
     // Add the slide on the left (previous slide)
-    requiredImages.push(
-      this.getNextSlideIndex(this.state.currentSlideIndex, -1)
-    );
-    // Then add all the rest
+    // requiredImages.push(
+    //   this.getNextSlideIndex(this.state.currentSlideIndex, -1)
+    // );
     for (let i = 0; i < this.constants.MAX_PRELOADED_IMAGES + 1; i++) {
       const nextSlide = this.getNextSlideIndex(this.state.currentSlideIndex, i);
-      if (!requiredImages.includes(nextSlide)) requiredImages.push(nextSlide);
+      const previousSlide = this.getNextSlideIndex(
+        this.state.currentSlideIndex,
+        -1
+      );
+      console.log('previous slide is', previousSlide);
+
+      if (i === 2) {
+        console.log('pushing previous');
+
+        requiredImages.push(previousSlide);
+      }
+      if (!requiredImages.includes(nextSlide)) {
+        console.log('pushing next');
+
+        requiredImages.push(nextSlide);
+      }
     }
     console.log('required slides:', requiredImages);
 
@@ -1077,12 +1092,12 @@ class LuloViewer extends Component {
     const slideSize = isHorizontal
       ? this.state.mainDivRect.height * this.constants.SLIDER_SIZE
       : this.state.mainDivRect.width * this.constants.SLIDER_SIZE;
-    const left = isHorizontal
-      ? this.lastSliderPos.left || this.lastSliderPos.top
-      : 0;
-    const top = isHorizontal
-      ? 0
-      : this.lastSliderPos.left || this.lastSliderPos.top;
+    // const left = isHorizontal
+    //   ? this.lastSliderPos.left || this.lastSliderPos.top
+    //   : 0;
+    // const top = isHorizontal
+    //   ? 0
+    //   : this.lastSliderPos.left || this.lastSliderPos.top;
 
     const slider = (
       <div
@@ -1105,15 +1120,16 @@ class LuloViewer extends Component {
           backgroundColor={this.state.backgroundColor}
           arrowDefaultColor={this.constants.ARROW_DEFAULT_COLOR}
           arrowHighlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
+          arrowDisabledColor={this.constants.ARROW_DISABLED_COLOR}
           sliderArrowSize={this.constants.SLIDER_ARROW_SIZE}
           activeSlideIdx={this.state.currentSlideIndex}
           slideSize={slideSize}
           slidesStripSize={slideSize * this.numberOfSlides}
           slideClick={this.setViewerToSlide}
           mainDivRect={this.state.mainDivRect}
-          left={left}
-          top={top}
-          updateSliderPos={this.updateSliderPos}
+          // left={left}
+          // top={top}
+          // updateSliderPos={this.updateSliderPos}
           showArrows={this.constants.SHOW_SLIDER_ARROWS}
           imagesInfo={this.state.imagesInfo}
         />

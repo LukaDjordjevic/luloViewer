@@ -123,6 +123,14 @@
   padding: 20%;
 }
 
+.slide-image {
+  position: absolute;
+  background-color: teal;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .slides-strip {
   position: relative;
   cursor: grab;
