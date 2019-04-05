@@ -816,13 +816,13 @@ class LuloViewer extends Component {
     // );
     for (let i = 0; i < this.constants.MAX_PRELOADED_IMAGES + 1; i++) {
       const nextSlide = this.getNextSlideIndex(this.state.currentSlideIndex, i);
-      const previousSlide = this.getNextSlideIndex(
-        this.state.currentSlideIndex,
-        -1
-      );
-      console.log('previous slide is', previousSlide);
 
       if (i === 2) {
+        const previousSlide = this.getNextSlideIndex(
+          this.state.currentSlideIndex,
+          -1
+        );
+        console.log('previous slide is', previousSlide);
         console.log('pushing previous');
 
         requiredImages.push(previousSlide);

@@ -34,7 +34,7 @@ class Slider extends PureComponent {
 
       // isHorizontal has changed
       this.calculateLayoutDimensions(nextProps);
-      this.setInitialPosition();
+      this.setInitialPosition(nextProps.activeSlideIdx);
       // Flip left & top
       const newPosition = {
         left: this.props.top,
@@ -56,7 +56,7 @@ class Slider extends PureComponent {
       // parent div bounding rect has changed
 
       this.calculateLayoutDimensions(nextProps);
-      this.setInitialPosition();
+      this.setInitialPosition(nextProps.activeSlideIdx);
     }
     if (this.props.activeSlideIdx !== nextProps.activeSlideIdx) {
       // Current slide has changed
@@ -70,7 +70,6 @@ class Slider extends PureComponent {
   }
 
   setInitialPosition(newSlideIndex) {
-    const activeSlideIdx = newSlideIndex || this.props.activeSlideIdx;
     // this.forceUpdate();
     console.log('initial pos thinks active slide is', newSlideIndex);
 
@@ -99,7 +98,7 @@ class Slider extends PureComponent {
         });
       }
     } else {
-      const newPos = this.getSlideCenterPos(activeSlideIdx);
+      const newPos = this.getSlideCenterPos(newSlideIndex);
       const constrainedPos = this.constrainMovement(newPos);
       this.setState({
         left: constrainedPos.left,
@@ -116,7 +115,7 @@ class Slider extends PureComponent {
         -1 * slideIdx * this.props.slideSize +
         this.contentSize / 2 -
         this.props.slideSize / 2;
-      console.log('getSlideCenterPos got', left);
+      console.log('getSlideCenterPos got', left, 'slide index was', slideIdx);
 
       return { left, top: 0 };
     } else {
@@ -124,7 +123,7 @@ class Slider extends PureComponent {
         -1 * slideIdx * this.props.slideSize +
         this.contentSize / 2 -
         this.props.slideSize / 2;
-      console.log('getSlideCenterPos got', top);
+      console.log('getSlideCenterPos got', top, 'slide index was', slideIdx);
       return { left: 0, top };
     }
   }
@@ -245,7 +244,7 @@ class Slider extends PureComponent {
     let top = pos.top;
 
     if (this.props.isHorizontal) {
-      if (this.props.slidesStripSize > this.contentSize) {
+      if (this.props.slidesStripSize >= this.contentSize) {
         // Slides strip can't fit in slides container
         if (left > 0) left = 0;
         if (left < this.contentSize - this.props.slidesStripSize)
@@ -268,7 +267,7 @@ class Slider extends PureComponent {
         }
       }
     } else {
-      if (this.props.slidesStripSize > this.contentSize) {
+      if (this.props.slidesStripSize >= this.contentSize) {
         // Slides strip can't fit in slides container
         console.log(
           'slides can not fit',
