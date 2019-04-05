@@ -7,7 +7,7 @@ const defaults = {
   SLIDE_TRANSITION_TIMEOUT: 600,
   BACKGROUND_COLOR: 'black',
   // BACKGROUND_COLOR: 'darkslategray',
-  SHOW_VIEWER: false,
+  SHOW_VIEWER: true,
   SHOW_ARROWS: true,
   SHOW_SLIDER: true,
   SHOW_SLIDER_ARROWS: true,

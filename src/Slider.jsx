@@ -82,27 +82,27 @@ class Slider extends PureComponent {
 
     if (this.allSlidesFit) {
       console.log('all slides fit');
-      const newPos = this.getSlideCenterPos(nextProps);
       if (props.isHorizontal) {
-        // left = (this.contentSize - props.slidesStripSize) / 2;
+        left = (this.contentSize - props.slidesStripSize) / 2;
         this.setState({
-          left: newPos.left,
+          left,
           top: 0,
           startArrowColor: props.arrowDisabledColor,
           endArrowColor: props.arrowDisabledColor
         });
       } else {
-        // const top = (this.contentSize - props.slidesStripSize) / 2;
+        const top = (this.contentSize - props.slidesStripSize) / 2;
         this.setState({
           left: 0,
-          top: newPos.top,
+          top,
           startArrowColor: props.arrowDisabledColor,
           endArrowColor: props.arrowDisabledColor
         });
       }
     } else {
+      const newPos = this.getSlideCenterPos(nextProps);
       console.log('slides no fit');
-      const constrainedPos = this.constrainMovement({ left, top }, nextProps);
+      const constrainedPos = this.constrainMovement(newPos, nextProps);
 
       this.setState({
         left: constrainedPos.left,

@@ -21,6 +21,7 @@ class LuloViewer extends Component {
     const imagesInfo = new Array(this.props.imageUrls.length);
     imagesInfo.fill(null);
     this.state = {
+      showViewer: this.constants.SHOW_VIEWER,
       showArrows: this.constants.SHOW_ARROWS,
       showZoomController: this.constants.SHOW_ZOOM_CONTROLLER,
       showSlider: this.constants.SHOW_SLIDER,
@@ -882,7 +883,7 @@ class LuloViewer extends Component {
       <Arrows
         arrowsSize={this.constants.ARROWS_SIZE}
         sliderSize={this.constants.SLIDER_SIZE}
-        showViewer={this.constants.SHOW_VIEWER}
+        showViewer={this.state.showViewer}
         arrowsPadding={this.constants.ARROWS_PADDING}
         allowCyclic={this.constants.ALLOW_CYCLIC}
         highlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
@@ -1037,9 +1038,7 @@ class LuloViewer extends Component {
       ? 'column'
       : 'row';
 
-    const sliderSize = this.constants.SHOW_VIEWER
-      ? this.constants.SLIDER_SIZE
-      : 1;
+    const sliderSize = this.state.showViewer ? this.constants.SLIDER_SIZE : 1;
     const slidesWidth =
       ['left', 'right'].includes(this.state.sliderPosition) &&
       this.state.showSlider
@@ -1120,7 +1119,7 @@ class LuloViewer extends Component {
         ? slider
         : null;
 
-    const middle = this.constants.SHOW_VIEWER ? (
+    const middle = this.state.showViewer ? (
       <div
         className="slides-main"
         ref={el => (this.slides = el)}
