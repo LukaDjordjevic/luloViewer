@@ -129,12 +129,14 @@
 }
 
 .single-slide {
-  margin: 5%;
   position: relative;
-  background-color: teal;
+  /* background-color: teal;
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: center; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .photo-darken {
@@ -213,8 +215,12 @@
       supported by Chrome and Opera */
 }
 
-img {
+.image-div img {
   position: relative;
+}
+
+.single-slide img {
+  position: absolute;
 }
 
 body {

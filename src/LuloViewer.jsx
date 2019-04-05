@@ -17,7 +17,7 @@ class LuloViewer extends Component {
     super(props);
     this.constants = {
       STARTING_SLIDE: 0,
-      MAX_PRELOADED_IMAGES: 50,
+      MAX_PRELOADED_IMAGES: 5,
       ZOOM_LEVELS: 100,
       SWIPE_THRESHOLD: 20,
       SLIDE_TRANSITION_DURATION: 0.3,
@@ -32,8 +32,8 @@ class LuloViewer extends Component {
       ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
       SHOW_SLIDER: true,
       SHOW_SLIDER_ARROWS: true,
-      SLIDER_POSITION: 'bottom',
-      SLIDER_SIZE: 0.10, //slider thickness as fraction of viewer dimension
+      SLIDER_POSITION: 'left',
+      SLIDER_SIZE: 0.1, //slider thickness as fraction of viewer dimension
       SLIDER_ARROW_SIZE: 3, // in percent of slider div
       ARROWS_PADDING: 5,
       SHOW_ZOOM_CONTROLLER: true,
@@ -306,6 +306,7 @@ class LuloViewer extends Component {
     );
 
     this.updateZoomControllerTransform(mainDivRect, slidesRect);
+    if (this.slider) this.slider.setInitialPosition();
 
     let slideALeft = 0;
     let slideBLeft = 0;
@@ -768,6 +769,7 @@ class LuloViewer extends Component {
           },
           () => {
             this.updateZoomController();
+            this.checkPreload();
           }
         );
         break;
@@ -781,6 +783,7 @@ class LuloViewer extends Component {
           },
           () => {
             this.updateZoomController();
+            this.checkPreload();
           }
         );
         break;
@@ -794,6 +797,7 @@ class LuloViewer extends Component {
           },
           () => {
             this.updateZoomController();
+            this.checkPreload();
           }
         );
         break;
@@ -915,9 +919,7 @@ class LuloViewer extends Component {
       this.state.slidesRect &&
       this.state.imagesInfo[this.state.currentSlideIndex] ? (
         <ZoomController
-          ref={el => {
-            this.zoomController = el;
-          }}
+          ref={el => (this.zoomController = el)}
           style={{
             left: this.zoomControllerTransform.left,
             top: this.zoomControllerTransform.top,
@@ -1081,7 +1083,6 @@ class LuloViewer extends Component {
     const top = isHorizontal
       ? 0
       : this.lastSliderPos.left || this.lastSliderPos.top;
-    console.log('slider left top', left, top);
 
     const slider = (
       <div
@@ -1093,6 +1094,7 @@ class LuloViewer extends Component {
         }}
       >
         <Slider
+          ref={el => (this.slider = el)}
           images={this.state.imagesInfo.map(el => {
             if (el) {
               return el.url;
@@ -1113,6 +1115,7 @@ class LuloViewer extends Component {
           top={top}
           updateSliderPos={this.updateSliderPos}
           showArrows={this.constants.SHOW_SLIDER_ARROWS}
+          imagesInfo={this.state.imagesInfo}
         />
       </div>
     );

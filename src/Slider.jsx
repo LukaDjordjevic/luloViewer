@@ -9,14 +9,12 @@ class Slider extends PureComponent {
     this.state = {
       startArrowColor: this.props.arrowDefaultColor,
       endArrowColor: this.props.arrowDefaultColor,
-      left: 0,
-      top: 0,
+      left: this.props.left,
+      top: this.props.top,
       bounced: false,
       currentEnergy: 1
       // allowSlider: true
     };
-    this.contentSize =
-      this.props.mainDivRect.width * ((100 - 2 * this.arrowWidth) / 100);
     this.energyAfterBounce = 0.1;
     this.dragging = false;
     this.slideMouseUp = this.slideMouseUp.bind(this);
@@ -35,26 +33,28 @@ class Slider extends PureComponent {
       console.log('isHorizontal changed');
 
       // isHorizontal has changed
-      this.contentSize =
-        this.props.mainDivRect.width * ((100 - 2 * this.arrowWidth) / 100);
-
+      this.calculateLayoutDimensions(nextProps);
       this.setInitialPosition();
-      this.setState({
+      const newPosition = {
         left: this.props.top,
         top: this.props.left
-      });
+      };
+      this.props.updateSliderPos(newPosition);
+      this.setState(newPosition);
     }
     if (
-      JSON.parse(
-        JSON.stringify(this.props.mainDivRect) !==
-          JSON.parse(JSON.stringify(nextProps.mainDivRect))
-      )
+      JSON.stringify(this.props.mainDivRect) !==
+      JSON.stringify(nextProps.mainDivRect)
     ) {
-      console.log('maindiv changed');
+      console.log(
+        'slider says maindiv changed',
+        JSON.stringify(this.props.mainDivRect),
+        JSON.stringify(nextProps.mainDivRect)
+      );
 
       // parent div bounding rect has changed
-      this.contentSize =
-        this.props.mainDivRect.width * ((100 - 2 * this.arrowWidth) / 100);
+
+      this.calculateLayoutDimensions(nextProps);
       this.setInitialPosition();
     }
   }
@@ -64,6 +64,7 @@ class Slider extends PureComponent {
   }
 
   setInitialPosition() {
+    // this.forceUpdate();
     console.log('set initial pos');
   }
 
@@ -79,8 +80,7 @@ class Slider extends PureComponent {
       deltaY = deltaY * -1;
     }
     if (Math.abs(e.deltaX) < 2 && Math.abs(e.deltaY) < 2) {
-      this.state.currentEnergy = 1;
-      this.setState({ bounced: false });
+      this.setState({ bounced: false, currentEnergy: 1 });
     }
     const left = this.state.left - deltaX / factor;
     const top = this.state.top - deltaY / factor;
@@ -138,7 +138,7 @@ class Slider extends PureComponent {
       newPosition.left = 0;
       this.setState({ top: constrainedPos.top });
     }
-    this.props.updateSliderPos(constrainedPos);
+    this.props.updateSliderPos(constrainedPos); // Save slider position to container component
 
     console.log(newPosition);
   }
@@ -193,40 +193,61 @@ class Slider extends PureComponent {
             bounced: !this.state.bounced,
             currentEnergy: this.state.currentEnergy * this.energyAfterBounce
           });
-
           left = 0;
         }
       }
     } else {
-      const contentSize =
-        this.props.mainDivRect.height * ((100 - 2 * this.arrowHeight) / 100);
+      if (this.props.slidesStripSize > this.contentSize) {
+        // Slides strip can't fit in slides container
+        console.log(
+          'slides can not fit',
+          this.props.slidesStripSize,
+          this.contentSize
+        );
 
-      if (this.props.slidesStripSize > contentSize) {
         if (top > 0) top = 0;
-        if (top < contentSize - this.props.slidesStripSize)
-          top = contentSize - this.props.slidesStripSize;
+        if (top < this.contentSize - this.props.slidesStripSize)
+          top = this.contentSize - this.props.slidesStripSize;
       } else {
-        if (top > contentSize - this.props.slidesStripSize)
-          top = contentSize - this.props.slidesStripSize;
-        if (top < 0) top = 0;
+        console.log('is smaller');
+        // Slides strip is smaller than slides container
+        if (top >= this.contentSize - this.props.slidesStripSize) {
+          top = this.contentSize - this.props.slidesStripSize;
+          this.setState({
+            bounced: !this.state.bounced,
+            currentEnergy: this.state.currentEnergy * this.energyAfterBounce
+          });
+        }
+        if (top <= 0) {
+          this.setState({
+            bounced: !this.state.bounced,
+            currentEnergy: this.state.currentEnergy * this.energyAfterBounce
+          });
+          top = 0;
+        }
       }
     }
     return { left, top };
   }
 
-  calculateLayoutDimensions() {
-    const arrowSize = this.props.showArrows ? this.props.sliderArrowSize : 0;
+  calculateLayoutDimensions(nextProps) {
+    const props = nextProps || this.props;
+    const arrowSize = props.showArrows ? props.sliderArrowSize : 0;
 
-    this.arrowWidth = this.props.isHorizontal ? arrowSize : 100;
-    this.arrowHeight = this.props.isHorizontal ? 100 : arrowSize;
-    this.contentWidth = this.props.isHorizontal ? 100 - arrowSize * 2 : 100;
-    this.contentHeight = this.props.isHorizontal ? 100 : 100 - arrowSize * 2;
+    this.arrowWidth = props.isHorizontal ? arrowSize : 100;
+    this.arrowHeight = props.isHorizontal ? 100 : arrowSize;
+    this.contentWidth = props.isHorizontal ? 100 - arrowSize * 2 : 100;
+    this.contentHeight = props.isHorizontal ? 100 : 100 - arrowSize * 2;
+
+    this.contentSize = props.isHorizontal
+      ? props.mainDivRect.width * ((100 - 2 * this.arrowWidth) / 100)
+      : props.mainDivRect.height * ((100 - 2 * this.arrowHeight) / 100);
   }
 
   render() {
     const startIconName = this.props.isHorizontal ? 'arrow-left' : 'arrow-up';
     const endIconName = this.props.isHorizontal ? 'arrow-right' : 'arrow-down';
-    this.calculateLayoutDimensions();
+    // this.calculateLayoutDimensions();
     const start = this.props.showArrows ? (
       <div
         className="slider-arrow"
@@ -254,6 +275,7 @@ class Slider extends PureComponent {
         slideSize={this.props.slideSize}
         isHorizontal={this.props.isHorizontal}
         slideClick={this.slideMouseUp}
+        imageLoaded={this.props.imagesInfo[idx] ? true : false}
       />
     ));
 
@@ -280,7 +302,6 @@ class Slider extends PureComponent {
           }}
           onMouseDown={this.onMouseDown}
           onTouchEnd={this.onTouchEnd}
-
           // onMouseUp={this.onMouseUp}
           // onMouseMove={this.onMouseMove}
         >
@@ -326,27 +347,43 @@ class Slider extends PureComponent {
 
 const SingleSlide = props => {
   const style = {
-    backgroundImage: `${"url('"}${props.backgroundImage}${"'"}`
-
-    // width: `${props.slideSize}px`,
-    // height: `${props.slideSize}px`,
-    // left: `${props.left}px`,
-    // top: `${props.top}px`
+    width: `${props.slideSize}px`,
+    height: `${props.slideSize}px`
   };
+
   if (props.isHorizontal) {
-    style.width = `${props.slideSize}px`;
-    style.margin = `${0.45}%`;
+    // style.margin = `${0.45}%`;
   } else {
-    style.height = `${props.slideSize}px`;
-    style.margin = `${5}%`;
+    // style.margin = `${5}%`;
   }
 
+  const slideMargin = 5;
+
+  const image = props.imageLoaded ? (
+    <img
+      alt=""
+      width={`${100 - slideMargin * 2}%`}
+      height={`${100 - slideMargin * 2}%`}
+      src={props.backgroundImage}
+      position={'absolute'}
+    />
+  ) : (
+    <div
+      style={{
+        position: 'absolute',
+        backgroundColor: 'teal',
+        width: `${100 - slideMargin * 2}%`,
+        height: `${100 - slideMargin * 2}%`
+      }}
+    />
+  );
   return (
     <div
       className="single-slide"
       style={style}
       onMouseUp={e => props.slideClick(props.index, e)}
     >
+      {image}
       {props.slideActive ? null : <div className="photo-darken" />}
     </div>
   );
