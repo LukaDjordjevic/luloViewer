@@ -32,6 +32,11 @@ class Slider extends PureComponent {
   }
 
   componentDidMount() {
+    // setTimeout(() => {
+    //   console.log('setting');
+
+    //   this.setState({ left: 300 });
+    // }, 5000);
     this.slidesStrip.onanimationend = this.onAnimationEnd;
     // this.sliderStylesheet = document.createElement('style');
     // this.sliderStylesheet.type = 'text/css';
@@ -128,7 +133,9 @@ class Slider extends PureComponent {
       const key = this.props.isHorizontal ? 'left' : 'top';
       const start = this.state[key];
       const end =
-        start - (index - this.props.activeSlideIdx) * this.props.slideSize;
+        start -
+        (index - this.props.activeSlideIdx) * this.props.slideSize -
+        this.props.slideSize / 2;
       console.log('start end', start, end, this.props.slideSize);
 
       this.updateSliderKeyframe(
@@ -334,7 +341,10 @@ class Slider extends PureComponent {
   updateSliderKeyframe(styleSheet, start, end, key, index) {
     console.log('style got', styleSheet, start, end, key);
     const newPos = { left: this.state.left, top: this.state.top };
-    let midPositionValue = this.contentSize / 2 - index * this.props.slideSize;
+    let midPositionValue =
+      this.contentSize / 2 -
+      index * this.props.slideSize -
+      this.props.slideSize / 2;
     newPos[key] = midPositionValue;
     const constrainedPos = this.constrainMovement(newPos);
     if (styleSheet.sheet.cssRules[8]) styleSheet.sheet.deleteRule(8);
@@ -520,7 +530,7 @@ class Slider extends PureComponent {
             top: `${this.state.top}px`,
             animationName: this.state.animationName,
             animationDuration: `${this.props.slideTransitionDuration}s`,
-            animationFillMode: 'forwards',
+            animationFillMode: 'none',
             width: this.props.isHorizontal
               ? this.props.slidesStripSize
               : this.props.slideSize,
