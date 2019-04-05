@@ -15,6 +15,8 @@ class Slider extends PureComponent {
       currentEnergy: 1
       // allowSlider: true
     };
+    this.startArrowAllowed = true;
+    this.endArrowAllowed = true;
     this.energyAfterBounce = 0.1;
     this.dragging = false;
     this.slideMouseUp = this.slideMouseUp.bind(this);
@@ -70,44 +72,45 @@ class Slider extends PureComponent {
   }
 
   setInitialPosition(nextProps) {
+    console.log('set initial pos');
     const props = nextProps || this.props;
 
+    let left = this.state.left;
+    let top = this.state.top;
     // this.forceUpdate();
     console.log('initial pos thinks active slide is', props.activeSlideIdx);
 
     if (this.allSlidesFit) {
       console.log('all slides fit');
-
+      const newPos = this.getSlideCenterPos(nextProps);
       if (props.isHorizontal) {
-        const left = (this.contentSize - props.slidesStripSize) / 2;
+        // left = (this.contentSize - props.slidesStripSize) / 2;
         this.setState({
-          left,
+          left: newPos.left,
           top: 0,
           startArrowColor: props.arrowDisabledColor,
           endArrowColor: props.arrowDisabledColor
         });
       } else {
-        const top = (this.contentSize - props.slidesStripSize) / 2;
+        // const top = (this.contentSize - props.slidesStripSize) / 2;
         this.setState({
           left: 0,
-          top,
+          top: newPos.top,
           startArrowColor: props.arrowDisabledColor,
           endArrowColor: props.arrowDisabledColor
         });
       }
     } else {
       console.log('slides no fit');
+      const constrainedPos = this.constrainMovement({ left, top }, nextProps);
 
-      const newPos = this.getSlideCenterPos(nextProps);
-      const constrainedPos = this.constrainMovement(newPos, nextProps);
       this.setState({
         left: constrainedPos.left,
         top: constrainedPos.top,
-        startArrowColor: props.arrowDefaultColor,
+        startArrowColor: props.arrowDisabledColor,
         endArrowColor: props.arrowDefaultColor
       });
     }
-    console.log('set initial pos');
   }
   getSlideCenterPos(nextProps) {
     const props = nextProps || this.props;
@@ -207,11 +210,18 @@ class Slider extends PureComponent {
   }
 
   onMouseEnter(arrow, e) {
+    console.log('on enter', arrow, this.startArrowAllowed, this.allSlidesFit);
+
     e.stopPropagation();
-    if (!this.allSlidesFit) {
-      if (arrow === 'start') {
+    if (arrow === 'start') {
+      if (!this.allSlidesFit && this.startArrowAllowed) {
+        console.log('highlighting start');
+
         this.setState({ startArrowColor: this.props.arrowHighlightColor });
-      } else {
+      }
+    } else {
+      if (!this.allSlidesFit && this.endArrowAllowed) {
+        console.log('highlighting end');
         this.setState({ endArrowColor: this.props.arrowHighlightColor });
       }
     }
@@ -222,17 +232,39 @@ class Slider extends PureComponent {
 
     if (arrow === 'start') {
       this.setState({
-        startArrowColor: this.allSlidesFit
-          ? this.props.arrowDisabledColor
-          : this.props.arrowDefaultColor
+        startArrowColor:
+          this.allSlidesFit || !this.startArrowAllowed
+            ? this.props.arrowDisabledColor
+            : this.props.arrowDefaultColor
       });
     } else {
       this.setState({
-        endArrowColor: this.allSlidesFit
-          ? this.props.arrowDisabledColor
-          : this.props.arrowDefaultColor
+        endArrowColor:
+          this.allSlidesFit || !this.endArrowAllowed
+            ? this.props.arrowDisabledColor
+            : this.props.arrowDefaultColor
       });
     }
+  }
+  onArrowClick(arrow, e) {
+    e.stopPropagation();
+    let left = this.state.left;
+    let top = this.state.top;
+    if (this.props.isHorizontal) {
+      if (arrow === 'start') {
+        left += this.contentSize;
+      } else {
+        left -= this.contentSize;
+      }
+    } else {
+      if (arrow === 'start') {
+        top += this.contentSize;
+      } else {
+        top -= this.contentSize;
+      }
+    }
+    const constrainedPos = this.constrainMovement({ left, top });
+    this.setState(constrainedPos);
   }
 
   slideMouseUp(index, e) {
@@ -250,12 +282,25 @@ class Slider extends PureComponent {
     let left = pos.left;
     let top = pos.top;
 
+    this.startArrowAllowed = true;
+    this.endArrowAllowed = true;
+
+    let startArrowColor = this.props.arrowDefaultColor;
+    let endArrowColor = this.props.arrowDefaultColor;
+
     if (props.isHorizontal) {
       if (props.slidesStripSize >= this.contentSize) {
         // Slides strip can't fit in slides container
-        if (left > 0) left = 0;
-        if (left < this.contentSize - props.slidesStripSize)
+        if (left > 0) {
+          this.startArrowAllowed = false;
+          startArrowColor = this.props.arrowDisabledColor;
+          left = 0;
+        }
+        if (left < this.contentSize - props.slidesStripSize) {
+          this.endArrowAllowed = false;
+          endArrowColor = this.props.arrowDisabledColor;
           left = this.contentSize - props.slidesStripSize;
+        }
       } else {
         // Slides strip is smaller than slides container
         if (left >= this.contentSize - props.slidesStripSize) {
@@ -282,9 +327,16 @@ class Slider extends PureComponent {
           this.contentSize
         );
 
-        if (top > 0) top = 0;
-        if (top < this.contentSize - props.slidesStripSize)
+        if (top > 0) {
+          this.startArrowAllowed = false;
+          startArrowColor = this.props.arrowDisabledColor;
+          top = 0;
+        }
+        if (top < this.contentSize - props.slidesStripSize) {
+          this.endArrowAllowed = false;
+          endArrowColor = this.props.arrowDisabledColor;
           top = this.contentSize - props.slidesStripSize;
+        }
       } else {
         console.log('is smaller');
         // Slides strip is smaller than slides container
@@ -304,6 +356,7 @@ class Slider extends PureComponent {
         }
       }
     }
+    this.setState({ startArrowColor, endArrowColor });
     console.log('constrain got', { left, top });
 
     return { left, top };
@@ -340,6 +393,7 @@ class Slider extends PureComponent {
         }}
         onMouseEnter={e => this.onMouseEnter('start', e)}
         onMouseLeave={e => this.onMouseLeave('start', e)}
+        onMouseUp={e => this.onArrowClick('start', e)}
       >
         <Icon
           className={this.props.isHorizontal ? `slider-icon` : ''}
@@ -359,6 +413,7 @@ class Slider extends PureComponent {
         isHorizontal={this.props.isHorizontal}
         slideClick={this.slideMouseUp}
         imageLoaded={this.props.imagesInfo[idx] ? true : false}
+        sliderCallback={this.props.sliderCallback}
       />
     ));
 
@@ -402,6 +457,7 @@ class Slider extends PureComponent {
         }}
         onMouseEnter={e => this.onMouseEnter('end', e)}
         onMouseLeave={e => this.onMouseLeave('end', e)}
+        onMouseUp={e => this.onArrowClick('end', e)}
       >
         <Icon
           className={this.props.isHorizontal ? `slider-icon` : ''}
@@ -462,7 +518,10 @@ const SingleSlide = props => {
     <div
       className="single-slide"
       style={style}
-      onMouseUp={e => props.slideClick(props.index, e)}
+      onMouseUp={e => {
+        props.sliderCallback(props.index);
+        props.slideClick(props.index, e);
+      }}
     >
       {/* {image} */}
       <div

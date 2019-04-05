@@ -39,6 +39,7 @@ class Arrows extends PureComponent {
       this.props.slidesRect.height / 2 -
       (this.props.slidesRect.height * this.props.arrowsSize) / 2 +
       (this.props.slidesRect.top - this.props.mainDivRect.top);
+    const sliderSize = this.props.SHOW_VIEWER ? this.props.sliderSize : 1;
     return (
       <div
         className="arrows"
@@ -48,7 +49,7 @@ class Arrows extends PureComponent {
           width:
             ['left', 'right'].includes(this.props.SLIDER_POSITION) &&
             this.props.SHOW_SLIDER
-              ? this.props.slidesRect.width * (1 - this.props.sliderSize)
+              ? this.props.slidesRect.width * (1 - sliderSize)
               : this.props.slidesRect.width
         }}
       >

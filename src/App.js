@@ -12,6 +12,9 @@ class App extends Component {
     //   this.setState({ bb: false });
     // }, 2000);
   }
+  sliderCallback(index) {
+    console.log('Slide', index, 'clicked');
+  }
   render() {
     const images = [
       'http://cdn.collider.com/wp-content/uploads/2018/08/bohemian-rhapsody-image-2.jpg',
@@ -42,7 +45,7 @@ class App extends Component {
           // width: '600px',
           // height: '600px',
           width: '80%',
-          height: '80%',
+          height: '70%',
           // width: '90%',
           // height: '90%',
           // width: '80px',
@@ -57,7 +60,9 @@ class App extends Component {
           // display: 'flex'
         }}
       >
-        {this.state.bb ? <LuloViewer imageUrls={images} /> : null}
+        {this.state.bb ? (
+          <LuloViewer imageUrls={images} sliderCallback={this.sliderCallback} />
+        ) : null}
       </div>
     );
   }

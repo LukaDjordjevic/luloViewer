@@ -4,6 +4,7 @@ import ZoomController from './ZoomController';
 import Slider from './Slider';
 import Arrows from './Arrows';
 import Menu from './Menu';
+import defaults from './defaults';
 import {
   calculateSlidesDivFromMainDiv,
   updateZoomTarget,
@@ -15,43 +16,11 @@ import {
 class LuloViewer extends Component {
   constructor(props) {
     super(props);
-    this.constants = {
-      STARTING_SLIDE: 0,
-      MAX_PRELOADED_IMAGES: 5,
-      ZOOM_LEVELS: 100,
-      SWIPE_THRESHOLD: 20,
-      SLIDE_TRANSITION_DURATION: 0.3,
-      SLIDE_TRANSITION_TIMEOUT: 600,
-      BACKGROUND_COLOR: 'black',
-      // BACKGROUND_COLOR: 'darkslategray',
-      SHOW_ARROWS: true,
-      ALLOW_MENU: true,
-      ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width
-      ALLOW_CYCLIC: true,
-      ARROW_DEFAULT_COLOR: '#AAAAAA',
-      ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
-      ARROW_DISABLED_COLOR: '#333333',
-      SHOW_SLIDER: true,
-      SHOW_SLIDER_ARROWS: true,
-      SLIDER_POSITION: 'bottom',
-      SLIDER_SIZE: 0.1, //slider thickness as fraction of viewer dimension
-      SLIDER_ARROW_SIZE: 3, // in percent of slider div
-      ARROWS_PADDING: 5,
-      SHOW_ZOOM_CONTROLLER: true,
-      ZOOM_CONTROLLER_SIZE: 0.18, // width of zoomController as fraction of viewer width
-      ZOOM_CONTROLLER_PADDING: 5, // zoomController padding as viewer width percent
-      ZOOM_CONTROLLER_POSITION_X: 0.8,
-      ZOOM_CONTROLLER_POSITION_Y: 0.025,
-      MENU_SIZE: 30, // %
-      MENU_TEXT_COLOR: 'lightgrey',
-      MENU_ICON_COLOR: 'lightgrey',
-      MENU_BGD_COLOR: 'rgba(0, 0, 0, 0.7)'
-    };
+    this.constants = defaults;
 
     const imagesInfo = new Array(this.props.imageUrls.length);
     imagesInfo.fill(null);
     this.state = {
-      currentSlideIndex: 0,
       showArrows: this.constants.SHOW_ARROWS,
       showZoomController: this.constants.SHOW_ZOOM_CONTROLLER,
       showSlider: this.constants.SHOW_SLIDER,
@@ -359,7 +328,7 @@ class LuloViewer extends Component {
       case 'f':
         if (!this.state.isFullscreen) {
           console.log('requesting fullscreen');
-          
+
           this.mainDiv.requestFullscreen();
           this.setState({ isFullscreen: true });
         } else {
@@ -913,6 +882,7 @@ class LuloViewer extends Component {
       <Arrows
         arrowsSize={this.constants.ARROWS_SIZE}
         sliderSize={this.constants.SLIDER_SIZE}
+        showViewer={this.constants.SHOW_VIEWER}
         arrowsPadding={this.constants.ARROWS_PADDING}
         allowCyclic={this.constants.ALLOW_CYCLIC}
         highlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
@@ -1067,26 +1037,29 @@ class LuloViewer extends Component {
       ? 'column'
       : 'row';
 
+    const sliderSize = this.constants.SHOW_VIEWER
+      ? this.constants.SLIDER_SIZE
+      : 1;
     const slidesWidth =
       ['left', 'right'].includes(this.state.sliderPosition) &&
       this.state.showSlider
-        ? (1 - this.constants.SLIDER_SIZE) * 100
+        ? (1 - sliderSize) * 100
         : 100;
     const slidesHeight =
       ['top', 'bottom'].includes(this.state.sliderPosition) &&
       this.state.showSlider
-        ? (1 - this.constants.SLIDER_SIZE) * 100
+        ? (1 - sliderSize) * 100
         : 100;
 
     const sliderWidth =
       ['left', 'right'].includes(this.state.sliderPosition) &&
       this.state.showSlider
-        ? this.constants.SLIDER_SIZE * 100
+        ? sliderSize * 100
         : 100;
     const sliderHeight =
       ['top', 'bottom'].includes(this.state.sliderPosition) &&
       this.state.showSlider
-        ? this.constants.SLIDER_SIZE * 100
+        ? sliderSize * 100
         : 100;
 
     //*******************************************
@@ -1094,8 +1067,8 @@ class LuloViewer extends Component {
     //*******************************************
     const isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
     const slideSize = isHorizontal
-      ? this.state.mainDivRect.height * this.constants.SLIDER_SIZE
-      : this.state.mainDivRect.width * this.constants.SLIDER_SIZE;
+      ? this.state.mainDivRect.height * sliderSize
+      : this.state.mainDivRect.width * sliderSize;
     // const left = isHorizontal
     //   ? this.lastSliderPos.left || this.lastSliderPos.top
     //   : 0;
@@ -1136,6 +1109,7 @@ class LuloViewer extends Component {
           // updateSliderPos={this.updateSliderPos}
           showArrows={this.constants.SHOW_SLIDER_ARROWS}
           imagesInfo={this.state.imagesInfo}
+          sliderCallback={this.props.sliderCallback}
         />
       </div>
     );
@@ -1146,7 +1120,7 @@ class LuloViewer extends Component {
         ? slider
         : null;
 
-    const middle = (
+    const middle = this.constants.SHOW_VIEWER ? (
       <div
         className="slides-main"
         ref={el => (this.slides = el)}
@@ -1161,7 +1135,7 @@ class LuloViewer extends Component {
           {photoSlides}
         </div>
       </div>
-    );
+    ) : null;
 
     const end =
       ['right', 'bottom'].includes(this.state.sliderPosition) &&
