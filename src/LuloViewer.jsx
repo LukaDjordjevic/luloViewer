@@ -51,6 +51,7 @@ class LuloViewer extends Component {
     const imagesInfo = new Array(this.props.imageUrls.length);
     imagesInfo.fill(null);
     this.state = {
+      currentSlideIndex: 0,
       showArrows: this.constants.SHOW_ARROWS,
       showZoomController: this.constants.SHOW_ZOOM_CONTROLLER,
       showSlider: this.constants.SHOW_SLIDER,
@@ -93,7 +94,7 @@ class LuloViewer extends Component {
     this.images = [];
     this.changingSlide = false;
     this.numberOfSlides = this.props.imageUrls.length;
-
+    this.loading = true;
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -125,6 +126,7 @@ class LuloViewer extends Component {
   // }
 
   componentDidMount() {
+    this.loading = false;
     window.oncontextmenu = e => {
       console.log('kontekst meni');
 
@@ -356,6 +358,8 @@ class LuloViewer extends Component {
         break;
       case 'f':
         if (!this.state.isFullscreen) {
+          console.log('requesting fullscreen');
+          
           this.mainDiv.requestFullscreen();
           this.setState({ isFullscreen: true });
         } else {
@@ -1188,21 +1192,27 @@ class LuloViewer extends Component {
 
     return (
       <div className="viewer" ref={el => (this.mainDiv = el)}>
-        <div
-          className="layout-main"
-          style={{
-            width: `${this.state.mainDivRect.width}px`,
-            height: `${this.state.mainDivRect.height}px`,
-            flexDirection,
-            backgroundColor: this.constants.BACKGROUND_COLOR
-          }}
-          onWheel={this.onWheel}
-          onMouseDown={this.onMouseDown}
-        >
-          {start}
-          {middle}
-          {end}
-        </div>
+        {/* if (this.loading) return ; */}
+        {this.loading ? (
+          <div>.!.</div>
+        ) : (
+          <div
+            className="layout-main"
+            style={{
+              width: `${this.state.mainDivRect.width}px`,
+              height: `${this.state.mainDivRect.height}px`,
+              flexDirection,
+              backgroundColor: this.constants.BACKGROUND_COLOR
+            }}
+            onWheel={this.onWheel}
+            onMouseDown={this.onMouseDown}
+          >
+            {start}
+            {middle}
+            {end}
+          </div>
+        )}
+
         {menu}
       </div>
     );

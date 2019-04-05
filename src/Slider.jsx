@@ -34,7 +34,7 @@ class Slider extends PureComponent {
 
       // isHorizontal has changed
       this.calculateLayoutDimensions(nextProps);
-      this.setInitialPosition(nextProps.activeSlideIdx);
+      this.setInitialPosition(nextProps);
       // Flip left & top
       const newPosition = {
         left: this.props.top,
@@ -52,16 +52,16 @@ class Slider extends PureComponent {
         JSON.stringify(this.props.mainDivRect),
         JSON.stringify(nextProps.mainDivRect)
       );
-
+      console.log('next props slide', nextProps.activeSlideIdx);
       // parent div bounding rect has changed
 
       this.calculateLayoutDimensions(nextProps);
-      this.setInitialPosition(nextProps.activeSlideIdx);
+      this.setInitialPosition(nextProps);
     }
     if (this.props.activeSlideIdx !== nextProps.activeSlideIdx) {
       // Current slide has changed
-      console.log('will receive props got', nextProps.activeSlideIdx);
-      this.setInitialPosition(nextProps.activeSlideIdx);
+      console.log('will receive props got', nextProps);
+      this.setInitialPosition(nextProps);
     }
   }
 
@@ -69,61 +69,63 @@ class Slider extends PureComponent {
     console.log('touch end');
   }
 
-  setInitialPosition(newSlideIndex) {
+  setInitialPosition(nextProps) {
+    const props = nextProps || this.props;
+
     // this.forceUpdate();
-    console.log('initial pos thinks active slide is', newSlideIndex);
+    console.log('initial pos thinks active slide is', props.activeSlideIdx);
 
     if (this.allSlidesFit) {
-      if (this.props.isHorizontal) {
-        const left = (this.contentSize - this.props.slidesStripSize) / 2;
+      console.log('all slides fit');
+
+      if (props.isHorizontal) {
+        const left = (this.contentSize - props.slidesStripSize) / 2;
         this.setState({
           left,
           top: 0,
-          startArrowColor: this.props.arrowDisabledColor,
-          endArrowColor: this.props.arrowDisabledColor
+          startArrowColor: props.arrowDisabledColor,
+          endArrowColor: props.arrowDisabledColor
         });
-        console.log(
-          'got initial',
-          left,
-          this.contentSize,
-          this.props.slidesStripSize
-        );
       } else {
-        const top = (this.contentSize - this.props.slidesStripSize) / 2;
+        const top = (this.contentSize - props.slidesStripSize) / 2;
         this.setState({
           left: 0,
           top,
-          startArrowColor: this.props.arrowDisabledColor,
-          endArrowColor: this.props.arrowDisabledColor
+          startArrowColor: props.arrowDisabledColor,
+          endArrowColor: props.arrowDisabledColor
         });
       }
     } else {
-      const newPos = this.getSlideCenterPos(newSlideIndex);
-      const constrainedPos = this.constrainMovement(newPos);
+      console.log('slides no fit');
+
+      const newPos = this.getSlideCenterPos(nextProps);
+      const constrainedPos = this.constrainMovement(newPos, nextProps);
       this.setState({
         left: constrainedPos.left,
         top: constrainedPos.top,
-        startArrowColor: this.props.arrowDefaultColor,
-        endArrowColor: this.props.arrowDefaultColor
+        startArrowColor: props.arrowDefaultColor,
+        endArrowColor: props.arrowDefaultColor
       });
     }
     console.log('set initial pos');
   }
-  getSlideCenterPos(slideIdx) {
-    if (this.props.isHorizontal) {
+  getSlideCenterPos(nextProps) {
+    const props = nextProps || this.props;
+
+    if (props.isHorizontal) {
       const left =
-        -1 * slideIdx * this.props.slideSize +
+        -1 * props.activeSlideIdx * props.slideSize +
         this.contentSize / 2 -
-        this.props.slideSize / 2;
-      console.log('getSlideCenterPos got', left, 'slide index was', slideIdx);
+        props.slideSize / 2;
+      console.log('getSlideCenterPos got', left);
 
       return { left, top: 0 };
     } else {
       const top =
-        -1 * slideIdx * this.props.slideSize +
+        -1 * props.activeSlideIdx * props.slideSize +
         this.contentSize / 2 -
-        this.props.slideSize / 2;
-      console.log('getSlideCenterPos got', top, 'slide index was', slideIdx);
+        props.slideSize / 2;
+      console.log('getSlideCenterPos got', top);
       return { left: 0, top };
     }
   }
@@ -144,6 +146,7 @@ class Slider extends PureComponent {
     }
     const left = this.state.left - deltaX / factor;
     const top = this.state.top - deltaY / factor;
+    console.log('123', left, top, this.state.top);
 
     const constrainedPos = this.constrainMovement({ left, top });
     if (this.props.isHorizontal) {
@@ -239,20 +242,24 @@ class Slider extends PureComponent {
     if (!this.dragging) this.props.slideClick(index, e);
   }
 
-  constrainMovement(pos) {
+  constrainMovement(pos, nextProps) {
+    console.log('constraint input', pos);
+
+    const props = nextProps || this.props;
+
     let left = pos.left;
     let top = pos.top;
 
-    if (this.props.isHorizontal) {
-      if (this.props.slidesStripSize >= this.contentSize) {
+    if (props.isHorizontal) {
+      if (props.slidesStripSize >= this.contentSize) {
         // Slides strip can't fit in slides container
         if (left > 0) left = 0;
-        if (left < this.contentSize - this.props.slidesStripSize)
-          left = this.contentSize - this.props.slidesStripSize;
+        if (left < this.contentSize - props.slidesStripSize)
+          left = this.contentSize - props.slidesStripSize;
       } else {
         // Slides strip is smaller than slides container
-        if (left >= this.contentSize - this.props.slidesStripSize) {
-          left = this.contentSize - this.props.slidesStripSize;
+        if (left >= this.contentSize - props.slidesStripSize) {
+          left = this.contentSize - props.slidesStripSize;
           this.setState({
             bounced: !this.state.bounced,
             currentEnergy: this.state.currentEnergy * this.energyAfterBounce
@@ -267,7 +274,7 @@ class Slider extends PureComponent {
         }
       }
     } else {
-      if (this.props.slidesStripSize >= this.contentSize) {
+      if (props.slidesStripSize >= this.contentSize) {
         // Slides strip can't fit in slides container
         console.log(
           'slides can not fit',
@@ -276,13 +283,13 @@ class Slider extends PureComponent {
         );
 
         if (top > 0) top = 0;
-        if (top < this.contentSize - this.props.slidesStripSize)
-          top = this.contentSize - this.props.slidesStripSize;
+        if (top < this.contentSize - props.slidesStripSize)
+          top = this.contentSize - props.slidesStripSize;
       } else {
         console.log('is smaller');
         // Slides strip is smaller than slides container
-        if (top >= this.contentSize - this.props.slidesStripSize) {
-          top = this.contentSize - this.props.slidesStripSize;
+        if (top >= this.contentSize - props.slidesStripSize) {
+          top = this.contentSize - props.slidesStripSize;
           this.setState({
             bounced: !this.state.bounced,
             currentEnergy: this.state.currentEnergy * this.energyAfterBounce
@@ -315,10 +322,12 @@ class Slider extends PureComponent {
       ? props.mainDivRect.width * ((100 - 2 * this.arrowWidth) / 100)
       : props.mainDivRect.height * ((100 - 2 * this.arrowHeight) / 100);
     this.allSlidesFit =
-      this.contentSize - this.props.slidesStripSize >= 0 ? true : false;
+      this.contentSize - props.slidesStripSize >= 0 ? true : false;
   }
 
   render() {
+    console.log('slider render', this.props.mainDivRect);
+
     const startIconName = this.props.isHorizontal ? 'arrow-left' : 'arrow-up';
     const endIconName = this.props.isHorizontal ? 'arrow-right' : 'arrow-down';
     // this.calculateLayoutDimensions();
