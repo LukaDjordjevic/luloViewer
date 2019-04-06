@@ -127,8 +127,9 @@ class Slider extends PureComponent {
       this.constrainAndApply(newPos, nextProps);
     }
     const newPos = this.getSlideCenterPos(props.activeSlideIdx);
+    console.log('new pos', newPos);
 
-    if (this.isHorizontal) {
+    if (this.props.isHorizontal) {
       this.updateArrowColors(newPos.left);
     } else {
       this.updateArrowColors(newPos.top);
@@ -171,7 +172,7 @@ class Slider extends PureComponent {
     const top = this.state.top - deltaY / factor;
 
     this.constrainAndApply({ left, top });
-    if (this.isHorizontal) {
+    if (this.props.isHorizontal) {
       this.updateArrowColors(left);
     } else {
       this.updateArrowColors(top);
@@ -210,7 +211,7 @@ class Slider extends PureComponent {
     // console.log('saving pos', newPosition);
 
     this.constrainAndApply(newPosition);
-    if (this.isHorizontal) {
+    if (this.props.isHorizontal) {
       this.updateArrowColors(newPosition.left);
     } else {
       this.updateArrowColors(newPosition.top);
@@ -267,6 +268,11 @@ class Slider extends PureComponent {
       }
     }
     this.constrainAndApply({ left, top });
+    if (this.props.isHorizontal) {
+      this.updateArrowColors(left);
+    } else {
+      this.updateArrowColors(top);
+    }
   }
 
   slideMouseUp(index, e) {
