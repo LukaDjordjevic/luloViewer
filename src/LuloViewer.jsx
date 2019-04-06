@@ -76,8 +76,7 @@ class LuloViewer extends Component {
     this.updateImageFromZoomController = this.updateImageFromZoomController.bind(
       this
     );
-    this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
-    this.onRightArrowClick = this.onRightArrowClick.bind(this);
+    this.onArrowClick = this.onArrowClick.bind(this);
     this.handleMenuClick = this.handleMenuClick.bind(this);
     this.setViewerToSlide = this.setViewerToSlide.bind(this);
     // this.updateSliderPos = this.updateSliderPos.bind(this);
@@ -116,7 +115,13 @@ class LuloViewer extends Component {
       this.state.showSlider,
       sliderSize
     );
-    this.sliderSize = sliderSize;
+    this.sliderSize = sliderSize; // Smaller dimension of slider in (%). Larger is 100%
+
+    const slideSize = this.isHorizontal
+      ? mainDivRect.height * sliderSize
+      : mainDivRect.width * sliderSize;
+
+    this.slideSize = slideSize; // Size of a single slide in slider in pixels
 
     // this.updateZoomControllerTransform(mainDivRect, slidesRect);
 
@@ -172,7 +177,7 @@ class LuloViewer extends Component {
   onWindowResize() {
     const mainDivRect = this.mainDiv.getBoundingClientRect();
     this.containerAspectRatio = mainDivRect.width / mainDivRect.height;
-
+    // this.isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
     // const normalizedSliderSize = this.isHorizontal
     //   ? this.constants.SLIDER_SIZE //* this.containerAspectRatio
     //   : this.constants.SLIDER_SIZE;
@@ -184,17 +189,15 @@ class LuloViewer extends Component {
       sliderSize
     );
     this.sliderSize = sliderSize;
-    // console.log('sider size', sliderSize);
+
+    const slideSize = this.isHorizontal
+      ? mainDivRect.height * sliderSize
+      : mainDivRect.width * sliderSize;
+
+    this.slideSize = slideSize; // Size of a single slide in slider in pixels
+
     console.log('onwindowsresize *************************');
     console.log(mainDivRect, slidesRect);
-
-    // const slidesRect = this.slides.getBoundingClientRect();
-    // const slidesRect = calculateSlidesDivFromMainDiv(
-    //   mainDivRect,
-    //   this.state.sliderPosition,
-    //   this.state.showSlider,
-    //   this.constants.SLIDER_SIZE
-    // );
 
     this.updateZoomControllerTransform(mainDivRect, slidesRect);
     if (this.slider) this.slider.setInitialPosition();
@@ -348,16 +351,19 @@ class LuloViewer extends Component {
     }
   }
 
-  onLeftArrowClick(e) {
+  onArrowClick(arrow, e) {
     e.preventDefault();
     e.stopPropagation();
-    this.changeSlide(-1);
-  }
+    if (arrow === 'left') {
+      this.changeSlide(-1);
+    } else {
+      this.changeSlide(1);
+    }
+    // if (this.slider) {
+    //   console.log('Parent calling *************');
 
-  onRightArrowClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    this.changeSlide(1);
+    //   this.slider.constrainMovement({left: this.slider.state.left, top: this.slider.state.top})
+    // }
   }
 
   getNextSlideIndex(currentIndex, amount) {
@@ -466,6 +472,9 @@ class LuloViewer extends Component {
           this.constants.SLIDER_SIZE
         );
         this.isHorizontal = ['top', 'bottom'].includes(item) ? true : false;
+        this.slideSize = this.isHorizontal
+        ? this.state.mainDivRect.height * this.sliderSize
+        : this.state.mainDivRect.width * this.sliderSize;
         this.setState({ sliderPosition: item, slidesRect }, () => {
           this.updateZoomControllerTransform(
             this.state.mainDivRect,
@@ -775,12 +784,10 @@ class LuloViewer extends Component {
   }
 
   checkPreload() {
-    //First figure out which images should be preloaded based on current image index & MAX_PRELOADED_IMAGES
+    // First figure out which images should be preloaded based on current image index & MAX_PRELOADED_IMAGES.
+    // First one should be current, then the one on the right (next), followed by one on the left (previous)
+    // Then add more images in accending order until MAX_PRELOADED_IMAGES is reached.
     const requiredImages = [];
-    // Add the slide on the left (previous slide)
-    // requiredImages.push(
-    //   this.getNextSlideIndex(this.state.currentSlideIndex, -1)
-    // );
     for (let i = 0; i < this.constants.MAX_PRELOADED_IMAGES + 1; i++) {
       const nextSlide = this.getNextSlideIndex(this.state.currentSlideIndex, i);
 
@@ -799,6 +806,7 @@ class LuloViewer extends Component {
 
     let allLoaded = true;
     const self = this;
+    // Load images one at a time
     requiredImages.forEach((imageIdx, idx) => {
       if (self.state.imagesInfo[imageIdx] === null) {
         allLoaded = false;
@@ -844,7 +852,7 @@ class LuloViewer extends Component {
         // console.log('downloaded image', idx);
         this.setState({ imagesInfo });
 
-        this.checkPreload();
+        this.checkPreload(); // Start checking cycle again to see if more images should be loaded
       }
     };
     image.onerror = () => {
@@ -857,12 +865,6 @@ class LuloViewer extends Component {
 
   render() {
     console.log('*** viewer render ***');
-
-    // const isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
-    // const normalizedSliderSize = isHorizontal
-    //   ? this.constants.SLIDER_SIZE * this.containerAspectRatio
-    //   : this.constants.SLIDER_SIZE;
-    // const sliderSize = this.state.showViewer ? normalizedSliderSize : 1;
 
     //*******************************************
     //****************** arrows *****************
@@ -883,8 +885,7 @@ class LuloViewer extends Component {
         leftArrowColor={this.state.leftArrowColor}
         rightArrowColor={this.state.rightArrowColor}
         currentSlideIndex={this.state.currentSlideIndex}
-        onLeftArrowClick={this.onLeftArrowClick}
-        onRightArrowClick={this.onRightArrowClick}
+        onArrowClick={this.onArrowClick}
         numberOfSlides={this.numberOfSlides}
       />
     ) : null;
@@ -1043,15 +1044,6 @@ class LuloViewer extends Component {
     //*******************************************
     //***************** Slider ******************
     //*******************************************
-    const slideSize = this.isHorizontal
-      ? this.state.mainDivRect.height * this.sliderSize
-      : this.state.mainDivRect.width * this.sliderSize;
-    // const left = isHorizontal
-    //   ? this.lastSliderPos.left || this.lastSliderPos.top
-    //   : 0;
-    // const top = isHorizontal
-    //   ? 0
-    //   : this.lastSliderPos.left || this.lastSliderPos.top;
 
     const slider = (
       <div
@@ -1077,8 +1069,8 @@ class LuloViewer extends Component {
           arrowDisabledColor={this.constants.ARROW_DISABLED_COLOR}
           sliderArrowSize={this.constants.SLIDER_ARROW_SIZE}
           activeSlideIdx={this.state.currentSlideIndex}
-          slideSize={slideSize}
-          slidesStripSize={slideSize * this.numberOfSlides}
+          slideSize={this.slideSize}
+          slidesStripSize={this.slideSize * this.numberOfSlides}
           slideClick={this.setViewerToSlide}
           mainDivRect={this.state.mainDivRect}
           // left={left}

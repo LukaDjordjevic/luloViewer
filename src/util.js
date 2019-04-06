@@ -309,6 +309,79 @@ const calculateSlidesDivFromMainDiv = (
   return slidesRect;
 };
 
+const constrainSliderMovement = (
+  pos,
+  slidesStripSize,
+  contentSize,
+  isHorizontal,
+  parent
+) => {
+  console.log('****** new called', pos);
+
+  let left = pos.left;
+  let top = pos.top;
+
+  if (isHorizontal) {
+    if (slidesStripSize >= contentSize) {
+      // Slides strip can't fit in slides container
+      if (left > 0) {
+        left = 0;
+      }
+      if (left < contentSize - slidesStripSize) {
+        left = contentSize - slidesStripSize;
+      }
+    } else {
+      // Slides strip is smaller than slides container
+
+      if (left > contentSize - slidesStripSize) {
+        left = contentSize - slidesStripSize;
+        parent.setState({
+          bounced: !parent.state.bounced,
+          currentEnergy: parent.state.currentEnergy * this.energyAfterBounce
+        });
+      }
+      if (left < 0) {
+        parent.setState({
+          bounced: !parent.state.bounced,
+          currentEnergy: parent.state.currentEnergy * this.energyAfterBounce
+        });
+        left = 0;
+      }
+    }
+    top = 0;
+  } else {
+    if (slidesStripSize >= contentSize) {
+      // Slides strip can't fit in slides container
+      if (top > 0) {
+        top = 0;
+      }
+      if (top < contentSize - slidesStripSize) {
+        top = contentSize - slidesStripSize;
+      }
+    } else {
+      // Slides strip is smaller than slides container
+      if (top >= contentSize - slidesStripSize) {
+        top = contentSize - slidesStripSize;
+        parent.setState({
+          bounced: !parent.state.bounced,
+          currentEnergy: parent.state.currentEnergy * 0.1
+        });
+      }
+      if (top <= 0) {
+        parent.setState({
+          bounced: !parent.state.bounced,
+          currentEnergy: parent.state.currentEnergy * 0.1
+        });
+        top = 0;
+      }
+    }
+    left = 0;
+  }
+  console.log('new returning', left, top);
+
+  return { left, top };
+};
+
 // const getSliderCenterPos = (
 //   viewerWidth,
 //   viewerHeight,
@@ -346,6 +419,7 @@ module.exports = {
   constrainTranslate,
   getViewRectangleTransform,
   createSlideAnimationKeyframes,
-  calculateSlidesDivFromMainDiv
+  calculateSlidesDivFromMainDiv,
+  constrainSliderMovement
   // getSliderCenterPos
 };

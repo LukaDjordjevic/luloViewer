@@ -9,22 +9,24 @@ class Arrows extends PureComponent {
       rightArrowColor: this.props.defaultColor
     };
 
-    this.onLeftArrowEnter = this.onLeftArrowEnter.bind(this);
-    this.onLeftArrowLeave = this.onLeftArrowLeave.bind(this);
-    this.onRightArrowEnter = this.onRightArrowEnter.bind(this);
-    this.onRightArrowLeave = this.onRightArrowLeave.bind(this);
+    this.onArrowEnter = this.onArrowEnter.bind(this);
+    this.onArrowLeave = this.onArrowLeave.bind(this);
   }
 
-  onLeftArrowEnter() {
-    this.setState({ leftArrowColor: this.props.highlightColor });
+  onArrowEnter(arrow) {
+    if (arrow === 'left') {
+      this.setState({ leftArrowColor: this.props.highlightColor });
+    } else {
+      this.setState({ rightArrowColor: this.props.highlightColor });
+    }
   }
 
-  onLeftArrowLeave() {
-    this.setState({ leftArrowColor: this.props.defaultColor });
-  }
-
-  onRightArrowEnter() {
-    this.setState({ rightArrowColor: this.props.highlightColor });
+  onArrowLeave(arrow) {
+    if (arrow === 'left') {
+      this.setState({ leftArrowColor: this.props.defaultColor });
+    } else {
+      this.setState({ rightArrowColor: this.props.defaultColor });
+    }
   }
 
   onRightArrowLeave() {
@@ -56,9 +58,9 @@ class Arrows extends PureComponent {
       >
         <div
           className="arrow"
-          onMouseEnter={this.onLeftArrowEnter}
-          onMouseLeave={this.onLeftArrowLeave}
-          onMouseUp={this.props.onLeftArrowClick}
+          onMouseEnter={e => this.onArrowEnter('left', e)}
+          onMouseLeave={e => this.onArrowLeave('left', e)}
+          onMouseUp={e => this.props.onArrowClick('left', e)}
           style={{
             width: arrowSize,
             height:
@@ -78,9 +80,9 @@ class Arrows extends PureComponent {
         </div>
         <div
           className="arrow"
-          onMouseEnter={this.onRightArrowEnter}
-          onMouseLeave={this.onRightArrowLeave}
-          onMouseUp={this.props.onRightArrowClick}
+          onMouseEnter={e => this.onArrowEnter('right', e)}
+          onMouseLeave={e => this.onArrowLeave('right', e)}
+          onMouseUp={e => this.props.onArrowClick('right', e)}
           style={{
             width: arrowSize,
             height:
