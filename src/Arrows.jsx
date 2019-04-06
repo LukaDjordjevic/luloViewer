@@ -38,7 +38,8 @@ class Arrows extends PureComponent {
     const arrowsTop =
       this.props.slidesRect.height / 2 -
       (this.props.slidesRect.height * this.props.arrowsSize) / 2 +
-      (this.props.slidesRect.top - this.props.mainDivRect.top);
+      (this.props.slidesRect.top - this.props.mainDivRect.top) -
+      arrowSize / 2;
     const sliderSize = this.props.SHOW_VIEWER ? this.props.sliderSize : 1;
     return (
       <div

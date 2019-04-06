@@ -42,10 +42,10 @@ class App extends Component {
     return (
       <div
         style={{
-          // width: '600px',
-          // height: '600px',
-          width: '80%',
-          height: '70%',
+          width: '650px',
+          height: '500px',
+          // width: '80%',
+          // height: '70%',
           // width: '90%',
           // height: '90%',
           // width: '180px',

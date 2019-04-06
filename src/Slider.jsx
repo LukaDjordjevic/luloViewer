@@ -62,12 +62,6 @@ class Slider extends PureComponent {
       JSON.stringify(this.props.mainDivRect) !==
       JSON.stringify(nextProps.mainDivRect)
     ) {
-      console.log(
-        'slider says maindiv changed',
-        JSON.stringify(this.props.mainDivRect),
-        JSON.stringify(nextProps.mainDivRect)
-      );
-      console.log('next props slide', nextProps.activeSlideIdx);
       // parent div bounding rect has changed
 
       this.calculateLayoutDimensions(nextProps);
@@ -75,7 +69,6 @@ class Slider extends PureComponent {
     }
     if (this.props.activeSlideIdx !== nextProps.activeSlideIdx) {
       // Current slide has changed
-      console.log('will receive props got', nextProps);
       this.setInitialPosition(nextProps);
     }
   }
@@ -85,7 +78,7 @@ class Slider extends PureComponent {
   }
 
   setInitialPosition(nextProps, swapCoords) {
-    console.log('set initial pos');
+    // console.log('set initial pos');
     const props = nextProps || this.props;
 
     let left = this.state.left;
@@ -95,7 +88,6 @@ class Slider extends PureComponent {
       left = this.state.top;
       top = this.state.left;
     }
-    console.log('initial pos thinks active slide is', props.activeSlideIdx);
 
     if (this.allSlidesFit) {
       // console.log('all slides fit');
@@ -157,7 +149,6 @@ class Slider extends PureComponent {
         -1 * index * props.slideSize +
         this.contentSize / 2 -
         props.slideSize / 2;
-      console.log('getSlideCenterPos got', left);
 
       return { left, top: 0 };
     } else {
@@ -165,7 +156,6 @@ class Slider extends PureComponent {
         -1 * index * props.slideSize +
         this.contentSize / 2 -
         props.slideSize / 2;
-      console.log('getSlideCenterPos got', top);
       return { left: 0, top };
     }
   }
@@ -174,7 +164,6 @@ class Slider extends PureComponent {
     e.preventDefault();
     e.stopPropagation();
     const factor = 1;
-    console.log('.!.', e.deltaX, e.deltaY);
     let deltaX = e.deltaX * this.state.currentEnergy;
     let deltaY = e.deltaY * this.state.currentEnergy;
     if (this.state.bounced) {
@@ -186,7 +175,6 @@ class Slider extends PureComponent {
     }
     const left = this.state.left - deltaX / factor;
     const top = this.state.top - deltaY / factor;
-    console.log('123', left, top, this.state.top);
 
     const constrainedPos = this.constrainMovement({ left, top });
     if (this.props.isHorizontal) {
@@ -238,23 +226,16 @@ class Slider extends PureComponent {
       this.setState({ top: constrainedPos.top });
     }
     // this.props.updateSliderPos(constrainedPos); // Save slider position to container component
-
-    console.log(newPosition);
   }
 
   onMouseEnter(arrow, e) {
-    console.log('on enter', arrow, this.startArrowAllowed, this.allSlidesFit);
-
     e.stopPropagation();
     if (arrow === 'start') {
       if (!this.allSlidesFit && this.startArrowAllowed) {
-        console.log('highlighting start');
-
         this.setState({ startArrowColor: this.props.arrowHighlightColor });
       }
     } else {
       if (!this.allSlidesFit && this.endArrowAllowed) {
-        console.log('highlighting end');
         this.setState({ endArrowColor: this.props.arrowHighlightColor });
       }
     }
@@ -305,8 +286,6 @@ class Slider extends PureComponent {
     console.log('slide mouseUp');
 
     const newPos = this.getSlideCenterPos(index);
-    console.log('111', newPos);
-
     if (!this.allSlidesFit) this.animateSlider(newPos);
 
     // e.stopPropagation();
@@ -315,12 +294,6 @@ class Slider extends PureComponent {
 
   animateSlider(newPos) {
     const key = this.props.isHorizontal ? 'left' : 'top';
-    console.log(
-      'sending to keyframes',
-      this.props.slideAnimationsStylesheet,
-      newPos[key],
-      key
-    );
     this.updateSliderKeyframe(
       this.props.slideAnimationsStylesheet,
       newPos[key],
@@ -336,7 +309,6 @@ class Slider extends PureComponent {
   }
 
   updateSliderKeyframe(styleSheet, end, key) {
-    console.log('keyframes got', styleSheet, end, 'key:', key);
     const newPos = { left: this.state.left, top: this.state.top };
     newPos[key] = end;
     if (styleSheet && styleSheet.sheet.cssRules[8])
@@ -360,14 +332,11 @@ class Slider extends PureComponent {
     }`,
       9
     );
-    console.log('saving pos to', newPos);
 
     this.animEndPos = newPos; // Save new position because we need to set state to that value once animation ends
   }
 
   constrainMovement(pos, nextProps) {
-    console.log('constraint input', pos);
-
     const props = nextProps || this.props;
 
     let left = pos.left;
@@ -412,12 +381,6 @@ class Slider extends PureComponent {
     } else {
       if (props.slidesStripSize >= this.contentSize) {
         // Slides strip can't fit in slides container
-        console.log(
-          'slides can not fit',
-          this.props.slidesStripSize,
-          this.contentSize
-        );
-
         if (top > 0) {
           this.startArrowAllowed = false;
           startArrowColor = this.props.arrowDisabledColor;
@@ -429,7 +392,6 @@ class Slider extends PureComponent {
           top = this.contentSize - props.slidesStripSize;
         }
       } else {
-        console.log('is smaller');
         // Slides strip is smaller than slides container
         if (top >= this.contentSize - props.slidesStripSize) {
           top = this.contentSize - props.slidesStripSize;
@@ -448,7 +410,6 @@ class Slider extends PureComponent {
       }
     }
     this.setState({ startArrowColor, endArrowColor });
-    console.log('constrain got', { left, top });
 
     return { left, top };
   }

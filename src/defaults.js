@@ -19,7 +19,7 @@ const defaults = {
   ARROW_DEFAULT_COLOR: '#AAAAAA',
   ARROW_HIGHLIGHT_COLOR: '#FFFFFF',
   ARROW_DISABLED_COLOR: '#333333',
-  SLIDER_SIZE: 0.1, //slider thickness as fraction of viewer dimension
+  SLIDER_SIZE: 0.12, //slider thickness as fraction of viewer dimension
   SLIDER_ARROW_SIZE: 3, // in percent of slider div
   ARROWS_PADDING: 5,
   ZOOM_CONTROLLER_SIZE: 0.18, // width of zoomController as fraction of viewer width

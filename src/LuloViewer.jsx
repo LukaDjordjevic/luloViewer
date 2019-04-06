@@ -60,6 +60,8 @@ class LuloViewer extends Component {
     };
     this.imageLoadFailedArr = [];
     // this.lastSliderPos = { left: 0, top: 0 };
+    this.containerAspectRatio = 1;
+    this.isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
     this.imageLoading = false;
     this.images = [];
     this.changingSlide = false;
@@ -98,20 +100,27 @@ class LuloViewer extends Component {
   componentDidMount() {
     this.loading = false;
     window.oncontextmenu = e => {
-      console.log('kontekst meni');
-
       if (this.constants.ALLOW_MENU) e.preventDefault();
     };
 
+    
     const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
+    // this.setState
+    
+    const normalizedSliderSize = this.isHorizontal
+    ? this.constants.SLIDER_SIZE * this.containerAspectRatio
+    : this.constants.SLIDER_SIZE;
+    const sliderSize = this.state.showViewer ? normalizedSliderSize : 1;
     const slidesRect = calculateSlidesDivFromMainDiv(
       mainDivRect,
       this.state.sliderPosition,
       this.state.showSlider,
-      this.constants.SLIDER_SIZE
+      sliderSize
     );
-    this.updateZoomControllerTransform(mainDivRect, slidesRect);
+    this.sliderSize = sliderSize
 
+    // this.updateZoomControllerTransform(mainDivRect, slidesRect);
+    
     setTimeout(() => {
       // const mainDivRect = this.mainDiv.getBoundingClientRect();
       // const slidesRect = this.slides.getBoundingClientRect();
@@ -121,8 +130,8 @@ class LuloViewer extends Component {
       this.onWindowResize();
     }, 1000);
 
-    console.log('dobijo', slidesRect, mainDivRect);
-
+    // console.log('didMount rects', mainDivRect, slidesRect);
+    
     this.setState(
       {
         slidesRect,
@@ -132,30 +141,24 @@ class LuloViewer extends Component {
         slideCLeft: -1 * slidesRect.width
       },
       () => {
-        // Create style object for slide animations
-        this.slideAnimationsStylesheet = document.createElement('style');
-        this.slideAnimationsStylesheet.type = 'text/css';
-        document.head.appendChild(this.slideAnimationsStylesheet);
-        createSlideAnimationKeyframes(
-          this.slideAnimationsStylesheet,
-          this.state.slidesRect
-        );
+        this.onWindowResize();
         this.updateZoomController();
-        console.log(this.slideAnimationsStylesheet);
       }
     );
     // document.addEventListener('wheel', this.onWheel);
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
+    // Create style object for slide animations
+    this.slideAnimationsStylesheet = document.createElement('style');
+    this.slideAnimationsStylesheet.type = 'text/css';
+    document.head.appendChild(this.slideAnimationsStylesheet);
+    createSlideAnimationKeyframes(
+      this.slideAnimationsStylesheet,
+      this.state.slidesRect
+    );
 
     this.checkPreload();
   }
-
-  // updateSliderPos(newPosition) {
-  //   // console.log(('saving position to', newPosition));
-
-  //   this.lastSliderPos = newPosition;
-  // }
 
   getActiveSlide() {
     const slides = {
@@ -248,10 +251,8 @@ class LuloViewer extends Component {
     //     imageInfo.imageAspectRatio >
     //     this.state.slidesRect.width / this.state.slidesRect.height
     //   ) {
-    //     console.log('veci je aspekt');
     //     offsetY = (height - width / imageInfo.imageAspectRatio) / 2;
     //   } else {
-    //     console.log('manji je aspekt');
     //     offsetY = (width - height * imageInfo.imageAspectRatio) / 2;
     //   }
     // }
@@ -263,20 +264,33 @@ class LuloViewer extends Component {
       // offsetX,
       // offsetY
     };
-    console.log('333', this.zoomControllerTransform);
   }
 
   onWindowResize() {
     console.log('onwindowsresize');
 
     const mainDivRect = this.mainDiv.getBoundingClientRect();
-    // const slidesRect = this.slides.getBoundingClientRect();
+    this.containerAspectRatio = mainDivRect.width / mainDivRect.height;
+
+    const normalizedSliderSize = this.isHorizontal
+      ? this.constants.SLIDER_SIZE * this.containerAspectRatio
+      : this.constants.SLIDER_SIZE;
+    const sliderSize = this.state.showViewer ? normalizedSliderSize : 1;
     const slidesRect = calculateSlidesDivFromMainDiv(
       mainDivRect,
       this.state.sliderPosition,
       this.state.showSlider,
-      this.constants.SLIDER_SIZE
+      sliderSize
     );
+    this.sliderSize = sliderSize;
+
+    // const slidesRect = this.slides.getBoundingClientRect();
+    // const slidesRect = calculateSlidesDivFromMainDiv(
+    //   mainDivRect,
+    //   this.state.sliderPosition,
+    //   this.state.showSlider,
+    //   this.constants.SLIDER_SIZE
+    // );
 
     this.updateZoomControllerTransform(mainDivRect, slidesRect);
     if (this.slider) this.slider.setInitialPosition();
@@ -338,7 +352,7 @@ class LuloViewer extends Component {
         }
         break;
       default:
-        console.log('something else');
+        console.log('some button pressed');
     }
   }
 
@@ -383,7 +397,7 @@ class LuloViewer extends Component {
   }
 
   onWheel(e) {
-    console.log('main onwheel', e.deltaX, e.deltaY, e.ctrlKey, e.button);
+    // console.log('main onwheel', e.deltaX, e.deltaY, e.ctrlKey, e.button);
 
     e.preventDefault();
     e.stopPropagation();
@@ -473,8 +487,6 @@ class LuloViewer extends Component {
   }
 
   handleMenuClick(item) {
-    console.log(item);
-
     switch (item) {
       case 'fullscreen':
         if (this.state.isFullscreen) {
@@ -516,6 +528,7 @@ class LuloViewer extends Component {
           this.state.showSlider,
           this.constants.SLIDER_SIZE
         );
+        this.isHorizontal = ['top', 'bottom'].includes(item) ? true : false;
         this.setState({ sliderPosition: item, slidesRect }, () => {
           this.updateZoomControllerTransform(
             this.state.mainDivRect,
@@ -566,11 +579,6 @@ class LuloViewer extends Component {
         1
       );
       if (this.state.slideALeft === -1 * this.state.slidesRect.width) {
-        console.log(
-          'AAAA IS LEFT',
-          this.state.slideALeft,
-          -1 * this.state.slidesRect.width
-        );
         slideBAnimationName =
           this.state.slideBAnimationName === 'center-left'
             ? 'center-left-alt'
@@ -590,8 +598,6 @@ class LuloViewer extends Component {
           2
         );
       } else if (this.state.slideBLeft === -1 * this.state.slidesRect.width) {
-        console.log('B is left');
-
         slideCAnimationName =
           this.state.slideCAnimationName === 'center-left'
             ? 'center-left-alt'
@@ -611,10 +617,7 @@ class LuloViewer extends Component {
           this.state.currentSlideIndex,
           2
         );
-        console.log('###', this.state.currentSlideIndex, slideBImageIndex);
       } else {
-        console.log('C is left');
-
         slideAAnimationName =
           this.state.slideAAnimationName === 'center-left'
             ? 'center-left-alt'
@@ -641,11 +644,6 @@ class LuloViewer extends Component {
         -1
       );
       if (this.state.slideALeft === -1 * this.state.slidesRect.width) {
-        console.log(
-          'AAAA IS LEFT',
-          this.state.slideALeft,
-          -1 * this.state.slidesRect.width
-        );
         slideAAnimationName =
           this.state.slideAAnimationName === 'left-center'
             ? 'left-center-alt'
@@ -665,8 +663,6 @@ class LuloViewer extends Component {
           -2
         );
       } else if (this.state.slideBLeft === -1 * this.state.slidesRect.width) {
-        console.log('B is left');
-
         slideBAnimationName =
           this.state.slideCAnimationName === 'left-center'
             ? 'left-center-alt'
@@ -687,8 +683,6 @@ class LuloViewer extends Component {
           -2
         );
       } else {
-        console.log('C is left');
-
         slideCAnimationName =
           this.state.slideAAnimationName === 'left-center'
             ? 'left-center-alt'
@@ -778,7 +772,6 @@ class LuloViewer extends Component {
         break;
       default:
     }
-    console.log(index);
   }
 
   checkPreload() {
@@ -796,18 +789,13 @@ class LuloViewer extends Component {
           this.state.currentSlideIndex,
           -1
         );
-        console.log('previous slide is', previousSlide);
-        console.log('pushing previous');
-
         requiredImages.push(previousSlide);
       }
       if (!requiredImages.includes(nextSlide)) {
-        console.log('pushing next');
-
         requiredImages.push(nextSlide);
       }
     }
-    console.log('required slides:', requiredImages);
+    // console.log('required slides:', requiredImages);
 
     let allLoaded = true;
     const self = this;
@@ -827,7 +815,7 @@ class LuloViewer extends Component {
   startImagePreload(idx) {
     this.imageLoading = true;
     const image = new Image();
-    console.log('starting preload of image', idx);
+    // console.log('starting preload of image', idx);
     image.src = this.props.imageUrls[idx];
     image.onload = () => {
       this.imageLoading = false;
@@ -853,7 +841,7 @@ class LuloViewer extends Component {
           zoomMultipliers
         };
 
-        console.log('downloaded image', idx);
+        // console.log('downloaded image', idx);
         this.setState({ imagesInfo });
 
         this.checkPreload();
@@ -862,19 +850,19 @@ class LuloViewer extends Component {
     image.onerror = () => {
       this.imageLoading = false;
       this.imageLoadFailedArr.push(idx);
-      console.log('loud fejld');
+      // console.log('load fejld');
       this.checkPreload();
     };
   }
 
   render() {
-    console.log(
-      '*** viewer render ***',
-      this.state.slidesRect ? this.state.slidesRect.height / 2 : 0
-    );
+    console.log('*** viewer render ***');
 
-    // const activeSlide = this.getActiveSlide();
-    // console.log('active slide', this.state.activeSlide, activeSlide);
+    // const isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
+    // const normalizedSliderSize = isHorizontal
+    //   ? this.constants.SLIDER_SIZE * this.containerAspectRatio
+    //   : this.constants.SLIDER_SIZE;
+    // const sliderSize = this.state.showViewer ? normalizedSliderSize : 1;
 
     //*******************************************
     //****************** arrows *****************
@@ -1038,36 +1026,26 @@ class LuloViewer extends Component {
       ? 'column'
       : 'row';
 
-    const sliderSize = this.state.showViewer ? this.constants.SLIDER_SIZE : 1;
     const slidesWidth =
-      ['left', 'right'].includes(this.state.sliderPosition) &&
-      this.state.showSlider
-        ? (1 - sliderSize) * 100
+      !this.isHorizontal && this.state.showSlider
+        ? (1 - this.sliderSize) * 100
         : 100;
     const slidesHeight =
-      ['top', 'bottom'].includes(this.state.sliderPosition) &&
-      this.state.showSlider
-        ? (1 - sliderSize) * 100
+      this.isHorizontal && this.state.showSlider
+        ? (1 - this.sliderSize) * 100
         : 100;
 
     const sliderWidth =
-      ['left', 'right'].includes(this.state.sliderPosition) &&
-      this.state.showSlider
-        ? sliderSize * 100
-        : 100;
+      !this.isHorizontal && this.state.showSlider ? this.sliderSize * 100 : 100;
     const sliderHeight =
-      ['top', 'bottom'].includes(this.state.sliderPosition) &&
-      this.state.showSlider
-        ? sliderSize * 100
-        : 100;
+      this.isHorizontal && this.state.showSlider ? this.sliderSize * 100 : 100;
 
     //*******************************************
     //***************** Slider ******************
     //*******************************************
-    const isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
-    const slideSize = isHorizontal
-      ? this.state.mainDivRect.height * sliderSize
-      : this.state.mainDivRect.width * sliderSize;
+    const slideSize = this.isHorizontal
+      ? this.state.mainDivRect.height * this.sliderSize
+      : this.state.mainDivRect.width * this.sliderSize;
     // const left = isHorizontal
     //   ? this.lastSliderPos.left || this.lastSliderPos.top
     //   : 0;
@@ -1092,7 +1070,7 @@ class LuloViewer extends Component {
             }
             return 'no-url';
           })}
-          isHorizontal={isHorizontal}
+          isHorizontal={this.isHorizontal}
           backgroundColor={this.state.backgroundColor}
           arrowDefaultColor={this.constants.ARROW_DEFAULT_COLOR}
           arrowHighlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
