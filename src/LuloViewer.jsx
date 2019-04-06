@@ -159,69 +159,6 @@ class LuloViewer extends Component {
     this.checkPreload();
   }
 
-  getActiveSlide() {
-    const slides = {
-      A: this.slideA,
-      B: this.slideB,
-      C: this.slideC
-    };
-    return slides[this.state.activeSlide];
-  }
-
-  updateImageFromZoomController(moveDelta) {
-    const activeSlide = this.getActiveSlide();
-    const imageLeft = activeSlide ? activeSlide.state.left : 0;
-    const imageTop = activeSlide ? activeSlide.state.top : 0;
-    const imageWidth = activeSlide ? activeSlide.state.width : 0;
-    const imageHeight = activeSlide ? activeSlide.state.height : 0;
-    const zoomFactor = activeSlide ? activeSlide.state.zoomFactor : 0;
-
-    const factor =
-      this.state.slidesRect.width / this.state.slidesRect.height >
-      this.state.imagesInfo[this.state.currentSlideIndex].imageAspectRatio
-        ? imageHeight / this.zoomControllerTransform.height
-        : imageWidth / this.zoomControllerTransform.width;
-    const newLeft = imageLeft - moveDelta.x * factor;
-    const newTop = imageTop - moveDelta.y * factor;
-
-    const zoomTarget = updateZoomTarget(
-      newLeft,
-      newTop,
-      imageWidth,
-      imageHeight,
-      this.state.slidesRect.width,
-      this.state.slidesRect.height
-    );
-
-    const { constrainedLeft, constrainedTop } = constrainTranslate(
-      newLeft,
-      newTop,
-      zoomFactor,
-      this.state.slidesRect,
-      this.state.imagesInfo[this.state.currentSlideIndex].imageAspectRatio
-    );
-
-    // const zoomTarget = updateZoomTarget(
-    //   constrainedLeft,
-    //   constrainedTop,
-    //   imageWidth,
-    //   imageHeight,
-    //   this.state.slidesRect.width,
-    //   this.state.slidesRect.width
-    // );
-
-    const newState = {
-      left: constrainedLeft,
-      top: constrainedTop,
-      // left: newLeft,
-      // top: newTop,
-      zoomTarget
-    };
-    activeSlide.setState(newState, () => {
-      this.updateZoomController();
-    });
-  }
-
   componentWillUnmount() {
     console.log('#######  unmounting  ######');
     // Delete animation styleSheet
@@ -232,42 +169,7 @@ class LuloViewer extends Component {
     document.removeEventListener('keydown', this.onKeyDown, false);
   }
 
-  updateZoomControllerTransform(mainDivRect, slidesRect) {
-    const left =
-      slidesRect.width * this.constants.ZOOM_CONTROLLER_POSITION_X +
-      (slidesRect.left - mainDivRect.left);
-    const top =
-      slidesRect.height * this.constants.ZOOM_CONTROLLER_POSITION_Y +
-      (slidesRect.top - mainDivRect.top);
-
-    const width = slidesRect.width * this.constants.ZOOM_CONTROLLER_SIZE;
-    const height = slidesRect.height * this.constants.ZOOM_CONTROLLER_SIZE;
-    // let offsetX = 0;
-    // let offsetY = 0;
-    // const imageInfo = this.state.imagesInfo[this.state.currentSlideIndex];
-    // if (imageInfo) {
-    //   if (
-    //     imageInfo.imageAspectRatio >
-    //     this.state.slidesRect.width / this.state.slidesRect.height
-    //   ) {
-    //     offsetY = (height - width / imageInfo.imageAspectRatio) / 2;
-    //   } else {
-    //     offsetY = (width - height * imageInfo.imageAspectRatio) / 2;
-    //   }
-    // }
-    this.zoomControllerTransform = {
-      left,
-      top,
-      width,
-      height
-      // offsetX,
-      // offsetY
-    };
-  }
-
   onWindowResize() {
-    console.log('onwindowsresize');
-
     const mainDivRect = this.mainDiv.getBoundingClientRect();
     this.containerAspectRatio = mainDivRect.width / mainDivRect.height;
 
@@ -282,7 +184,9 @@ class LuloViewer extends Component {
       sliderSize
     );
     this.sliderSize = sliderSize;
-    console.log('sider size', sliderSize);
+    // console.log('sider size', sliderSize);
+    console.log('onwindowsresize *************************');
+    console.log(mainDivRect, slidesRect);
 
     // const slidesRect = this.slides.getBoundingClientRect();
     // const slidesRect = calculateSlidesDivFromMainDiv(
@@ -486,14 +390,47 @@ class LuloViewer extends Component {
     }
   }
 
+  updateZoomControllerTransform(mainDivRect, slidesRect) {
+    const left =
+      slidesRect.width * this.constants.ZOOM_CONTROLLER_POSITION_X +
+      (slidesRect.left - mainDivRect.left);
+    const top =
+      slidesRect.height * this.constants.ZOOM_CONTROLLER_POSITION_Y +
+      (slidesRect.top - mainDivRect.top);
+
+    const width = slidesRect.width * this.constants.ZOOM_CONTROLLER_SIZE;
+    const height = slidesRect.height * this.constants.ZOOM_CONTROLLER_SIZE;
+    // let offsetX = 0;
+    // let offsetY = 0;
+    // const imageInfo = this.state.imagesInfo[this.state.currentSlideIndex];
+    // if (imageInfo) {
+    //   if (
+    //     imageInfo.imageAspectRatio >
+    //     this.state.slidesRect.width / this.state.slidesRect.height
+    //   ) {
+    //     offsetY = (height - width / imageInfo.imageAspectRatio) / 2;
+    //   } else {
+    //     offsetY = (width - height * imageInfo.imageAspectRatio) / 2;
+    //   }
+    // }
+    this.zoomControllerTransform = {
+      left,
+      top,
+      width,
+      height
+      // offsetX,
+      // offsetY
+    };
+  }
+
   handleMenuClick(item) {
     switch (item) {
       case 'fullscreen':
         if (this.state.isFullscreen) {
-          this.setState({ isFullscreen: false });
+          this.setState({ isFullscreen: false, showMenu: false });
           if (window.fullScreen) document.exitFullscreen();
         } else {
-          this.setState({ isFullscreen: true });
+          this.setState({ isFullscreen: true, showMenu: false });
           this.mainDiv.requestFullscreen();
         }
         break;
@@ -539,6 +476,60 @@ class LuloViewer extends Component {
     }
   }
 
+  updateImageFromZoomController(moveDelta) {
+    const activeSlide = this.getActiveSlide();
+    const imageLeft = activeSlide ? activeSlide.state.left : 0;
+    const imageTop = activeSlide ? activeSlide.state.top : 0;
+    const imageWidth = activeSlide ? activeSlide.state.width : 0;
+    const imageHeight = activeSlide ? activeSlide.state.height : 0;
+    const zoomFactor = activeSlide ? activeSlide.state.zoomFactor : 0;
+
+    const factor =
+      this.state.slidesRect.width / this.state.slidesRect.height >
+      this.state.imagesInfo[this.state.currentSlideIndex].imageAspectRatio
+        ? imageHeight / this.zoomControllerTransform.height
+        : imageWidth / this.zoomControllerTransform.width;
+    const newLeft = imageLeft - moveDelta.x * factor;
+    const newTop = imageTop - moveDelta.y * factor;
+
+    const zoomTarget = updateZoomTarget(
+      newLeft,
+      newTop,
+      imageWidth,
+      imageHeight,
+      this.state.slidesRect.width,
+      this.state.slidesRect.height
+    );
+
+    const { constrainedLeft, constrainedTop } = constrainTranslate(
+      newLeft,
+      newTop,
+      zoomFactor,
+      this.state.slidesRect,
+      this.state.imagesInfo[this.state.currentSlideIndex].imageAspectRatio
+    );
+
+    // const zoomTarget = updateZoomTarget(
+    //   constrainedLeft,
+    //   constrainedTop,
+    //   imageWidth,
+    //   imageHeight,
+    //   this.state.slidesRect.width,
+    //   this.state.slidesRect.width
+    // );
+
+    const newState = {
+      left: constrainedLeft,
+      top: constrainedTop,
+      // left: newLeft,
+      // top: newTop,
+      zoomTarget
+    };
+    activeSlide.setState(newState, () => {
+      this.updateZoomController();
+    });
+  }
+
   saveSlidePosition() {
     console.log('saving slide');
 
@@ -554,6 +545,15 @@ class LuloViewer extends Component {
       imagesInfo[this.state.currentSlideIndex] = imageInfo;
     }
     this.setState({ imagesInfo });
+  }
+
+  getActiveSlide() {
+    const slides = {
+      A: this.slideA,
+      B: this.slideB,
+      C: this.slideC
+    };
+    return slides[this.state.activeSlide];
   }
 
   changeSlide(amount) {
@@ -1131,8 +1131,8 @@ class LuloViewer extends Component {
           width: `${menuWidth}px`,
           // height: `${this.constants.MENU_SIZE}%`,
           // height:'auto',
-          left: `${this.state.menuPosition.x}px`,
-          top: `${this.state.menuPosition.y}px`,
+          left: `${this.state.menuPosition.x + 5}px`,
+          top: `${this.state.menuPosition.y + 5}px`,
           backgroundColor: this.constants.MENU_BGD_COLOR
         }}
         menuIconColor={this.constants.MENU_ICON_COLOR}

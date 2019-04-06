@@ -362,6 +362,9 @@ class Slider extends PureComponent {
         }
       } else {
         // Slides strip is smaller than slides container
+        startArrowColor = this.props.arrowDisabledColor;
+        endArrowColor = this.props.arrowDisabledColor;
+
         if (left >= this.contentSize - props.slidesStripSize) {
           left = this.contentSize - props.slidesStripSize;
           this.setState({
@@ -392,6 +395,8 @@ class Slider extends PureComponent {
         }
       } else {
         // Slides strip is smaller than slides container
+        startArrowColor = this.props.arrowDisabledColor;
+        endArrowColor = this.props.arrowDisabledColor;
         if (top >= this.contentSize - props.slidesStripSize) {
           top = this.contentSize - props.slidesStripSize;
           this.setState({
