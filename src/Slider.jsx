@@ -80,8 +80,12 @@ class Slider extends PureComponent {
     }
     if (this.props.activeSlideIdx !== nextProps.activeSlideIdx) {
       // Current slide has changed
-      console.log('slide change');
-      this.calculateLayoutDimensions(nextProps);
+      console.log(
+        'slide change'
+        // this.getSlideCenterPos(nextProps.activeSlideIdx)
+      );
+
+      // this.calculateLayoutDimensions(nextProps);
 
       this.setInitialPosition(nextProps);
     }
@@ -122,6 +126,13 @@ class Slider extends PureComponent {
       // this.animateSlider(newPos);
       this.constrainAndApply(newPos, nextProps);
     }
+    const newPos = this.getSlideCenterPos(props.activeSlideIdx);
+
+    if (this.isHorizontal) {
+      this.updateArrowColors(newPos.left);
+    } else {
+      this.updateArrowColors(newPos.top);
+    }
   }
 
   getSlideCenterPos(index) {
@@ -160,6 +171,11 @@ class Slider extends PureComponent {
     const top = this.state.top - deltaY / factor;
 
     this.constrainAndApply({ left, top });
+    if (this.isHorizontal) {
+      this.updateArrowColors(left);
+    } else {
+      this.updateArrowColors(top);
+    }
   }
 
   onMouseDown(e) {
@@ -194,6 +210,11 @@ class Slider extends PureComponent {
     // console.log('saving pos', newPosition);
 
     this.constrainAndApply(newPosition);
+    if (this.isHorizontal) {
+      this.updateArrowColors(newPosition.left);
+    } else {
+      this.updateArrowColors(newPosition.top);
+    }
   }
 
   onMouseEnter(arrow, e) {
@@ -299,6 +320,34 @@ class Slider extends PureComponent {
     );
 
     this.animEndPos = newPos; // Save new position because we need to set state to that value once animation ends
+  }
+
+  updateArrowColors(value) {
+    console.log('arrow colors in', value);
+
+    let startArrowColor = this.props.arrowDefaultColor;
+    let endArrowColor = this.props.arrowDefaultColor;
+    this.startArrowAllowed = true;
+    this.endArrowAllowed = true;
+
+    if (this.allSlidesFit) {
+      startArrowColor = this.props.arrowDisabledColor;
+      endArrowColor = this.props.arrowDisabledColor;
+      this.startArrowAllowed = false;
+      this.endArrowAllowed = false;
+    } else {
+      if (value >= 0) {
+        this.startArrowAllowed = false;
+        startArrowColor = this.props.arrowDisabledColor;
+      }
+      if (value <= this.contentSize - this.props.slidesStripSize) {
+        this.endArrowAllowed = false;
+        endArrowColor = this.props.arrowDisabledColor;
+      }
+    }
+    console.log('arrow colors out', startArrowColor, endArrowColor);
+
+    this.setState({ startArrowColor, endArrowColor });
   }
 
   constrainAndApply(pos, nextProps) {
