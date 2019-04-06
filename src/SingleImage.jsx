@@ -295,7 +295,7 @@ class SingleImage extends PureComponent {
 
     return (
       <div
-        className="image-div"
+        className="lv-image-div"
         style={{ cursor: this.state.cursor }}
         ref={el => (this.imageDiv = el)}
         onMouseDown={this.handleMouseDown}

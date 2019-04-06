@@ -38,7 +38,7 @@ class Menu extends PureComponent {
       );
     });
     const sliderPosition = this.props.showSlider ? (
-      <div className="menu-buttons">
+      <div className="lv-menu-buttons">
         {/* <Button
           text="Top"
           onClick={e => this.onMouseUp('top', e)}
@@ -51,7 +51,7 @@ class Menu extends PureComponent {
       </div>
     ) : null;
     return (
-      <div className="menu-main" style={this.props.style}>
+      <div className="lv-menu-main" style={this.props.style}>
         <Item
           text="Fullscreen"
           menuWidth={this.props.menuWidth}
@@ -103,12 +103,12 @@ class Menu extends PureComponent {
 const Item = props => {
   return (
     <div
-      className="menu-item"
+      className="lv-menu-item"
       onMouseUp={props.onClick}
       style={{ height: `${props.menuWidth * 0.1}px` }}
     >
       <div
-        className="menu-text no-select"
+        className="lv-menu-text no-select"
         style={{
           color: props.menuTextColor,
           fontSize: `${props.menuWidth * 0.08}px`
@@ -127,7 +127,7 @@ const Item = props => {
 const Button = props => {
   return (
     <div
-      className="menu-button no-select"
+      className="lv-menu-button no-select"
       onMouseUp={props.onClick}
       style={props.style}
     >

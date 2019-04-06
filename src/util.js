@@ -103,6 +103,7 @@ const getImageDimensions = (
   return { width, height };
 };
 
+// Used by SingleImage component
 const constrainTranslate = (
   left,
   top,
@@ -196,6 +197,7 @@ const getViewRectangleTransform = (
   return { left, top, width, height };
 };
 
+// Creates keyframes for main image scrolling
 const createSlideAnimationKeyframes = (styleSheet, slidesRect) => {
   const width = slidesRect.width;
   if (styleSheet.sheet.cssRules[0]) styleSheet.sheet.deleteRule(0);
@@ -272,6 +274,7 @@ const createSlideAnimationKeyframes = (styleSheet, slidesRect) => {
   );
 };
 
+// Calculates main image rectangle from main div
 const calculateSlidesDivFromMainDiv = (
   mainDivRect,
   sliderPosition,

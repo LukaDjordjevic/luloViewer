@@ -42,10 +42,10 @@ class App extends Component {
     return (
       <div
         style={{
-          width: '500px',
-          height: '300px',
-          // width: '80%',
-          // height: '70%',
+          // width: '500px',
+          // height: '30px',
+          width: '80%',
+          height: '70%',
           // width: '90%',
           // height: '90%',
           // width: '180px',
@@ -53,8 +53,8 @@ class App extends Component {
           // width: '100vw',
           // height: '100vh',
           backgroundColor: '#000',
-          top: '100px',
-          left: '100px',
+          // top: '100px',
+          // left: '100px',
           position: 'relative',
           margin: 0
           // display: 'flex'

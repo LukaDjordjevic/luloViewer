@@ -412,7 +412,7 @@ class Slider extends PureComponent {
     // this.calculateLayoutDimensions();
     const start = this.props.showArrows ? (
       <div
-        className="slider-arrow"
+        className="lv-slider-arrow"
         style={{
           width: `${this.arrowWidth}%`,
           height: `${this.arrowHeight}%`
@@ -445,7 +445,7 @@ class Slider extends PureComponent {
 
     const middle = (
       <div
-        className="slider-content"
+        className="lv-slider-content"
         style={{
           width: `${this.contentWidth}%`,
           height: `${this.contentHeight}%`
@@ -453,7 +453,7 @@ class Slider extends PureComponent {
       >
         <div
           ref={el => (this.slidesStrip = el)}
-          className="slides-strip"
+          className="lv-slides-strip"
           style={{
             left: `${this.state.left}px`,
             top: `${this.state.top}px`,
@@ -480,7 +480,7 @@ class Slider extends PureComponent {
 
     const end = this.props.showArrows ? (
       <div
-        className="slider-arrow"
+        className="lv-slider-arrow"
         style={{
           width: `${this.arrowWidth}%`,
           height: `${this.arrowHeight}%`
@@ -499,7 +499,7 @@ class Slider extends PureComponent {
 
     return (
       <div
-        className="slider-main"
+        className="lv-slider-main"
         style={{
           backgroundColor: this.props.backgroundColor,
           flexDirection: this.props.isHorizontal ? 'row' : 'column'
@@ -546,7 +546,7 @@ const SingleSlide = props => {
   // );
   return (
     <div
-      className="single-slide"
+      className="lv-single-slide"
       style={style}
       onMouseUp={e => {
         props.sliderCallback(props.index);
@@ -555,14 +555,14 @@ const SingleSlide = props => {
     >
       {/* {image} */}
       <div
-        className="slide-image"
+        className="lv-slide-image"
         style={{
           backgroundImage: `${"url('"}${props.backgroundImage}${"'"}`,
           width: `${100 - slideMargin * 2}%`,
           height: `${100 - slideMargin * 2}%`
         }}
       />
-      {props.slideActive ? null : <div className="photo-darken" />}
+      {props.slideActive ? null : <div className="lv-photo-darken" />}
     </div>
   );
 };

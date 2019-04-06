@@ -917,14 +917,14 @@ class LuloViewer extends Component {
     //****************************************
     const photoSlides = (
       <div
-        className="photo-slides"
+        className="lv-photo-slides"
         style={{
           width: this.state.slidesRect.width,
           height: this.state.slidesRect.height
         }}
       >
         <div
-          className="main-image-div"
+          className="lv-main-image-div"
           style={{
             animationName: this.state.slideAAnimationName,
             animationDuration: `${this.state.slideTransitionDuration}s`,
@@ -950,16 +950,16 @@ class LuloViewer extends Component {
               updateZoomController={this.updateZoomController}
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideAImageIndex) ? (
-            <div className="message">
+            <div className="lv-message">
               Image {this.props.imageUrls[this.state.currentSlideIndex]} failed
               to load.
             </div>
           ) : (
-            <div className="message">Image Loading</div>
+            <div className="lv-message">Image Loading</div>
           )}
         </div>
         <div
-          className="main-image-div"
+          className="lv-main-image-div"
           style={{
             animationName: this.state.slideBAnimationName,
             animationDuration: `${this.state.slideTransitionDuration}s`,
@@ -981,16 +981,16 @@ class LuloViewer extends Component {
               updateZoomController={this.updateZoomController}
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideBImageIndex) ? (
-            <div className="message">
+            <div className="lv-message">
               Image {this.props.imageUrls[this.state.currentSlideIndex]} failed
               to load.
             </div>
           ) : (
-            <div className="message">Image Loading</div>
+            <div className="lv-message">Image Loading</div>
           )}
         </div>
         <div
-          className="main-image-div"
+          className="lv-main-image-div"
           style={{
             animationName: this.state.slideCAnimationName,
             animationDuration: `${this.state.slideTransitionDuration}s`,
@@ -1012,12 +1012,12 @@ class LuloViewer extends Component {
               updateZoomController={this.updateZoomController}
             />
           ) : this.imageLoadFailedArr.includes(this.state.slideCImageIndex) ? (
-            <div className="message">
+            <div className="lv-message">
               Image {this.props.imageUrls[this.state.currentSlideIndex]} failed
               to load.
             </div>
           ) : (
-            <div className="message">Image Loading</div>
+            <div className="lv-message">Image Loading</div>
           )}
         </div>
       </div>
@@ -1047,7 +1047,7 @@ class LuloViewer extends Component {
 
     const slider = (
       <div
-        className="layout-slider"
+        className="lv-layout-slider"
         style={{
           width: `${sliderWidth}%`,
           height: `${sliderHeight}%`
@@ -1093,7 +1093,7 @@ class LuloViewer extends Component {
 
     const middle = this.state.showViewer ? (
       <div
-        className="slides-main"
+        className="lv-slides-main"
         ref={el => (this.slides = el)}
         style={{
           width: `${slidesWidth}%`,
@@ -1140,13 +1140,13 @@ class LuloViewer extends Component {
     ) : null;
 
     return (
-      <div className="viewer" ref={el => (this.mainDiv = el)}>
+      <div className="lv-viewer" ref={el => (this.mainDiv = el)}>
         {/* if (this.loading) return ; */}
         {this.loading ? (
           <div>.!.</div>
         ) : (
           <div
-            className="layout-main"
+            className="lv-layout-main"
             style={{
               width: `${this.state.mainDivRect.width}px`,
               height: `${this.state.mainDivRect.height}px`,

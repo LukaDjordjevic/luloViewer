@@ -45,7 +45,7 @@ class Arrows extends PureComponent {
     const sliderSize = this.props.SHOW_VIEWER ? this.props.sliderSize : 1;
     return (
       <div
-        className="arrows"
+        className="lv-arrows"
         style={{
           top: `${arrowsTop}px`,
 
@@ -57,7 +57,7 @@ class Arrows extends PureComponent {
         }}
       >
         <div
-          className="arrow"
+          className="lv-arrow"
           onMouseEnter={e => this.onArrowEnter('left', e)}
           onMouseLeave={e => this.onArrowLeave('left', e)}
           onMouseUp={e => this.props.onArrowClick('left', e)}
@@ -70,7 +70,7 @@ class Arrows extends PureComponent {
             paddingLeft: `${this.props.arrowsPadding}%`
           }}
         >
-          <div className="arrows-icon">
+          <div className="lv-arrows-icon">
             <Icon
               name="arrow-left"
               color={this.state.leftArrowColor}
@@ -79,7 +79,7 @@ class Arrows extends PureComponent {
           </div>
         </div>
         <div
-          className="arrow"
+          className="lv-arrow"
           onMouseEnter={e => this.onArrowEnter('right', e)}
           onMouseLeave={e => this.onArrowLeave('right', e)}
           onMouseUp={e => this.props.onArrowClick('right', e)}
@@ -93,7 +93,7 @@ class Arrows extends PureComponent {
             paddingRight: `${this.props.arrowsPadding}%`
           }}
         >
-          <div className="arrows-icon">
+          <div className="lv-arrows-icon">
             <Icon
               name="arrow-right"
               color={this.state.rightArrowColor}

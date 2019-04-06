@@ -79,14 +79,14 @@ class ZoomController extends PureComponent {
       viewRectangleHeight = Math.floor(this.props.style.height);
     return (
       <div
-        className="zoom-controller"
+        className="lv-zoom-controller"
         style={this.props.style}
         onWheel={this.onWheel}
         ref={el => (this.zoomController = el)}
       >
-        <div className="zoom-controller-bgd" />
+        <div className="lv-zoom-controller-bgd" />
         <div
-          className="view-rectangle"
+          className="lv-view-rectangle"
           style={{
             left: `${viewRectangleLeft}${'px'}`,
             top: `${viewRectangleTop}${'px'}`,
