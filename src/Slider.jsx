@@ -339,7 +339,8 @@ class Slider extends PureComponent {
     console.log('keyframes got', styleSheet, end, 'key:', key);
     const newPos = { left: this.state.left, top: this.state.top };
     newPos[key] = end;
-    if (styleSheet.sheet.cssRules[8]) styleSheet.sheet.deleteRule(8);
+    if (styleSheet && styleSheet.sheet.cssRules[8])
+      styleSheet.sheet.deleteRule(8);
     styleSheet.sheet.insertRule(
       `
     @keyframes slider-move {
@@ -348,7 +349,8 @@ class Slider extends PureComponent {
     }`,
       8
     );
-    if (styleSheet.sheet.cssRules[9]) styleSheet.sheet.deleteRule(9);
+    if (styleSheet && styleSheet.sheet.cssRules[9])
+      styleSheet.sheet.deleteRule(9);
     console.log('***********', styleSheet.sheet.cssRules);
     styleSheet.sheet.insertRule(
       `

@@ -117,6 +117,7 @@ const Item = props => {
         <p>{props.text}</p>
       </div>
       <div style={{ width: '10%' }}>
+        {/* <img src={'./check.svg'} /> */}
         <Icon name={props.iconName} color={props.menuIconColor} size="100%" />
       </div>
     </div>

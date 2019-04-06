@@ -198,13 +198,13 @@
   margin: 3%;
   margin-left: 0;
   width: 70%;
-  height: 30%;
+  /* height: 30%; */
 }
 
 .menu-button {
   background-color: rgb(80, 92, 99);
   color: lightgray;
-  padding: 3%;
+  padding: 2% 3%;
   margin: 3%;
   border-radius: 10%;
   /* font-size: 30%; */

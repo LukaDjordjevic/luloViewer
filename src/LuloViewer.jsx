@@ -479,7 +479,7 @@ class LuloViewer extends Component {
       case 'fullscreen':
         if (this.state.isFullscreen) {
           this.setState({ isFullscreen: false });
-          document.exitFullscreen();
+          if (window.fullScreen) document.exitFullscreen();
         } else {
           this.setState({ isFullscreen: true });
           this.mainDiv.requestFullscreen();
@@ -1146,7 +1146,7 @@ class LuloViewer extends Component {
 
     let menuWidth =
       (this.constants.MENU_SIZE / 100) * this.state.mainDivRect.width;
-    if (menuWidth > 120) menuWidth = 120;
+    if (menuWidth > 150) menuWidth = 150;
     const menu = this.state.showMenu ? (
       <Menu
         style={{
