@@ -10,7 +10,6 @@ const updateZoomTarget = (
 ) => {
   const zoomTargetX = (-1 * imageLeft + boundingRectWidth / 2) / imageWidth;
   const zoomTargetY = (-1 * imageTop + boundingRectHeight / 2) / imageHeight;
-  console.log(('new zoom target', { x: zoomTargetX, y: zoomTargetY }));
 
   return { x: zoomTargetX, y: zoomTargetY };
 };
@@ -200,7 +199,6 @@ const getViewRectangleTransform = (
 const createSlideAnimationKeyframes = (styleSheet, slidesRect) => {
   const width = slidesRect.width;
   if (styleSheet.sheet.cssRules[0]) styleSheet.sheet.deleteRule(0);
-  console.log('***********', styleSheet.sheet.cssRules);
   styleSheet.sheet.insertRule(
     `
   @keyframes center-left {
@@ -272,7 +270,6 @@ const createSlideAnimationKeyframes = (styleSheet, slidesRect) => {
   }`,
     7
   );
-  console.log('new animations:', styleSheet.sheet);
 };
 
 const calculateSlidesDivFromMainDiv = (

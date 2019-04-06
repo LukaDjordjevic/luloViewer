@@ -103,24 +103,23 @@ class LuloViewer extends Component {
       if (this.constants.ALLOW_MENU) e.preventDefault();
     };
 
-    
     const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
     // this.setState
-    
-    const normalizedSliderSize = this.isHorizontal
-    ? this.constants.SLIDER_SIZE * this.containerAspectRatio
-    : this.constants.SLIDER_SIZE;
-    const sliderSize = this.state.showViewer ? normalizedSliderSize : 1;
+
+    // const normalizedSliderSize = this.isHorizontal
+    //   ? this.constants.SLIDER_SIZE //* this.containerAspectRatio
+    //   : this.constants.SLIDER_SIZE;
+    const sliderSize = this.state.showViewer ? this.constants.SLIDER_SIZE : 1;
     const slidesRect = calculateSlidesDivFromMainDiv(
       mainDivRect,
       this.state.sliderPosition,
       this.state.showSlider,
       sliderSize
     );
-    this.sliderSize = sliderSize
+    this.sliderSize = sliderSize;
 
     // this.updateZoomControllerTransform(mainDivRect, slidesRect);
-    
+
     setTimeout(() => {
       // const mainDivRect = this.mainDiv.getBoundingClientRect();
       // const slidesRect = this.slides.getBoundingClientRect();
@@ -131,7 +130,7 @@ class LuloViewer extends Component {
     }, 1000);
 
     // console.log('didMount rects', mainDivRect, slidesRect);
-    
+
     this.setState(
       {
         slidesRect,
@@ -272,10 +271,10 @@ class LuloViewer extends Component {
     const mainDivRect = this.mainDiv.getBoundingClientRect();
     this.containerAspectRatio = mainDivRect.width / mainDivRect.height;
 
-    const normalizedSliderSize = this.isHorizontal
-      ? this.constants.SLIDER_SIZE * this.containerAspectRatio
-      : this.constants.SLIDER_SIZE;
-    const sliderSize = this.state.showViewer ? normalizedSliderSize : 1;
+    // const normalizedSliderSize = this.isHorizontal
+    //   ? this.constants.SLIDER_SIZE //* this.containerAspectRatio
+    //   : this.constants.SLIDER_SIZE;
+    const sliderSize = this.state.showViewer ? this.constants.SLIDER_SIZE : 1;
     const slidesRect = calculateSlidesDivFromMainDiv(
       mainDivRect,
       this.state.sliderPosition,
@@ -283,6 +282,7 @@ class LuloViewer extends Component {
       sliderSize
     );
     this.sliderSize = sliderSize;
+    console.log('sider size', sliderSize);
 
     // const slidesRect = this.slides.getBoundingClientRect();
     // const slidesRect = calculateSlidesDivFromMainDiv(

@@ -323,7 +323,6 @@ class Slider extends PureComponent {
     );
     if (styleSheet && styleSheet.sheet.cssRules[9])
       styleSheet.sheet.deleteRule(9);
-    console.log('***********', styleSheet.sheet.cssRules);
     styleSheet.sheet.insertRule(
       `
     @keyframes slider-move-alt {
