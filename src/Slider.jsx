@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { getSliderCenterPos } from './util';
 import Icon from './Icon';
 
 class Slider extends PureComponent {
@@ -38,13 +37,10 @@ class Slider extends PureComponent {
     //   this.setState({ left: 300 });
     // }, 5000);
     this.slidesStrip.onanimationend = this.onAnimationEnd;
-    // this.sliderStylesheet = document.createElement('style');
-    // this.sliderStylesheet.type = 'text/css';
-    // document.head.appendChild(this.sliderStylesheet);
   }
 
   onAnimationEnd() {
-    console.log('animation end');
+    console.log('animation end', this.animEndPos);
 
     this.setState(this.animEndPos);
   }
@@ -55,14 +51,13 @@ class Slider extends PureComponent {
 
       // isHorizontal has changed
       this.calculateLayoutDimensions(nextProps);
-      this.setInitialPosition(nextProps);
+      this.setInitialPosition(nextProps, true);
       // Flip left & top
-      const newPosition = {
-        left: this.props.top,
-        top: this.props.left
-      };
-      // this.props.updateSliderPos(newPosition);
-      this.setState(newPosition);
+      // const newPosition = {
+      //   left: this.props.top,
+      //   top: this.props.left
+      // };
+      // this.setState(newPosition);
     }
     if (
       JSON.stringify(this.props.mainDivRect) !==
@@ -90,13 +85,16 @@ class Slider extends PureComponent {
     console.log('touch end');
   }
 
-  setInitialPosition(nextProps) {
+  setInitialPosition(nextProps, swapCoords) {
     console.log('set initial pos');
     const props = nextProps || this.props;
 
     let left = this.state.left;
     let top = this.state.top;
-    // this.forceUpdate();
+    if (swapCoords) {
+      left = this.state.top;
+      top = this.state.left;
+    }
     console.log('initial pos thinks active slide is', props.activeSlideIdx);
 
     if (this.allSlidesFit) {
@@ -120,9 +118,9 @@ class Slider extends PureComponent {
       }
     } else {
       console.log('slides no fit');
-      // const newPos = this.getSlideCenterPos(nextProps);
-      // const constrainedPos = this.constrainMovement(newPos, nextProps);
 
+      const newPos = this.getSlideCenterPos(props.activeSlideIdx);
+      const constrainedPos = this.constrainMovement(newPos, nextProps);
       this.setState({
         // left: constrainedPos.left,
         // top: constrainedPos.top,
@@ -130,37 +128,17 @@ class Slider extends PureComponent {
         endArrowColor: props.arrowDefaultColor
       });
       const index = props.activeSlideIdx;
-      const key = this.props.isHorizontal ? 'left' : 'top';
-      const start = this.state[key];
-      const end =
-        start -
-        (index - this.props.activeSlideIdx) * this.props.slideSize -
-        this.props.slideSize / 2;
-      console.log('start end', start, end, this.props.slideSize);
 
-      this.updateSliderKeyframe(
-        this.props.slideAnimationsStylesheet,
-        start,
-        end,
-        key,
-        index
-      );
-      console.log('style', this.styleSheet);
-
-      this.setState({
-        animationName:
-          this.state.animationName === 'slider-move'
-            ? 'slider-move-alt'
-            : 'slider-move'
-      });
+      this.animateSlider(constrainedPos);
     }
   }
-  getSlideCenterPos(nextProps) {
-    const props = nextProps || this.props;
+
+  getSlideCenterPos(index) {
+    const props = this.props;
 
     if (props.isHorizontal) {
       const left =
-        -1 * props.activeSlideIdx * props.slideSize +
+        -1 * index * props.slideSize +
         this.contentSize / 2 -
         props.slideSize / 2;
       console.log('getSlideCenterPos got', left);
@@ -168,7 +146,7 @@ class Slider extends PureComponent {
       return { left, top: 0 };
     } else {
       const top =
-        -1 * props.activeSlideIdx * props.slideSize +
+        -1 * index * props.slideSize +
         this.contentSize / 2 -
         props.slideSize / 2;
       console.log('getSlideCenterPos got', top);
@@ -200,10 +178,6 @@ class Slider extends PureComponent {
     } else {
       this.setState({ top: constrainedPos.top });
     }
-    // this.props.updateSliderPos({
-    //   left: constrainedPos.left,
-    //   top: constrainedPos.top
-    // });
   }
 
   onMouseDown(e) {
@@ -307,25 +281,34 @@ class Slider extends PureComponent {
       }
     }
     const constrainedPos = this.constrainMovement({ left, top });
-    this.setState(constrainedPos);
+    this.animateSlider(constrainedPos);
   }
 
   slideMouseUp(index, e) {
     console.log('slide mouseUp');
-    const key = this.props.isHorizontal ? 'left' : 'top';
-    const start = this.state[key];
-    const end =
-      start - (index - this.props.activeSlideIdx) * this.props.slideSize;
-    console.log('start end', start, end, this.props.slideSize);
 
+    const newPos = this.getSlideCenterPos(index);
+    console.log('111', newPos);
+
+    this.animateSlider(newPos);
+
+    // e.stopPropagation();
+    if (!this.dragging) this.props.slideClick(index, e);
+  }
+
+  animateSlider(newPos) {
+    const key = this.props.isHorizontal ? 'left' : 'top';
+    console.log(
+      'sending to keyframes',
+      this.props.slideAnimationsStylesheet,
+      newPos[key],
+      key
+    );
     this.updateSliderKeyframe(
       this.props.slideAnimationsStylesheet,
-      start,
-      end,
-      key,
-      index
+      newPos[key],
+      key
     );
-    console.log('style', this.styleSheet);
 
     this.setState({
       animationName:
@@ -333,27 +316,18 @@ class Slider extends PureComponent {
           ? 'slider-move-alt'
           : 'slider-move'
     });
-
-    // e.stopPropagation();
-    if (!this.dragging) this.props.slideClick(index, e);
   }
 
-  updateSliderKeyframe(styleSheet, start, end, key, index) {
-    console.log('style got', styleSheet, start, end, key);
+  updateSliderKeyframe(styleSheet, end, key) {
+    console.log('keyframes got', styleSheet, end, 'key:', key);
     const newPos = { left: this.state.left, top: this.state.top };
-    let midPositionValue =
-      this.contentSize / 2 -
-      index * this.props.slideSize -
-      this.props.slideSize / 2;
-    newPos[key] = midPositionValue;
-    const constrainedPos = this.constrainMovement(newPos);
+    newPos[key] = end;
     if (styleSheet.sheet.cssRules[8]) styleSheet.sheet.deleteRule(8);
-    console.log('modified end', midPositionValue);
     styleSheet.sheet.insertRule(
       `
     @keyframes slider-move {
-      from { ${key}: ${start}px; } 
-      to { ${key}: ${constrainedPos[key]}px; }
+      from { ${key}: ${this.state[key]}px; } 
+      to { ${key}: ${newPos[key]}px; }
     }`,
       8
     );
@@ -362,13 +336,14 @@ class Slider extends PureComponent {
     styleSheet.sheet.insertRule(
       `
     @keyframes slider-move-alt {
-      from { ${key}: ${start}px; } 
-      to { ${key}: ${constrainedPos[key]}px; }
+      from { ${key}: ${this.state[key]}px; } 
+      to { ${key}: ${newPos[key]}px; }
     }`,
       9
     );
+    console.log('saving pos to', newPos);
 
-    this.animEndPos = constrainedPos; // Save new position because we need to set state to that value once animation ends
+    this.animEndPos = newPos; // Save new position because we need to set state to that value once animation ends
   }
 
   constrainMovement(pos, nextProps) {
@@ -476,8 +451,6 @@ class Slider extends PureComponent {
   }
 
   render() {
-    console.log('slider render', this.props.mainDivRect);
-
     const startIconName = this.props.isHorizontal ? 'arrow-left' : 'arrow-up';
     const endIconName = this.props.isHorizontal ? 'arrow-right' : 'arrow-down';
     // this.calculateLayoutDimensions();
