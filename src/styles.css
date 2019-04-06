@@ -161,9 +161,9 @@
 /***********************/
 
 .menu-main {
-  width: 150px;
+  /* width: 150px; */
   position: absolute;
-  padding: 1.5%;
+  padding: 1%;
   z-index: 2;
   box-shadow: 7px 7px 14px rgba(0, 0, 0, 0.5);
 }
@@ -172,7 +172,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  height: 20px;
+  /* height: 20px; */
   padding: 1%;
 }
 
@@ -182,8 +182,8 @@
 
 .menu-text {
   /* color: white; */
-  /* width: 80%; */
-  font-size: 80%;
+  width: 80%;
+  /* font-size: 2vw; */
 }
 
 .menu-item p {
@@ -196,7 +196,9 @@
   flex-direction: row;
   justify-content: flex-start;
   margin: 3%;
-  width: 90%;
+  margin-left: 0;
+  width: 70%;
+  height: 30%;
 }
 
 .menu-button {
@@ -205,7 +207,7 @@
   padding: 3%;
   margin: 3%;
   border-radius: 10%;
-  font-size: 30%;
+  /* font-size: 30%; */
 }
 
 .no-select {

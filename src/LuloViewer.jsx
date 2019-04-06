@@ -1144,10 +1144,13 @@ class LuloViewer extends Component {
         ? slider
         : null;
 
+    let menuWidth =
+      (this.constants.MENU_SIZE / 100) * this.state.mainDivRect.width;
+    if (menuWidth > 120) menuWidth = 120;
     const menu = this.state.showMenu ? (
       <Menu
         style={{
-          // width: `${this.constants.MENU_SIZE}%`,
+          width: `${menuWidth}px`,
           // height: `${this.constants.MENU_SIZE}%`,
           // height:'auto',
           left: `${this.state.menuPosition.x}px`,
@@ -1162,6 +1165,7 @@ class LuloViewer extends Component {
         showZoomController={this.state.showZoomController}
         slideTransitionDuration={this.state.slideTransitionDuration}
         isFullscreen={this.state.isFullscreen}
+        menuWidth={menuWidth}
       />
     ) : null;
 

@@ -51,8 +51,7 @@ class Slider extends PureComponent {
 
       // isHorizontal has changed
       this.calculateLayoutDimensions(nextProps);
-      this.setInitialPosition(nextProps, true);
-      // Flip left & top
+      this.setInitialPosition(nextProps, false);
       // const newPosition = {
       //   left: this.props.top,
       //   top: this.props.left
@@ -91,6 +90,7 @@ class Slider extends PureComponent {
 
     let left = this.state.left;
     let top = this.state.top;
+    // Flip left & top when isHorizontal has changed
     if (swapCoords) {
       left = this.state.top;
       top = this.state.left;
@@ -98,28 +98,45 @@ class Slider extends PureComponent {
     console.log('initial pos thinks active slide is', props.activeSlideIdx);
 
     if (this.allSlidesFit) {
-      console.log('all slides fit');
+      // console.log('all slides fit');
+      const newPos = {
+        left: (this.contentSize - props.slidesStripSize) / 2,
+        top: (this.contentSize - props.slidesStripSize) / 2
+      };
       if (props.isHorizontal) {
-        left = (this.contentSize - props.slidesStripSize) / 2;
-        this.setState({
-          left,
-          top: 0,
-          startArrowColor: props.arrowDisabledColor,
-          endArrowColor: props.arrowDisabledColor
-        });
+        newPos.top = 0;
       } else {
-        top = (this.contentSize - props.slidesStripSize) / 2;
-        this.setState({
-          left: 0,
-          top,
-          startArrowColor: props.arrowDisabledColor,
-          endArrowColor: props.arrowDisabledColor
-        });
+        newPos.left = 0;
       }
-    } else {
-      console.log('slides no fit');
 
+      // if (props.isHorizontal) {
+      //   left = (this.contentSize - props.slidesStripSize) / 2;
+      //   this.setState({
+      //     left,
+      //     top: 0,
+      //     startArrowColor: props.arrowDisabledColor,
+      //     endArrowColor: props.arrowDisabledColor
+      //   });
+      // } else {
+      //   top = (this.contentSize - props.slidesStripSize) / 2;
+      //   this.setState({
+      //     left: 0,
+      //     top,
+      //     startArrowColor: props.arrowDisabledColor,
+      //     endArrowColor: props.arrowDisabledColor
+      //   });
+      // }
+      const constrainedPos = this.constrainMovement(newPos, nextProps);
+      this.setState(constrainedPos); // Chrome animate end event bug
+      this.animateSlider(constrainedPos);
+    } else {
+      // console.log('slides no fit');
       const newPos = this.getSlideCenterPos(props.activeSlideIdx);
+      if (props.isHorizontal) {
+        newPos.top = 0;
+      } else {
+        newPos.left = 0;
+      }
       const constrainedPos = this.constrainMovement(newPos, nextProps);
       this.setState({
         left: constrainedPos.left,
@@ -127,7 +144,6 @@ class Slider extends PureComponent {
         startArrowColor: props.arrowDisabledColor,
         endArrowColor: props.arrowDefaultColor
       });
-      const index = props.activeSlideIdx;
 
       this.animateSlider(constrainedPos);
     }
@@ -281,7 +297,7 @@ class Slider extends PureComponent {
       }
     }
     const constrainedPos = this.constrainMovement({ left, top });
-    this.setState(constrainedPos); // This is because onanimationend won't fire in Chrome
+    this.setState(constrainedPos); // This is because onanimationend won't fire in hrome
     this.animateSlider(constrainedPos);
   }
 
@@ -291,7 +307,7 @@ class Slider extends PureComponent {
     const newPos = this.getSlideCenterPos(index);
     console.log('111', newPos);
 
-    this.animateSlider(newPos);
+    if (!this.allSlidesFit) this.animateSlider(newPos);
 
     // e.stopPropagation();
     if (!this.dragging) this.props.slideClick(index, e);
@@ -511,7 +527,7 @@ class Slider extends PureComponent {
             height: this.props.isHorizontal
               ? this.props.slideSize
               : this.props.slidesStripSize,
-            display: this.props.isHorizontal ? 'inline-flex' : 'block'
+            display: this.props.isHorizontal ? 'flex' : 'block'
           }}
           onMouseDown={this.onMouseDown}
           onTouchEnd={this.onTouchEnd}

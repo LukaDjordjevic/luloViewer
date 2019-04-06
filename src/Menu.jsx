@@ -26,22 +26,35 @@ class Menu extends PureComponent {
   // }
 
   render() {
+    const buttonNames = ['bottom', 'right', 'top', 'left'];
+    const buttons = buttonNames.map(name => {
+      return (
+        <Button
+          key={name}
+          text={name}
+          onClick={e => this.onMouseUp(name, e)}
+          style={{ marginLeft: 0, fontSize: this.props.menuWidth * 0.07 }}
+        />
+      );
+    });
     const sliderPosition = this.props.showSlider ? (
       <div className="menu-buttons">
-        <Button
+        {/* <Button
           text="Top"
           onClick={e => this.onMouseUp('top', e)}
-          style={{ marginLeft: 0 }}
+          style={{ marginLeft: 0, fontSize: this.props.menuWidth * 0.05 }}
         />
         <Button text="Bottom" onClick={e => this.onMouseUp('bottom', e)} />
         <Button text="Left" onClick={e => this.onMouseUp('left', e)} />
-        <Button text="Right" onClick={e => this.onMouseUp('right', e)} />
+        <Button text="Right" onClick={e => this.onMouseUp('right', e)} /> */}
+        {buttons}
       </div>
     ) : null;
     return (
       <div className="menu-main" style={this.props.style}>
         <Item
           text="Fullscreen"
+          menuWidth={this.props.menuWidth}
           menuIconColor={this.props.menuIconColor}
           menuTextColor={this.props.menuTextColor}
           iconName={this.props.isFullscreen ? 'check' : 'uncheck'}
@@ -49,6 +62,7 @@ class Menu extends PureComponent {
         />
         <Item
           text="Show arrows"
+          menuWidth={this.props.menuWidth}
           menuIconColor={this.props.menuIconColor}
           menuTextColor={this.props.menuTextColor}
           iconName={this.props.showArrows ? 'check' : 'uncheck'}
@@ -56,6 +70,7 @@ class Menu extends PureComponent {
         />
         <Item
           text="Show zoom thingy"
+          menuWidth={this.props.menuWidth}
           menuIconColor={this.props.menuIconColor}
           menuTextColor={this.props.menuTextColor}
           iconName={this.props.showZoomController ? 'check' : 'uncheck'}
@@ -63,6 +78,7 @@ class Menu extends PureComponent {
         />
         <Item
           text="Show slider"
+          menuWidth={this.props.menuWidth}
           menuIconColor={this.props.menuIconColor}
           menuTextColor={this.props.menuTextColor}
           iconName={this.props.showSlider ? 'check' : 'uncheck'}
@@ -71,6 +87,7 @@ class Menu extends PureComponent {
         {sliderPosition}
         <Item
           text="Animate slides"
+          menuWidth={this.props.menuWidth}
           menuIconColor={this.props.menuIconColor}
           menuTextColor={this.props.menuTextColor}
           iconName={
@@ -85,10 +102,17 @@ class Menu extends PureComponent {
 
 const Item = props => {
   return (
-    <div className="menu-item" onMouseUp={props.onClick}>
+    <div
+      className="menu-item"
+      onMouseUp={props.onClick}
+      style={{ height: `${props.menuWidth * 0.1}px` }}
+    >
       <div
         className="menu-text no-select"
-        style={{ color: props.menuTextColor }}
+        style={{
+          color: props.menuTextColor,
+          fontSize: `${props.menuWidth * 0.08}px`
+        }}
       >
         <p>{props.text}</p>
       </div>
