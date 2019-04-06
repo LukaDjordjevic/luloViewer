@@ -122,8 +122,8 @@ class Slider extends PureComponent {
       const newPos = this.getSlideCenterPos(props.activeSlideIdx);
       const constrainedPos = this.constrainMovement(newPos, nextProps);
       this.setState({
-        // left: constrainedPos.left,
-        // top: constrainedPos.top,
+        left: constrainedPos.left,
+        top: constrainedPos.top,
         startArrowColor: props.arrowDisabledColor,
         endArrowColor: props.arrowDefaultColor
       });
@@ -281,6 +281,7 @@ class Slider extends PureComponent {
       }
     }
     const constrainedPos = this.constrainMovement({ left, top });
+    this.setState(constrainedPos); // This is because onanimationend won't fire in Chrome
     this.animateSlider(constrainedPos);
   }
 
