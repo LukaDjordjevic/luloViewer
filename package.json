@@ -1,6 +1,8 @@
 {
   "name": "lulo-viewer",
-  "version": "0.1.0",
+  "description": "Customizible React image viewer",
+  "version": "0.0.1",
+  "main": "build/index.js",
   "private": true,
   "dependencies": {
     "react": "^16.8.2",
@@ -11,7 +13,13 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    // "start": "webpack --watch",
+    // "build": "webpack"
+  },
+  "author": {
+    "name": "Luka Djordjevic",
+    "email": "lulo.djordjevic@gmail.com"
   },
   "eslintConfig": {
     "extends": "react-app"
