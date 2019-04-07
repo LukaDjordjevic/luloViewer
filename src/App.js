@@ -63,7 +63,10 @@ class App extends Component {
         {this.state.bb ? (
           <LuloViewer
             imageUrls={images}
-            // showViewer={true}
+            // slideBgdColor="teal"
+            // randomSlideColors={false}
+            // allowCyclic={false}
+            // showViewer={false}
             // allowMenu={false}
             // showSlider={false}
             // showArrows={false}

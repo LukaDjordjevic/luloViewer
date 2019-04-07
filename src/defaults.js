@@ -27,6 +27,7 @@ const defaults = {
   SWIPE_THRESHOLD: 20,
   SLIDE_TRANSITION_DURATION: 0.3,
   SLIDE_TRANSITION_TIMEOUT: 600,
+  RANDOM_SLIDE_COLORS: true,
 
   // Colors
   BACKGROUND_COLOR: 'black',
@@ -35,7 +36,8 @@ const defaults = {
   ARROW_DISABLED_COLOR: '#333333',
   MENU_TEXT_COLOR: 'lightgrey',
   MENU_ICON_COLOR: 'lightgrey',
-  MENU_BGD_COLOR: 'rgba(0, 0, 0, 0.7)'
+  MENU_BGD_COLOR: 'rgba(0, 0, 0, 0.7)',
+  SLIDE_BGD_COLOR: 'rgb(28, 70, 93)'
 };
 
 export default defaults;

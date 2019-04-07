@@ -461,6 +461,8 @@ const updateWithPropsInfo = (defaults, props) => {
     constants.SLIDE_TRANSITION_DURATION = props.slideTransitionDuration;
   if (typeof props.slideTransitionTimeout === 'number')
     constants.SLIDE_TRANSITION_TIMEOUT = props.slideTransitionTimeout;
+  if (typeof props.randomSlideColors === 'boolean')
+    constants.RANDOM_SLIDE_COLORS = props.randomSlideColors;
 
   if (typeof props.backgroundColor === 'string')
     constants.BACKGROUND_COLOR = props.backgroundColor;
@@ -476,6 +478,8 @@ const updateWithPropsInfo = (defaults, props) => {
     constants.MENU_ICON_COLOR = props.menuIconColor;
   if (typeof props.menuBgdColor === 'string')
     constants.MENU_BGD_COLOR = props.menuBgdColor;
+  if (typeof props.slideBgdColor === 'string')
+    constants.SLIDE_BGD_COLOR = props.slideBgdColor;
 
   console.log('returning', constants);
   return constants;

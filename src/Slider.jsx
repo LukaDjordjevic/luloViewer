@@ -440,7 +440,11 @@ class Slider extends PureComponent {
         slideClick={this.slideMouseUp}
         imageLoaded={this.props.imagesInfo[idx] ? true : false}
         sliderCallback={this.props.sliderCallback}
-        color={this.props.slideColors[idx]}
+        color={
+          this.props.randomSlidesColor
+            ? this.props.slideColors[idx]
+            : this.props.slideBgdColor
+        }
       />
     ));
 

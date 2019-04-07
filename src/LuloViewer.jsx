@@ -1086,15 +1086,14 @@ class LuloViewer extends Component {
           slidesStripSize={this.slideSize * this.numberOfSlides}
           slideClick={this.setViewerToSlide}
           mainDivRect={this.state.mainDivRect}
-          // left={left}
-          // top={top}
-          // updateSliderPos={this.updateSliderPos}
           showArrows={this.constants.SHOW_SLIDER_ARROWS}
           imagesInfo={this.state.imagesInfo}
           sliderCallback={this.props.sliderCallback}
           slideAnimationsStylesheet={this.slideAnimationsStylesheet}
           slideTransitionDuration={this.state.slideTransitionDuration}
           slideColors={this.slideColors}
+          slideBgdColor={this.constants.SLIDE_BGD_COLOR}
+          randomSlidesColor={this.constants.RANDOM_SLIDE_COLORS}
         />
       </div>
     );
