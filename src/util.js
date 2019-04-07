@@ -385,6 +385,80 @@ const constrainSliderMovement = (
   return { left, top };
 };
 
+const generateColorArray = numberOfSlides => {
+  const colors = [];
+  for (let i = 0; i < numberOfSlides; i++) {
+    colors.push(getRandomColor());
+  }
+  return colors;
+};
+
+const getRandomColor = () => {
+  const letters = '0123456789AB';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    if ([4, 5].includes(i)) {
+      color += letters[Math.floor(Math.random() * 6)];
+      // Blue
+    } else {
+      color += letters[Math.floor(Math.random() * 12)];
+    }
+    console.log('color', color);
+  }
+  return color;
+};
+
+// Returns constants obj that is used throughout the app
+const updateWithPropsInfo = (defaults, props) => {
+  const constants = {
+    SHOW_VIEWER: props.showViewer || defaults.SHOW_VIEWER,
+    SHOW_ARROWS: props.showArrows || defaults.SHOW_ARROWS,
+    SHOW_SLIDER: props.showSlider || defaults.SHOW_SLIDER,
+    SHOW_SLIDER_ARROWS: props.showSliderArrows || defaults.SHOW_SLIDER_ARROWS,
+    SHOW_ZOOM_CONTROLLER:
+      props.showZoomController || defaults.SHOW_ZOOM_CONTROLLER,
+    SLIDER_POSITION: props.sliderPosition || defaults.SLIDER_POSITION,
+    ALLOW_MENU: props.allowMenu || defaults.ALLOW_MENU,
+
+    ARROWS_SIZE: props.arrowsSize || defaults.ARROWS_SIZE,
+    ARROWS_PADDING: props.arrowsPadding || defaults.ARROWS_PADDING,
+    SLIDER_SIZE: props.sliderSize || defaults.SLIDER_SIZE,
+    SLIDER_ARROW_SIZE: props.sliderArrowsSize || defaults.SLIDER_ARROW_SIZE,
+    ZOOM_CONTROLLER_SIZE:
+      props.zoomControllerSize || defaults.ZOOM_CONTROLLER_SIZE,
+    ZOOM_CONTROLLER_PADDING:
+      props.zoomControllerPadding || defaults.ZOOM_CONTROLLER_PADDING,
+    ZOOM_CONTROLLER_POSITION_X:
+      props.zoomControllerPositionX || defaults.ZOOM_CONTROLLER_POSITION_X,
+    ZOOM_CONTROLLER_POSITION_Y:
+      props.zoomcontrollerPositionY || defaults.ZOOM_CONTROLLER_POSITION_Y,
+    MENU_SIZE: props.menuSize || defaults.MENU_SIZE,
+
+    ALLOW_CYCLIC: props.allowCyclic || defaults.ALLOW_CYCLIC,
+    STARTING_SLIDE: props.startingSize || defaults.STARTING_SLIDE,
+    MAX_PRELOADED_IMAGES:
+      props.maxPreloadedImages || defaults.MAX_PRELOADED_IMAGES,
+    ZOOM_LEVELS: props.zoomLevels || defaults.ZOOM_LEVELS,
+    SWIPE_THRESHOLD: props.swipeThreshhold || defaults.SWIPE_THRESHOLD,
+    SLIDE_TRANSITION_DURATION:
+      props.slideTransitionDuration || defaults.SLIDE_TRANSITION_DURATION,
+    SLIDE_TRANSITION_TIMEOUT:
+      props.slideTransitionTimeout || defaults.SLIDE_TRANSITION_TIMEOUT,
+
+    BACKGROUND_COLOR: props.backgroundColor || defaults.BACKGROUND_COLOR,
+    ARROW_DEFAULT_COLOR:
+      props.arrowDefaultColor || defaults.ARROW_DEFAULT_COLOR,
+    ARROW_HIGHLIGHT_COLOR:
+      props.arrowHighlightColor || defaults.ARROW_HIGHLIGHT_COLOR,
+    ARROW_DISABLED_COLOR:
+      props.arrowDisabledColor || defaults.ARROW_DISABLED_COLOR,
+    MENU_TEXT_COLOR: props.menuTextColor || defaults.MENU_TEXT_COLOR,
+    MENU_ICON_COLOR: props.menuIconColor || defaults.MENU_ICON_COLOR,
+    MENU_BGD_COLOR: props.menuBgdColor || defaults.MENU_BGD_COLOR
+  };
+  return constants;
+};
+
 // const getSliderCenterPos = (
 //   viewerWidth,
 //   viewerHeight,
@@ -423,6 +497,9 @@ module.exports = {
   getViewRectangleTransform,
   createSlideAnimationKeyframes,
   calculateSlidesDivFromMainDiv,
-  constrainSliderMovement
+  constrainSliderMovement,
+  getRandomColor,
+  generateColorArray,
+  updateWithPropsInfo
   // getSliderCenterPos
 };

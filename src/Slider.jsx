@@ -440,6 +440,7 @@ class Slider extends PureComponent {
         slideClick={this.slideMouseUp}
         imageLoaded={this.props.imagesInfo[idx] ? true : false}
         sliderCallback={this.props.sliderCallback}
+        color={this.props.slideColors[idx]}
       />
     ));
 
@@ -520,30 +521,8 @@ const SingleSlide = props => {
     height: `${props.slideSize}px`
   };
 
-  if (props.isHorizontal) {
-    // style.margin = `${0.45}%`;
-  } else {
-    // style.margin = `${5}%`;
-  }
-
   const slideMargin = 5;
 
-  // const image = props.imageLoaded ? (
-  //   <img
-  //     alt=""
-  //     width={`${100 - slideMargin * 2}%`}
-  //     height={`${100 - slideMargin * 2}%`}
-  //     src={props.backgroundImage}
-  //     position={'absolute'}
-  //   />
-  // ) : (
-  //   <div
-  //     style={{
-  //       width: `${100 - slideMargin * 2}%`,
-  //       height: `${100 - slideMargin * 2}%`
-  //     }}
-  //   />
-  // );
   return (
     <div
       className="lv-single-slide"
@@ -559,7 +538,8 @@ const SingleSlide = props => {
         style={{
           backgroundImage: `${"url('"}${props.backgroundImage}${"'"}`,
           width: `${100 - slideMargin * 2}%`,
-          height: `${100 - slideMargin * 2}%`
+          height: `${100 - slideMargin * 2}%`,
+          backgroundColor: props.color
         }}
       />
       {props.slideActive ? null : <div className="lv-photo-darken" />}

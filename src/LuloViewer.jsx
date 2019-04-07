@@ -6,18 +6,19 @@ import Arrows from './Arrows';
 import Menu from './Menu';
 import defaults from './defaults';
 import {
+  updateWithPropsInfo,
   calculateSlidesDivFromMainDiv,
   updateZoomTarget,
   constrainTranslate,
   getViewRectangleTransform,
-  createSlideAnimationKeyframes
+  createSlideAnimationKeyframes,
+  generateColorArray
 } from './util';
 
 class LuloViewer extends Component {
   constructor(props) {
     super(props);
-    this.constants = defaults;
-
+    this.constants = updateWithPropsInfo(defaults, this.props);
     const imagesInfo = new Array(this.props.imageUrls.length);
     imagesInfo.fill(null);
     this.state = {
@@ -66,6 +67,9 @@ class LuloViewer extends Component {
     this.images = [];
     this.changingSlide = false;
     this.numberOfSlides = this.props.imageUrls.length;
+    console.log('@@ number of slides', this.numberOfSlides);
+    this.slideColors = generateColorArray(this.numberOfSlides);
+
     this.loading = true;
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -254,8 +258,10 @@ class LuloViewer extends Component {
           this.mainDiv.requestFullscreen();
           this.setState({ isFullscreen: true });
         } else {
-          document.exitFullscreen();
           this.setState({ isFullscreen: false });
+          if (!window.screenTop && !window.screenY) {
+            document.exitFullscreen();
+          }
         }
         break;
       default:
@@ -433,8 +439,12 @@ class LuloViewer extends Component {
     switch (item) {
       case 'fullscreen':
         if (this.state.isFullscreen) {
+          console.log('333', window);
+
           this.setState({ isFullscreen: false, showMenu: false });
-          if (window.fullScreen) document.exitFullscreen();
+          if (!window.screenTop && !window.screenY) {
+            document.exitFullscreen();
+          }
         } else {
           this.setState({ isFullscreen: true, showMenu: false });
           this.mainDiv.requestFullscreen();
@@ -473,8 +483,8 @@ class LuloViewer extends Component {
         );
         this.isHorizontal = ['top', 'bottom'].includes(item) ? true : false;
         this.slideSize = this.isHorizontal
-        ? this.state.mainDivRect.height * this.sliderSize
-        : this.state.mainDivRect.width * this.sliderSize;
+          ? this.state.mainDivRect.height * this.sliderSize
+          : this.state.mainDivRect.width * this.sliderSize;
         this.setState({ sliderPosition: item, slidesRect }, () => {
           this.updateZoomControllerTransform(
             this.state.mainDivRect,
@@ -1081,6 +1091,7 @@ class LuloViewer extends Component {
           sliderCallback={this.props.sliderCallback}
           slideAnimationsStylesheet={this.slideAnimationsStylesheet}
           slideTransitionDuration={this.state.slideTransitionDuration}
+          slideColors={this.slideColors}
         />
       </div>
     );

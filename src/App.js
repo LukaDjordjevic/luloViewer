@@ -42,10 +42,10 @@ class App extends Component {
     return (
       <div
         style={{
-          // width: '500px',
-          // height: '30px',
-          width: '80%',
-          height: '70%',
+          width: '500px',
+          height: '400px',
+          // width: '70%',
+          // height: '80%',
           // width: '90%',
           // height: '90%',
           // width: '180px',
@@ -53,15 +53,20 @@ class App extends Component {
           // width: '100vw',
           // height: '100vh',
           backgroundColor: '#000',
-          // top: '100px',
-          // left: '100px',
+          top: '100px',
+          left: '100px',
           position: 'relative',
           margin: 0
           // display: 'flex'
         }}
       >
         {this.state.bb ? (
-          <LuloViewer imageUrls={images} sliderCallback={this.sliderCallback} />
+          <LuloViewer
+            imageUrls={images}
+            arrowDefaultColor="#8888AA"
+            arrowHighlightColor="#AAAAFF"
+            sliderCallback={this.sliderCallback}
+          />
         ) : null}
       </div>
     );

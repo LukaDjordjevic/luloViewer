@@ -24,6 +24,17 @@ class Menu extends PureComponent {
   //   console.log('onArrows');
 
   // }
+  // onMouseEnter(e) {
+  //   console.log('.!.');
+
+  //   e.preventDefault();
+  // }
+
+  // onMouseEnter(e) {
+  //   console.log('leave .!.');
+
+  //   e.preventDefault();
+  // }
 
   render() {
     const buttonNames = ['bottom', 'right', 'top', 'left'];
@@ -33,6 +44,8 @@ class Menu extends PureComponent {
           key={name}
           text={name}
           onClick={e => this.onMouseUp(name, e)}
+          // onMouseEnter={this.onMouseEnter}
+          // onMouseLeave={this.onMouseLeave}
           style={{ marginLeft: 0, fontSize: this.props.menuWidth * 0.07 }}
         />
       );
