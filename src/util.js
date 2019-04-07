@@ -410,52 +410,74 @@ const getRandomColor = () => {
 
 // Returns constants obj that is used throughout the app
 const updateWithPropsInfo = (defaults, props) => {
-  const constants = {
-    SHOW_VIEWER: props.showViewer || defaults.SHOW_VIEWER,
-    SHOW_ARROWS: props.showArrows || defaults.SHOW_ARROWS,
-    SHOW_SLIDER: props.showSlider || defaults.SHOW_SLIDER,
-    SHOW_SLIDER_ARROWS: props.showSliderArrows || defaults.SHOW_SLIDER_ARROWS,
-    SHOW_ZOOM_CONTROLLER:
-      props.showZoomController || defaults.SHOW_ZOOM_CONTROLLER,
-    SLIDER_POSITION: props.sliderPosition || defaults.SLIDER_POSITION,
-    ALLOW_MENU: props.allowMenu || defaults.ALLOW_MENU,
+  console.log('got', defaults);
+  const constants = Object.assign({}, defaults);
 
-    ARROWS_SIZE: props.arrowsSize || defaults.ARROWS_SIZE,
-    ARROWS_PADDING: props.arrowsPadding || defaults.ARROWS_PADDING,
-    SLIDER_SIZE: props.sliderSize || defaults.SLIDER_SIZE,
-    SLIDER_ARROW_SIZE: props.sliderArrowsSize || defaults.SLIDER_ARROW_SIZE,
-    ZOOM_CONTROLLER_SIZE:
-      props.zoomControllerSize || defaults.ZOOM_CONTROLLER_SIZE,
-    ZOOM_CONTROLLER_PADDING:
-      props.zoomControllerPadding || defaults.ZOOM_CONTROLLER_PADDING,
-    ZOOM_CONTROLLER_POSITION_X:
-      props.zoomControllerPositionX || defaults.ZOOM_CONTROLLER_POSITION_X,
-    ZOOM_CONTROLLER_POSITION_Y:
-      props.zoomcontrollerPositionY || defaults.ZOOM_CONTROLLER_POSITION_Y,
-    MENU_SIZE: props.menuSize || defaults.MENU_SIZE,
+  // TODO: write this with loop to lower source size
+  if (typeof props.showViewer === 'boolean')
+    constants.SHOW_VIEWER = props.showViewer;
+  if (typeof props.showArrows === 'boolean')
+    constants.SHOW_ARROWS = props.showArrows;
+  if (typeof props.showSlider === 'boolean')
+    constants.SHOW_SLIDER = props.showSlider;
+  if (typeof props.showSliderArrows === 'boolean')
+    constants.SHOW_SLIDER_ARROWS = props.showSliderArrows;
+  if (typeof props.showZoomController === 'boolean')
+    constants.SHOW_ZOOM_CONTROLLER = props.showZoomControlle;
+  if (typeof props.allowMenu === 'boolean')
+    constants.ALLOW_MENU = props.allowMenu;
+  if (['left', 'right', 'top', 'bottom'].includes(props.sliderPosition))
+    constants.SLIDER_POSITION = props.sliderPosition;
 
-    ALLOW_CYCLIC: props.allowCyclic || defaults.ALLOW_CYCLIC,
-    STARTING_SLIDE: props.startingSize || defaults.STARTING_SLIDE,
-    MAX_PRELOADED_IMAGES:
-      props.maxPreloadedImages || defaults.MAX_PRELOADED_IMAGES,
-    ZOOM_LEVELS: props.zoomLevels || defaults.ZOOM_LEVELS,
-    SWIPE_THRESHOLD: props.swipeThreshhold || defaults.SWIPE_THRESHOLD,
-    SLIDE_TRANSITION_DURATION:
-      props.slideTransitionDuration || defaults.SLIDE_TRANSITION_DURATION,
-    SLIDE_TRANSITION_TIMEOUT:
-      props.slideTransitionTimeout || defaults.SLIDE_TRANSITION_TIMEOUT,
+  if (typeof props.arrowsSize === 'number')
+    constants.ARROWS_SIZE = props.arrowsSize;
+  if (typeof props.arrowsPadding === 'number')
+    constants.ARROWS_PADDING = props.arrowsPadding;
+  if (typeof props.sliderSize === 'number')
+    constants.SLIDER_SIZE = props.sliderSize;
+  if (typeof props.sliderArrowSize === 'number')
+    constants.SLIDER_ARROW_SIZE = props.sliderArrowSize;
+  if (typeof props.zoomControllerSize === 'number')
+    constants.ZOOM_CONTROLLER_SIZE = props.zoomControllerSize;
+  if (typeof props.zoomControllerPadding === 'number')
+    constants.ZOOM_CONTROLLER_PADDING = props.zoomControllerPadding;
+  if (typeof props.zoomControllerPositionX === 'number')
+    constants.ZOOM_CONTROLLER_POSITION_X = props.zoomControllerPositionX;
+  if (typeof props.zoomControllerPositionY === 'number')
+    constants.ZOOM_CONTROLLER_POSITION_Y = props.zoomControllerPositionY;
+  if (typeof props.menuSize === 'number') constants.MENU_SIZE = props.menuSize;
 
-    BACKGROUND_COLOR: props.backgroundColor || defaults.BACKGROUND_COLOR,
-    ARROW_DEFAULT_COLOR:
-      props.arrowDefaultColor || defaults.ARROW_DEFAULT_COLOR,
-    ARROW_HIGHLIGHT_COLOR:
-      props.arrowHighlightColor || defaults.ARROW_HIGHLIGHT_COLOR,
-    ARROW_DISABLED_COLOR:
-      props.arrowDisabledColor || defaults.ARROW_DISABLED_COLOR,
-    MENU_TEXT_COLOR: props.menuTextColor || defaults.MENU_TEXT_COLOR,
-    MENU_ICON_COLOR: props.menuIconColor || defaults.MENU_ICON_COLOR,
-    MENU_BGD_COLOR: props.menuBgdColor || defaults.MENU_BGD_COLOR
-  };
+  if (typeof props.allowCyclic === 'boolean')
+    constants.ALLOW_CYCLIC = props.allowCyclic;
+  if (typeof props.startingSlide === 'number')
+    constants.STARTING_SLIDE = props.startingSlide;
+  if (typeof props.maxPreloadedImages === 'number')
+    constants.MAX_PRELOADED_IMAGES = props.maxPreloadedImages;
+  if (typeof props.zoomLevels === 'number')
+    constants.ZOOM_LEVELS = props.zoomLevels;
+  if (typeof props.swipeThreshold === 'number')
+    constants.SWIPE_THRESHOLD = props.swipeThreshold;
+  if (typeof props.slideTransitionDuration === 'number')
+    constants.SLIDE_TRANSITION_DURATION = props.slideTransitionDuration;
+  if (typeof props.slideTransitionTimeout === 'number')
+    constants.SLIDE_TRANSITION_TIMEOUT = props.slideTransitionTimeout;
+
+  if (typeof props.backgroundColor === 'string')
+    constants.BACKGROUND_COLOR = props.backgroundColor;
+  if (typeof props.arrowDefaultColor === 'string')
+    constants.ARROW_DEFAULT_COLOR = props.arrowDefaultColor;
+  if (typeof props.arrowHighlightColor === 'string')
+    constants.ARROW_HIGHLIGHT_COLOR = props.arrowHighlightColor;
+  if (typeof props.arrowDisabledColor === 'string')
+    constants.ARROW_DISABLED_COLOR = props.arrowDisabledColor;
+  if (typeof props.menuTextColor === 'string')
+    constants.MENU_TEXT_COLOR = props.menuTextColor;
+  if (typeof props.menuIconColor === 'string')
+    constants.MENU_ICON_COLOR = props.menuIconColor;
+  if (typeof props.menuBgdColor === 'string')
+    constants.MENU_BGD_COLOR = props.menuBgdColor;
+
+  console.log('returning', constants);
   return constants;
 };
 

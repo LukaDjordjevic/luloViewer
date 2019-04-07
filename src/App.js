@@ -63,8 +63,14 @@ class App extends Component {
         {this.state.bb ? (
           <LuloViewer
             imageUrls={images}
-            arrowDefaultColor="#8888AA"
-            arrowHighlightColor="#AAAAFF"
+            // showViewer={true}
+            // allowMenu={false}
+            // showSlider={false}
+            // showArrows={false}
+            // showZoomController={false}
+            // slideTransitionDuration={0}
+            // arrowDefaultColor="#8888AA"
+            // arrowHighlightColor="#AAAAFF"
             sliderCallback={this.sliderCallback}
           />
         ) : null}

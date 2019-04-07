@@ -5,8 +5,8 @@ const defaults = {
   SHOW_SLIDER: true,
   SHOW_SLIDER_ARROWS: true,
   SHOW_ZOOM_CONTROLLER: true,
-  SLIDER_POSITION: 'bottom',
   ALLOW_MENU: true,
+  SLIDER_POSITION: 'bottom',
 
   // Transforms
   ARROWS_SIZE: 0.05, // width of arrow as fraction of viewer width

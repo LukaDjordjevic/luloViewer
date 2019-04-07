@@ -19,6 +19,9 @@ class LuloViewer extends Component {
   constructor(props) {
     super(props);
     this.constants = updateWithPropsInfo(defaults, this.props);
+    console.log('defaults, constants', defaults, this.constants);
+
+    // this.constants = defaults;
     const imagesInfo = new Array(this.props.imageUrls.length);
     imagesInfo.fill(null);
     this.state = {
