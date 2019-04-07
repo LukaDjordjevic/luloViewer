@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import './styles.css';
+
 import SingleImage from './SingleImage';
 import ZoomController from './ZoomController';
 import Slider from './Slider';
