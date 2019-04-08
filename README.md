@@ -2,6 +2,9 @@
 
 > Customizable React based image viewer
 
+[![INSERT YOUR GRAPHIC HERE](https://gdurl.com/6Kp5)]()
+
+
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org) 
 
 
@@ -39,15 +42,15 @@ const images = [
 
 <LuloViewer 
   imageUrls={images}
-  slideBgdColor="teal"
-  randomSlideColors={true}
-  allowCyclic={true}
   showViewer={true}
-  allowMenu={true}
   showSlider={true}
   showArrows={true}
   showZoomController={true}
-  slideTransitionDuration={500}/>
+  allowMenu={true}
+  allowCyclic={true}
+  slideBgdColor="teal"
+  randomSlideColors={true}
+  slideTransitionDuration={500} />
 ...
 
 ```
