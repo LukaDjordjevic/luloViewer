@@ -281,8 +281,8 @@ const calculateSlidesDivFromMainDiv = (
   showSlider,
   sliderSize
 ) => {
+  if (!mainDivRect) return;
   const slidesRect = Object.assign({}, mainDivRect);
-
   const slidesWidth =
     ['left', 'right'].includes(sliderPosition) && showSlider
       ? mainDivRect.width * (1 - sliderSize)
@@ -403,7 +403,6 @@ const getRandomColor = () => {
     } else {
       color += letters[Math.floor(Math.random() * 12)];
     }
-    console.log('color', color);
   }
   return color;
 };

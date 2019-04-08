@@ -73,7 +73,7 @@ class App extends Component {
           // slideTransitionDuration={0}
           // arrowDefaultColor="#8888AA"
           // arrowHighlightColor="#AAAAFF"
-          sliderCallback={this.sliderCallback}
+          // sliderCallback={this.sliderCallback}
         />
       </div>
     );

@@ -20,6 +20,7 @@ import {
 class LuloViewer extends Component {
   constructor(props) {
     super(props);
+    if (!this.props.imageUrls) return;
     this.constants = updateWithPropsInfo(defaults, this.props);
     console.log('defaults, constants', defaults, this.constants);
 
@@ -64,15 +65,14 @@ class LuloViewer extends Component {
       width: 0,
       height: 0
     };
+
     this.imageLoadFailedArr = [];
     // this.lastSliderPos = { left: 0, top: 0 };
     this.containerAspectRatio = 1;
     this.isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
     this.imageLoading = false;
-    this.images = [];
     this.changingSlide = false;
     this.numberOfSlides = this.props.imageUrls.length;
-    console.log('@@ number of slides', this.numberOfSlides);
     this.slideColors = generateColorArray(this.numberOfSlides);
 
     this.loading = true;
@@ -111,6 +111,7 @@ class LuloViewer extends Component {
       if (this.constants.ALLOW_MENU) e.preventDefault();
     };
 
+    if (!this.props.imageUrls) return;
     const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
     // this.setState
 
@@ -378,10 +379,12 @@ class LuloViewer extends Component {
   }
 
   getNextSlideIndex(currentIndex, amount) {
+    // if (currentIndex) {
     let nextSlideIndex =
       (currentIndex + amount + this.props.imageUrls.length) %
       this.props.imageUrls.length;
     return nextSlideIndex;
+    // }
   }
 
   updateZoomController(e, eventType) {
@@ -444,8 +447,6 @@ class LuloViewer extends Component {
     switch (item) {
       case 'fullscreen':
         if (this.state.isFullscreen) {
-          console.log('333', window);
-
           this.setState({ isFullscreen: false, showMenu: false });
           if (!window.screenTop && !window.screenY) {
             document.exitFullscreen();
@@ -556,7 +557,6 @@ class LuloViewer extends Component {
 
   saveSlidePosition() {
     console.log('saving slide');
-
     const activeSlide = this.getActiveSlide();
     const imagesInfo = JSON.parse(JSON.stringify(this.state.imagesInfo));
     const imageInfo = JSON.parse(
@@ -802,6 +802,7 @@ class LuloViewer extends Component {
     // First figure out which images should be preloaded based on current image index & MAX_PRELOADED_IMAGES.
     // First one should be current, then the one on the right (next), followed by one on the left (previous)
     // Then add more images in accending order until MAX_PRELOADED_IMAGES is reached.
+
     const requiredImages = [];
     for (let i = 0; i < this.constants.MAX_PRELOADED_IMAGES + 1; i++) {
       const nextSlide = this.getNextSlideIndex(this.state.currentSlideIndex, i);
@@ -826,7 +827,7 @@ class LuloViewer extends Component {
       if (self.state.imagesInfo[imageIdx] === null) {
         allLoaded = false;
         if (!this.imageLoading && !this.imageLoadFailedArr.includes(imageIdx))
-          self.startImagePreload(imageIdx);
+        self.startImagePreload(imageIdx);
         return;
       }
     });
@@ -881,6 +882,13 @@ class LuloViewer extends Component {
   render() {
     console.log('*** viewer render ***');
 
+    if (!this.props.imageUrls || !this.props.imageUrls.length) {
+      return (
+        <div style={{ color: 'lightgrey', padding: '5%' }}>
+          imageUrls prop missing.
+        </div>
+      );
+    }
     //*******************************************
     //****************** arrows *****************
     //*******************************************
@@ -930,6 +938,7 @@ class LuloViewer extends Component {
     //****************************************
     //************** Photo Slides ************
     //****************************************
+
     const photoSlides = (
       <div
         className="lv-photo-slides"
@@ -1051,14 +1060,14 @@ class LuloViewer extends Component {
         ? (1 - this.sliderSize) * 100
         : 100;
 
+    //*******************************************
+    //***************** Slider ******************
+    //*******************************************
+
     const sliderWidth =
       !this.isHorizontal && this.state.showSlider ? this.sliderSize * 100 : 100;
     const sliderHeight =
       this.isHorizontal && this.state.showSlider ? this.sliderSize * 100 : 100;
-
-    //*******************************************
-    //***************** Slider ******************
-    //*******************************************
 
     const slider = (
       <div
