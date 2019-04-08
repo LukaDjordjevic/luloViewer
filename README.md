@@ -1,6 +1,6 @@
 # LuloViewer
 
-> Customizable React based image viewer
+Customizable React based image viewer
 
 [![INSERT YOUR GRAPHIC HERE](https://gdurl.com/2mMv)]()
 
