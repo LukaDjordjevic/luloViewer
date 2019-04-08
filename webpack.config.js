@@ -1,7 +1,7 @@
 var path = require('path');
-const nodeExternals = require('webpack-node-externals');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const nodeExternals = require('webpack-node-externals');
+// const ExtractTextPlugin = require('extract-text-webpack-plugin');
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   entry: './src/LuloViewer.jsx',
   output: {
@@ -20,20 +20,17 @@ module.exports = {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
       },
-      // {
-      //   test: /\.css$/,
-      //   use: ExtractTextPlugin.extract({
-      //     fallback: 'style-loader',
-      //     use: ['css-loader']
-      //   })
-      // },
-      // {
-      //   test: /\.css$/,
-      //   use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader']
-      // },
       {
-        test: /\.svg$/,
-        loader: 'svg-inline-loader'
+        test: /\.(png|jpg|gif|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 5 * 1024,
+              outputPath: 'images'
+            }
+          }
+        ]
       }
     ]
   },
