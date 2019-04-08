@@ -22,7 +22,7 @@ Fully customizable React image viewer. It features image preloader, fullscreen m
 
 ## Installation
 ```shell
-$ yarn add lulo-viewer
+$ yarn add lulo-viewer@0.1.0-beta.1
 ```
 
 ---
