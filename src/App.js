@@ -60,23 +60,21 @@ class App extends Component {
           // display: 'flex'
         }}
       >
-        {this.state.bb ? (
-          <LuloViewer
-            imageUrls={images}
-            // slideBgdColor="teal"
-            // randomSlideColors={false}
-            // allowCyclic={false}
-            // showViewer={false}
-            // allowMenu={false}
-            // showSlider={false}
-            // showArrows={false}
-            // showZoomController={false}
-            // slideTransitionDuration={0}
-            // arrowDefaultColor="#8888AA"
-            // arrowHighlightColor="#AAAAFF"
-            sliderCallback={this.sliderCallback}
-          />
-        ) : null}
+        <LuloViewer
+          imageUrls={images}
+          // slideBgdColor="teal"
+          // randomSlideColors={false}
+          // allowCyclic={false}
+          // showViewer={false}
+          // allowMenu={false}
+          // showSlider={false}
+          // showArrows={false}
+          // showZoomController={false}
+          // slideTransitionDuration={0}
+          // arrowDefaultColor="#8888AA"
+          // arrowHighlightColor="#AAAAFF"
+          sliderCallback={this.sliderCallback}
+        />
       </div>
     );
   }

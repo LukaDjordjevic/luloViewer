@@ -532,7 +532,7 @@ const SingleSlide = props => {
       className="lv-single-slide"
       style={style}
       onMouseUp={e => {
-        props.sliderCallback(props.index);
+        if (props.sliderCallback) props.sliderCallback(props.index);
         props.slideClick(props.index, e);
       }}
     >
