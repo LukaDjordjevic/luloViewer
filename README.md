@@ -2,7 +2,7 @@
 
 > Customizable React based image viewer
 
-[![INSERT YOUR GRAPHIC HERE](https://gdurl.com/6Kp5)]()
+[![INSERT YOUR GRAPHIC HERE](https://gdurl.com/2mMv)]()
 
 
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org) 
