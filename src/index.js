@@ -5,7 +5,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-  <div style={{ backgroundColor: '#222', height: '100vh' }}>
+  <div style={{ backgroundColor: '#222', height: '100vh', width: '100vw' }}>
     <App />
   </div>,
   document.getElementById('root')

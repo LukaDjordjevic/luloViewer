@@ -113,11 +113,7 @@ class LuloViewer extends Component {
 
     if (!this.props.imageUrls) return;
     const mainDivRect = this.mainDiv.parentNode.getBoundingClientRect();
-    // this.setState
 
-    // const normalizedSliderSize = this.isHorizontal
-    //   ? this.constants.SLIDER_SIZE //* this.containerAspectRatio
-    //   : this.constants.SLIDER_SIZE;
     const sliderSize = this.state.showViewer ? this.constants.SLIDER_SIZE : 1;
     const slidesRect = calculateSlidesDivFromMainDiv(
       mainDivRect,
@@ -187,10 +183,7 @@ class LuloViewer extends Component {
   onWindowResize() {
     const mainDivRect = this.mainDiv.getBoundingClientRect();
     this.containerAspectRatio = mainDivRect.width / mainDivRect.height;
-    // this.isHorizontal = ['top', 'bottom'].includes(this.state.sliderPosition);
-    // const normalizedSliderSize = this.isHorizontal
-    //   ? this.constants.SLIDER_SIZE //* this.containerAspectRatio
-    //   : this.constants.SLIDER_SIZE;
+
     const sliderSize = this.state.showViewer ? this.constants.SLIDER_SIZE : 1;
     const slidesRect = calculateSlidesDivFromMainDiv(
       mainDivRect,
