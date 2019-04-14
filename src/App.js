@@ -40,12 +40,20 @@ class App extends Component {
       'https://www.popsci.com/sites/popsci.com/files/styles/655_1x_/public/images/2018/10/comet_in_may_2015.jpg?itok=l7KMRGJf&fc=50,50'
     ];
     return (
-      <div>
-        {' '}
+      <div style={{ backgroundColor: '#222' }}>
+        <h2 style={{ color: '#CCC', padding: '10px' }}>Lulo Viewer</h2>
+        <p style={{ color: '#CCC', padding: '10px' }}>
+          Press F for fullscreen. Keyboard arrows for prev/next slide, wheel to
+          zoom. Right click for menu.
+        </p>
+        <p style={{ color: '#CCC', padding: '10px' }}>
+          Repository and docs{' '}
+          <a href="https://www.github.com/lukaDjordjevic/luloViewer">here</a>
+        </p>
         <div
           style={{
             width: '500px',
-            height: '400px',
+            height: '350px',
             // width: '70%',
             // height: '80%',
             // width: '90%',
@@ -55,8 +63,8 @@ class App extends Component {
             // width: '100vw',
             // height: '100vh',
             backgroundColor: '#000',
-            top: '100px',
-            left: '100px',
+            top: '50px',
+            left: '50px',
             position: 'relative',
             margin: 0
             // display: 'flex'
@@ -78,7 +86,7 @@ class App extends Component {
             // sliderCallback={this.sliderCallback}
           />
         </div>
-        <div
+        {/* <div
           style={{
             width: '500px',
             height: '400px',
@@ -113,7 +121,7 @@ class App extends Component {
             // arrowHighlightColor="#AAAAFF"
             // sliderCallback={this.sliderCallback}
           />
-        </div>
+        </div> */}
       </div>
     );
   }
