@@ -57,7 +57,7 @@ const images = [
       'https://upload.wikimedia.org/wikipedia/commons/0/03/Tavares.Forum.Romanum.redux.jpg',
       'https://upload.wikimedia.org/wikipedia/commons/8/89/Grasses_in_the_Valles_Caldera_2014-06-26.JPG'
     ];
-    
+
 ...
 
 <LuloViewer
@@ -88,7 +88,7 @@ Only imageUrls prop is required. LuloViewer will inherit dimensions from it's pa
 | showSliderArrows        | boolean | Show slider arrows.                                                                                    |
 | showZoomController      | boolean | Show zoom controller.                                                                                  |
 | allowMenu               | boolean | Allow right-click menu.                                                                                |
-| sliderPosition          | string  | Slider position. It can be 'bottom', 'top', 'left' or 'right'.                                         |
+| sliderPosition          | string  | Slider position. It can be `'bottom'`, `'top'`, `'left'` or `'right'`.                                 |
 | arrowsSize              | number  | Size of main screen arrows. Should be between `0` and `1`. Defaults to `0.05`.                         |
 | arrowsPadding           | number  | Padding for main arrows in percent of picture div width. Defaults to `5`.                              |
 | sliderSize              | number  | Slider size as fraction of div dimensions. Should be between `0` and `1`. Defaults to `0.12`           |
