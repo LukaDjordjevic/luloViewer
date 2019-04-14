@@ -1,8 +1,8 @@
 # LuloViewer
 
-Customizable React based image viewer
+Customizable React based image viewer. View the <a href="https://lulo-viewer.herokuapp.com/" target="_blank">DEMO</a> here.
 
-[![INSERT YOUR GRAPHIC HERE](https://gdurl.com/2mMv)]()
+[![INSERT YOUR GRAPHIC HERE](https://gdurl.com/2mMv)](https://lulo-viewer.herokuapp.com/)
 
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
 
