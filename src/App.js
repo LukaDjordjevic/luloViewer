@@ -40,41 +40,80 @@ class App extends Component {
       'https://www.popsci.com/sites/popsci.com/files/styles/655_1x_/public/images/2018/10/comet_in_may_2015.jpg?itok=l7KMRGJf&fc=50,50'
     ];
     return (
-      <div
-        style={{
-          width: '500px',
-          height: '400px',
-          // width: '70%',
-          // height: '80%',
-          // width: '90%',
-          // height: '90%',
-          // width: '180px',
-          // height: '180px',
-          // width: '100vw',
-          // height: '100vh',
-          backgroundColor: '#000',
-          top: '100px',
-          left: '100px',
-          position: 'relative',
-          margin: 0
-          // display: 'flex'
-        }}
-      >
-        <LuloViewer
-          imageUrls={images}
-          // slideBgdColor="teal"
-          // randomSlideColors={false}
-          // allowCyclic={false}
-          // showViewer={false}
-          // allowMenu={false}
-          // showSlider={false}
-          // showArrows={false}
-          // showZoomController={false}
-          // slideTransitionDuration={0}
-          // arrowDefaultColor="#8888AA"
-          // arrowHighlightColor="#AAAAFF"
-          // sliderCallback={this.sliderCallback}
-        />
+      <div>
+        {' '}
+        <div
+          style={{
+            width: '500px',
+            height: '400px',
+            // width: '70%',
+            // height: '80%',
+            // width: '90%',
+            // height: '90%',
+            // width: '180px',
+            // height: '180px',
+            // width: '100vw',
+            // height: '100vh',
+            backgroundColor: '#000',
+            top: '100px',
+            left: '100px',
+            position: 'relative',
+            margin: 0
+            // display: 'flex'
+          }}
+        >
+          <LuloViewer
+            imageUrls={images}
+            // slideBgdColor="teal"
+            // randomSlideColors={false}
+            // allowCyclic={false}
+            // showViewer={false}
+            // allowMenu={false}
+            // showSlider={false}
+            // showArrows={false}
+            // showZoomController={false}
+            // slideTransitionDuration={0}
+            // arrowDefaultColor="#8888AA"
+            // arrowHighlightColor="#AAAAFF"
+            // sliderCallback={this.sliderCallback}
+          />
+        </div>
+        <div
+          style={{
+            width: '500px',
+            height: '400px',
+            // width: '70%',
+            // height: '80%',
+            // width: '90%',
+            // height: '90%',
+            // width: '180px',
+            // height: '180px',
+            // width: '100vw',
+            // height: '100vh',
+            backgroundColor: '#000',
+            // top: '100px',
+            // left: '100px',
+            position: 'relative',
+            margin: 0
+            // display: 'flex'
+          }}
+        >
+          <LuloViewer
+            imageUrls={images}
+            // slideBgdColor="teal"
+            // randomSlideColors={false}
+            // allowCyclic={false}
+            // showViewer={false}
+            // allowMenu={false}
+            // showSlider={false}
+            // showArrows={false}
+            // showZoomController={false}
+            // slideTransitionDuration={0}
+            // arrowDefaultColor="#8888AA"
+            // arrowHighlightColor="#AAAAFF"
+            // sliderCallback={this.sliderCallback}
+          />
+        </div>
       </div>
     );
   }

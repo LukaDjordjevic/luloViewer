@@ -133,8 +133,6 @@ class SingleImage extends PureComponent {
   }
 
   handleMouseDown(e) {
-    console.log('single image mouse down');
-
     this.startingX = e.pageX;
     this.startingY = e.pageY;
     this.startingLeft = this.state.left;
@@ -151,8 +149,6 @@ class SingleImage extends PureComponent {
   }
 
   handleMouseMove(e) {
-    console.log('single image mouse move');
-
     e.preventDefault();
     e.stopPropagation();
     const offset = {
@@ -225,7 +221,7 @@ class SingleImage extends PureComponent {
       JSON.stringify(this.props.parentBoundingRect)
     );
     const imageAspectRatio = this.props.imageInfo.imageAspectRatio;
-    const eventPosition = { x: e.clientX, y: e.clientY };
+    const eventPosition = { x: e.pageX, y: e.pageY };
 
     const imgLeft = this.state.left;
     const imgTop = this.state.top;

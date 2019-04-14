@@ -5,7 +5,6 @@ import { constrainSliderMovement } from './util';
 class Slider extends PureComponent {
   constructor(props) {
     super(props);
-    console.log('constr');
     this.calculateLayoutDimensions();
     this.state = {
       startArrowColor: this.props.arrowDefaultColor,
@@ -41,6 +40,7 @@ class Slider extends PureComponent {
     // this.calculateLayoutDimensions();
 
     this.slidesStrip.onanimationend = this.onAnimationEnd;
+    this.content.addEventListener('wheel', this.onWheel, { passive: false });
   }
 
   onAnimationEnd() {
@@ -50,16 +50,9 @@ class Slider extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('will receive unconditional');
-
     this.calculateLayoutDimensions(nextProps);
 
     if (this.props.isHorizontal !== nextProps.isHorizontal) {
-      console.log('isHorizontal changed');
-
-      // isHorizontal has changed
-      console.log('is horizontal changed');
-
       this.calculateLayoutDimensions(nextProps);
       this.setInitialPosition(nextProps);
       // const newPosition = {
@@ -73,19 +66,11 @@ class Slider extends PureComponent {
       JSON.stringify(nextProps.mainDivRect)
     ) {
       // parent div bounding rect has changed
-      console.log('resize');
-
       this.calculateLayoutDimensions(nextProps);
       this.setInitialPosition(nextProps);
     }
     if (this.props.activeSlideIdx !== nextProps.activeSlideIdx) {
       // Current slide has changed
-      console.log(
-        'slide change'
-        // this.getSlideCenterPos(nextProps.activeSlideIdx)
-      );
-
-      // this.calculateLayoutDimensions(nextProps);
 
       this.setInitialPosition(nextProps);
     }
@@ -96,7 +81,6 @@ class Slider extends PureComponent {
   }
 
   setInitialPosition(nextProps) {
-    console.log('set initial pos', this.allSlidesFit);
     const props = nextProps || this.props;
 
     // Flip left & top when isHorizontal has changed
@@ -127,7 +111,6 @@ class Slider extends PureComponent {
       this.constrainAndApply(newPos, nextProps);
     }
     const newPos = this.getSlideCenterPos(props.activeSlideIdx);
-    console.log('new pos', newPos);
 
     if (this.props.isHorizontal) {
       this.updateArrowColors(newPos.left);
@@ -182,7 +165,6 @@ class Slider extends PureComponent {
   onMouseDown(e) {
     // e.stopPropagation();
     e.preventDefault();
-    console.log('slider-strip onMouseDown', e.clientX, e.pageX, e.screenX);
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
     this.startingClick = { x: e.clientX, y: e.clientY };
@@ -192,7 +174,6 @@ class Slider extends PureComponent {
   }
 
   onMouseUp(e) {
-    console.log('slides strip mouse up');
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
     this.setState({ bounced: false, currentEnergy: 1 });
@@ -202,13 +183,11 @@ class Slider extends PureComponent {
   onMouseMove(e) {
     e.preventDefault();
 
-    // console.log('slider mouse move');
     this.dragging = true;
     const newPosition = {
       left: e.clientX - this.startingClick.x + this.startingSliderPosition.x,
       top: e.clientY - this.startingClick.y + this.startingSliderPosition.y
     };
-    // console.log('saving pos', newPosition);
 
     this.constrainAndApply(newPosition);
     if (this.props.isHorizontal) {
@@ -276,8 +255,6 @@ class Slider extends PureComponent {
   }
 
   slideMouseUp(index, e) {
-    console.log('slide mouseUp', this.dragging);
-
     const newPos = this.getSlideCenterPos(index);
     if (!this.allSlidesFit && !this.dragging) this.animateSlider(newPos);
 
@@ -287,11 +264,13 @@ class Slider extends PureComponent {
 
   animateSlider(newPos) {
     const key = this.props.isHorizontal ? 'left' : 'top';
-    this.createKeyframes(
-      this.props.slideAnimationsStylesheet,
-      newPos[key],
-      key
-    );
+    if (this.props.slideAnimationsStylesheet) {
+      this.createKeyframes(
+        this.props.slideAnimationsStylesheet,
+        newPos[key],
+        key
+      );
+    }
 
     this.setState({
       animationName:
@@ -329,8 +308,6 @@ class Slider extends PureComponent {
   }
 
   updateArrowColors(value) {
-    console.log('arrow colors in', value);
-
     let startArrowColor = this.props.arrowDefaultColor;
     let endArrowColor = this.props.arrowDefaultColor;
     this.startArrowAllowed = true;
@@ -351,14 +328,10 @@ class Slider extends PureComponent {
         endArrowColor = this.props.arrowDisabledColor;
       }
     }
-    console.log('arrow colors out', startArrowColor, endArrowColor);
-
     this.setState({ startArrowColor, endArrowColor });
   }
 
   constrainAndApply(pos, nextProps) {
-    console.log('****** constrain called', pos);
-
     const props = nextProps || this.props;
 
     const constrainedPos = constrainSliderMovement(
@@ -381,8 +354,6 @@ class Slider extends PureComponent {
   }
 
   calculateLayoutDimensions(nextProps) {
-    console.log('.1.');
-
     const props = nextProps || this.props;
     const arrowSize = props.showArrows ? props.sliderArrowSize : 0;
 
@@ -396,12 +367,6 @@ class Slider extends PureComponent {
       : props.mainDivRect.height * ((100 - 2 * this.arrowHeight) / 100);
     this.allSlidesFit =
       this.contentSize - props.slidesStripSize >= 0 ? true : false;
-    console.log(
-      'calculated',
-      this.allSlidesFit,
-      this.contentSize,
-      props.slidesStripSize
-    );
   }
 
   render() {
@@ -451,6 +416,7 @@ class Slider extends PureComponent {
     const middle = (
       <div
         className="lv-slider-content"
+        ref={el => (this.content = el)}
         style={{
           width: `${this.contentWidth}%`,
           height: `${this.contentHeight}%`
@@ -509,7 +475,6 @@ class Slider extends PureComponent {
           backgroundColor: this.props.backgroundColor,
           flexDirection: this.props.isHorizontal ? 'row' : 'column'
         }}
-        onWheel={this.onWheel}
       >
         {start}
         {middle}

@@ -42,15 +42,20 @@ class Arrows extends PureComponent {
       (this.props.slidesRect.height * this.props.arrowsSize) / 2 +
       (this.props.slidesRect.top - this.props.mainDivRect.top) -
       arrowSize / 2;
+    const arrowsLeft =
+      this.props.sliderPosition === 'left'
+        ? this.props.sliderSize * this.props.mainDivRect.width
+        : 0;
+
     const sliderSize = this.props.SHOW_VIEWER ? this.props.sliderSize : 1;
     return (
       <div
         className="lv-arrows"
         style={{
+          left: `${arrowsLeft}px`,
           top: `${arrowsTop}px`,
-
           width:
-            ['left', 'right'].includes(this.props.SLIDER_POSITION) &&
+            ['left', 'right'].includes(this.props.sliderPosition) &&
             this.props.SHOW_SLIDER
               ? this.props.slidesRect.width * (1 - sliderSize)
               : this.props.slidesRect.width

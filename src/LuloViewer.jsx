@@ -75,7 +75,7 @@ class LuloViewer extends Component {
     this.numberOfSlides = this.props.imageUrls.length;
     this.slideColors = generateColorArray(this.numberOfSlides);
 
-    this.loading = true;
+    // this.loading = true;
     this.onWindowResize = this.onWindowResize.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -106,7 +106,7 @@ class LuloViewer extends Component {
   // }
 
   componentDidMount() {
-    this.loading = false;
+    // this.loading = false;
     window.oncontextmenu = e => {
       if (this.constants.ALLOW_MENU) e.preventDefault();
     };
@@ -131,14 +131,14 @@ class LuloViewer extends Component {
 
     // this.updateZoomControllerTransform(mainDivRect, slidesRect);
 
-    setTimeout(() => {
-      // const mainDivRect = this.mainDiv.getBoundingClientRect();
-      // const slidesRect = this.slides.getBoundingClientRect();
-      // this.setState({ slidesRect, mainDivRect }, () => {
-      //   this.updateZoomControllerTransform();
-      // });
-      this.onWindowResize();
-    }, 1000);
+    // setTimeout(() => {
+    //   // const mainDivRect = this.mainDiv.getBoundingClientRect();
+    //   // const slidesRect = this.slides.getBoundingClientRect();
+    //   // this.setState({ slidesRect, mainDivRect }, () => {
+    //   //   this.updateZoomControllerTransform();
+    //   // });
+    //   this.onWindowResize();
+    // }, 1000);
 
     // console.log('didMount rects', mainDivRect, slidesRect);
 
@@ -158,6 +158,7 @@ class LuloViewer extends Component {
     // document.addEventListener('wheel', this.onWheel);
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
+    this.slides.addEventListener('wheel', this.onWheel, { passive: false });
     // Create style object for slide animations
     this.slideAnimationsStylesheet = document.createElement('style');
     this.slideAnimationsStylesheet.type = 'text/css';
@@ -198,9 +199,6 @@ class LuloViewer extends Component {
       : mainDivRect.width * sliderSize;
 
     this.slideSize = slideSize; // Size of a single slide in slider in pixels
-
-    console.log('onwindowsresize *************************');
-    console.log(mainDivRect, slidesRect);
 
     this.updateZoomControllerTransform(mainDivRect, slidesRect);
     if (this.slider) this.slider.setInitialPosition();
@@ -269,8 +267,6 @@ class LuloViewer extends Component {
   }
 
   onMouseDown(e) {
-    console.log('layout-main onMouseDown', e.clientX, e.pageX, e.screenX);
-
     e.preventDefault();
     // e.stopPropagation();
     if (e.button === 0) {
@@ -284,11 +280,12 @@ class LuloViewer extends Component {
     } else {
       // Right click
       if (this.constants.ALLOW_MENU) {
+        console.log(e.clientY, e.screenY, e.pageY, this.state.mainDivRect);
         this.setState({
           showMenu: !this.state.showMenu,
           menuPosition: {
-            x: e.clientX - this.state.mainDivRect.left,
-            y: e.clientY - this.state.mainDivRect.top
+            x: e.pageX - this.state.mainDivRect.left,
+            y: e.pageY - this.state.mainDivRect.top
           }
         });
       }
@@ -309,15 +306,13 @@ class LuloViewer extends Component {
   }
 
   onWheel(e) {
-    // console.log('main onwheel', e.deltaX, e.deltaY, e.ctrlKey, e.button);
-
     e.preventDefault();
     e.stopPropagation();
 
     if (!this.changingSlide) {
       let threshold = this.constants.SWIPE_THRESHOLD;
       let timeout = this.constants.SLIDE_TRANSITION_TIMEOUT;
-      if (this.isFirefox) threshold = threshold * 1.5;
+      if (this.isFirefox) threshold = threshold * 1.3;
       const activeSlide = this.getActiveSlide();
       if (Math.abs(e.deltaX) > threshold) {
         console.log('THRESHOLD');
@@ -364,11 +359,6 @@ class LuloViewer extends Component {
     } else {
       this.changeSlide(1);
     }
-    // if (this.slider) {
-    //   console.log('Parent calling *************');
-
-    //   this.slider.constrainMovement({left: this.slider.state.left, top: this.slider.state.top})
-    // }
   }
 
   getNextSlideIndex(currentIndex, amount) {
@@ -549,7 +539,6 @@ class LuloViewer extends Component {
   }
 
   saveSlidePosition() {
-    console.log('saving slide');
     const activeSlide = this.getActiveSlide();
     const imagesInfo = JSON.parse(JSON.stringify(this.state.imagesInfo));
     const imageInfo = JSON.parse(
@@ -820,7 +809,7 @@ class LuloViewer extends Component {
       if (self.state.imagesInfo[imageIdx] === null) {
         allLoaded = false;
         if (!this.imageLoading && !this.imageLoadFailedArr.includes(imageIdx))
-        self.startImagePreload(imageIdx);
+          self.startImagePreload(imageIdx);
         return;
       }
     });
@@ -1117,11 +1106,7 @@ class LuloViewer extends Component {
           height: `${slidesHeight}%`
         }}
       >
-        <div style={{ overflow: 'hidden' }}>
-          {arrows}
-          {zoomController}
-          {photoSlides}
-        </div>
+        {photoSlides}
       </div>
     ) : null;
 
@@ -1159,26 +1144,23 @@ class LuloViewer extends Component {
     return (
       <div className="lv-viewer" ref={el => (this.mainDiv = el)}>
         {/* if (this.loading) return ; */}
-        {this.loading ? (
-          <div>.!.</div>
-        ) : (
-          <div
-            className="lv-layout-main"
-            style={{
-              width: `${this.state.mainDivRect.width}px`,
-              height: `${this.state.mainDivRect.height}px`,
-              flexDirection,
-              backgroundColor: this.constants.BACKGROUND_COLOR
-            }}
-            onWheel={this.onWheel}
-            onMouseDown={this.onMouseDown}
-          >
-            {start}
-            {middle}
-            {end}
-          </div>
-        )}
 
+        <div
+          className="lv-layout-main"
+          style={{
+            width: `${this.state.mainDivRect.width}px`,
+            height: `${this.state.mainDivRect.height}px`,
+            flexDirection,
+            backgroundColor: this.constants.BACKGROUND_COLOR
+          }}
+          onMouseDown={this.onMouseDown}
+        >
+          {start}
+          {middle}
+          {end}
+        </div>
+        {arrows}
+        {zoomController}
         {menu}
       </div>
     );
