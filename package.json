@@ -2,7 +2,7 @@
   "name": "lulo-viewer",
   "description": "Customizable React image viewer",
   "version": "0.1.0-beta.4",
-  "main": "src/index.js",
+  "main": "build/index.js",
   "private": false,
   "engines": {
     "npm": "6.4.1",
