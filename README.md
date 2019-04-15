@@ -64,9 +64,8 @@ const images = [
   allowCyclic={true}
   slideBgdColor="teal"
   randomSlideColors={true}
-  slideTransitionDuration={500} />
-...
-
+  slideTransitionDuration={0.3}
+/>
 ```
 
 Only imageUrls prop is required. LuloViewer will inherit dimensions from it's parent `<div>`.
