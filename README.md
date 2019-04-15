@@ -75,7 +75,7 @@ Only imageUrls prop is required. LuloViewer will inherit dimensions from it's pa
 
 | Prop                    |  Type   | Description                                                                                            |
 | :---------------------- | :-----: | :----------------------------------------------------------------------------------------------------- |
-| imageUrls               |  array  | Array of image URLs.                                                                                   |
+| imageUrls               |  array of strings  | Array of image URLs. The only prop you MUST supply. Standard web formats accepted, including animated `gif`.                                                                                |
 | showViewer              | boolean | Show main image screen.                                                                                |
 | showArrows              | boolean | Show arrows on main image screen.                                                                      |
 | showSlider              | boolean | Show slider.                                                                                           |
