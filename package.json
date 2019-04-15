@@ -4,10 +4,6 @@
   "version": "1.0.1",
   "main": "build/index.js",
   "private": false,
-  "engines": {
-    "npm": "6.4.1",
-    "node": "10.15.1"
-  },
   "dependencies": {
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
