@@ -24,7 +24,7 @@ Fully customizable React image viewer. It features image preloader, fullscreen m
 From root dir of your project:
 
 ```shell
-$ yarn add lulo-viewer --save
+$ yarn add lulo-viewer
 ```
 
 ---
