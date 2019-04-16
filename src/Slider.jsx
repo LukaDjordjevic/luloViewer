@@ -40,7 +40,8 @@ class Slider extends PureComponent {
     // this.calculateLayoutDimensions();
 
     this.slidesStrip.onanimationend = this.onAnimationEnd;
-    this.content.addEventListener('wheel', this.onWheel, { passive: false });
+    if (this.content)
+      this.content.addEventListener('wheel', this.onWheel, { passive: false });
   }
 
   onAnimationEnd() {

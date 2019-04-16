@@ -158,7 +158,10 @@ class LuloViewer extends Component {
     // document.addEventListener('wheel', this.onWheel);
     window.addEventListener('resize', this.onWindowResize);
     document.addEventListener('keydown', this.onKeyDown, false);
-    this.slides.addEventListener('wheel', this.onWheel, { passive: false });
+    if (this.slides)
+      this.slides.addEventListener('wheel', this.onWheel, { passive: false });
+    if (this.arrows)
+      this.arrows.addEventListener('wheel', this.onWheel, { passive: false });
     // Create style object for slide animations
     this.slideAnimationsStylesheet = document.createElement('style');
     this.slideAnimationsStylesheet.type = 'text/css';
@@ -179,6 +182,14 @@ class LuloViewer extends Component {
     );
     window.removeEventListener('resize', this.onWindowResize);
     document.removeEventListener('keydown', this.onKeyDown, false);
+    if (this.slides)
+      this.slides.removeEventListener('wheel', this.onWheel, {
+        passive: false
+      });
+    if (this.arrows)
+      this.arrows.removeEventListener('wheel', this.onWheel, {
+        passive: false
+      });
   }
 
   onWindowResize() {
@@ -875,24 +886,26 @@ class LuloViewer extends Component {
     //****************** arrows *****************
     //*******************************************
     const arrows = this.state.showArrows ? (
-      <Arrows
-        arrowsSize={this.constants.ARROWS_SIZE}
-        sliderSize={this.constants.SLIDER_SIZE}
-        showViewer={this.state.showViewer}
-        arrowsPadding={this.constants.ARROWS_PADDING}
-        allowCyclic={this.constants.ALLOW_CYCLIC}
-        highlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
-        defaultColor={this.constants.ARROW_DEFAULT_COLOR}
-        sliderPosition={this.state.sliderPosition}
-        showSlider={this.state.showSlider}
-        mainDivRect={this.state.mainDivRect}
-        slidesRect={this.state.slidesRect}
-        leftArrowColor={this.state.leftArrowColor}
-        rightArrowColor={this.state.rightArrowColor}
-        currentSlideIndex={this.state.currentSlideIndex}
-        onArrowClick={this.onArrowClick}
-        numberOfSlides={this.numberOfSlides}
-      />
+      <div ref={el => (this.arrows = el)}>
+        <Arrows
+          arrowsSize={this.constants.ARROWS_SIZE}
+          sliderSize={this.constants.SLIDER_SIZE}
+          showViewer={this.state.showViewer}
+          arrowsPadding={this.constants.ARROWS_PADDING}
+          allowCyclic={this.constants.ALLOW_CYCLIC}
+          highlightColor={this.constants.ARROW_HIGHLIGHT_COLOR}
+          defaultColor={this.constants.ARROW_DEFAULT_COLOR}
+          sliderPosition={this.state.sliderPosition}
+          showSlider={this.state.showSlider}
+          mainDivRect={this.state.mainDivRect}
+          slidesRect={this.state.slidesRect}
+          leftArrowColor={this.state.leftArrowColor}
+          rightArrowColor={this.state.rightArrowColor}
+          currentSlideIndex={this.state.currentSlideIndex}
+          onArrowClick={this.onArrowClick}
+          numberOfSlides={this.numberOfSlides}
+        />
+      </div>
     ) : null;
 
     //*******************************************
