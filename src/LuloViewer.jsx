@@ -886,7 +886,7 @@ class LuloViewer extends Component {
     //****************** arrows *****************
     //*******************************************
     const arrows = this.state.showArrows ? (
-      <div ref={el => (this.arrows = el)}>
+      <div ref={el => (this.arrows = el)} onMouseDown={this.onMouseDown}>
         <Arrows
           arrowsSize={this.constants.ARROWS_SIZE}
           sliderSize={this.constants.SLIDER_SIZE}
